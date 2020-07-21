@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sensorweb.datacenter.dao.PositionMapper">
+    <sql id="insertFields">
+        position_identifier, position_longitude, position_latitude, position_altitude
+    </sql>
+
+    <sql id="selectFields">
+        position_id, position_identifier, position_longitude, position_latitude, position_altitude
+    </sql>
+
+    <insert id="insertData" parameterType="Position">
+        INSERT INTO position (<include refid="insertFields"></include>)
+        VALUES (#{identifier}, #{longitude}, #{latitude}. #{altitude})
+    </insert>
+
+    <delete id="deleteByIdentifier">
+        DELETE FROM position
+        WHERE position_identifier = #{identifier}
+    </delete>
+
+    <delete id="deleteByIdentifierNoNum">
+        DELETE FROM position
+        WHERE position_identifier like concat(#{identifier},%)
+    </delete>
+
+    <delete id="deleteById" parameterType="int">
+        DELETE FROM position
+        WHERE position_id = #{id}
+    </delete>
+
+    <select id="selectById" parameterType="int" resultMap="position">
+        SELECT <include refid="selectFields"></include>
+        FROM position
+        WHERE position_id = #{id}
+    </select>
+
+    <select id="selectByIdentifier" resultMap="position">
+        SELECT <include refid="selectFields"></include>
+        FROM position
+        WHERE position_identifier = #{identifier}
+    </select>
+
+    <select id="selectByIdentifierNoNum" resultMap="position">
+        SELECT <include refid="selectFields"></include>
+        FROM position
+        WHERE position_identifier like concat(#{identifier},%)
+    </select>
+
+    <select id="selectByEnvelope" resultMap="position">
+        SELECT <include refid="selectFields"></include>
+        FROM position
+        WHERE position_longtude <![CDATA[<=]]> #{maxLon} AND position_latitude <![CDATA[<=]]> #{maxLat} AND position_longitude <![CDATA[>=]]> #{minLon} AND position_latitude <![CDATA[>=]]> #{minLat}
+    </select>
+
+    <resultMap id="position" type="Position">
+        <id property="id" column="position_id"/>
+        <result property="identifier" column="position_identifier"/>
+        <result property="longitude" column="position_longitude"/>
+        <result property="latitude" column="position_latitude"/>
+        <result property="altitude" column="position_altitude"/>
+    </resultMap>
+
+</mapper>

@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sensorweb.datacenter.dao.ValidTimeMapper">
+    <sql id="insertFields">
+        validtime_identifier, validtime_begin, validtime_end
+    </sql>
+
+    <sql id="selectFields">
+        validtime_id, validtime_identifier, validtime_begin, validtime_end
+    </sql>
+
+    <insert id="insertData" parameterType="ValidTime">
+        INSERT INTO validtime (<include refid="insertFields"></include>)
+        VALUES (#{identifier}, #{beginPosition}, #{endPosition})
+    </insert>
+
+    <delete id="deleteByIdentifier">
+        DELETE FROM validtime
+        WHERE validtime_identifier = #{identifier}
+    </delete>
+
+    <delete id="deleteById" parameterType="int">
+        DELETE FROM validtime
+        WHERE validtime_id = #{id}
+    </delete>
+
+    <select id="selectById" parameterType="int" resultMap="validtime">
+        SELECT <include refid="selectFields"></include>
+        FROM validtime
+        WHERE validtime_id = #{id}
+    </select>
+
+    <select id="selectByIdentifier" resultMap="validtime">
+        SELECT <include refid="selectFields"></include>
+        FROM validtime
+        WHERE validtime_identifier = #{identifier}
+    </select>
+
+    <select id="selectByTime" resultMap="validtime">
+        SELECT <include refid="selectFields"></include>
+        FROM validtime
+        WHERE validtime_begin <![CDATA[>=]]> #{begin} AND validtime_end <![CDATA[<=]]> #{end}
+    </select>
+
+    <select id="selectByBeginTime" resultMap="validtime">
+        SELECT <include refid="selectFields"></include>
+        FROM validtime
+        WHERE validtime_begin <![CDATA[>=]]> #{begin}
+    </select>
+
+    <select id="selectByEndTime" resultMap="validtime">
+        SELECT <include refid="selectFields"></include>
+        FROM validtime
+        WHERE validtime_end <![CDATA[<]]> #{end}
+    </select>
+
+    <resultMap id="validtime" type="ValidTime">
+        <id property="id" column="validtime_id"/>
+        <result property="identifier" column="validtime_identifier"/>
+        <result property="beginPosition" column="validtime_begin"/>
+        <result property="endPosition" column="validtime_end"/>
+    </resultMap>
+
+</mapper>

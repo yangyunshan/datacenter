@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+<!--    <link rel=stylesheet href="../static/plugin/codemirror/doc/docs.css">-->
+
+<!--    <link rel="stylesheet" href="../static/plugin/codemirror/lib/codemirror.css">-->
+<!--    <script src="../static/plugin/codemirror/lib/codemirror.js"></script>-->
+<!--    <script src="../static/plugin/codemirror/mode/xml/xml.js"></script>-->
+
+    <link rel=stylesheet th:href="@{/plugin/codemirror/doc/docs.css}">
+    <link rel="stylesheet" th:href="@{/plugin/codemirror/lib/codemirror.css}">
+
+    <link rel="stylesheet" th:href="@{/plugin/codemirror/addon/fold/foldgutter.css}">
+
+    <script th:src="@{/plugin/codemirror/lib/codemirror.js}"></script>
+    <script th:src="@{/plugin/codemirror/mode/xml/xml.js}"></script>
+
+    <script th:src="@{/plugin/codemirror/addon/fold/foldcode}"></script>
+    <script th:src="@{/plugin/codemirror/addon/fold/foldgutter}"></script>
+    <script th:src="@{/plugin/codemirror/addon/fold/brace-fold}"></script>
+    <script th:src="@{/plugin/codemirror/addon/fold/comment-fold}"></script>
+
+    <title>首页</title>
+    <style>#content {border-top: 1px solid black; border-bottom: 1px solid black;}</style>
+</head>
+<body>
+    <div>
+        <p>Welcome!</p>
+    </div>
+
+    <div style="width: 50%; float: left">
+        <div id="addContent" style="padding: 10px; border: 2px solid red; margin: 10px;">
+            <label>传感器注册:</label>
+            <form th:action="@{/sensor/add}" method="post" enctype="multipart/form-data" id="addFile">
+                <input type="file" name="file">
+                <button type="submit" id="uploadFile">注册</button>
+            </form>
+        </div>
+
+        <div id="query_condition" style="padding: 10px; border: 2px solid red; margin: 10px;">
+            <label>查询条件:</label>
+
+            <form th:action="@{/sensor/queryAllSensor}" method="get" id="queryAll">
+                <label>查询所有传感器：</label>
+                <button type="submit" id="queryAll_btn">查询</button>
+            </form>
+            <form th:action="@{/sensor/queryByIdentifier}" method="get" id="form1">
+                <label>按唯一标识符查询：</label>
+                <input type="text" id="identifier" name="identifier">
+                <button type="submit" id="identifier_btn">查询</button>
+            </form>
+            <form th:action="@{/sensor/queryByName}" method="get" id="queryByName">
+                <label>按名称查询：</label>
+                <input type="text" name="name">
+                <button type="submit" id="queryByName_btn">查询</button>
+            </form>
+            <form th:action="@{/sensor/queryByStatus}" method="get" id="queryByStatus">
+                <label>按状态查询：</label>
+                <input type="text" name="status">
+                <button type="submit" id="queryByStatus_btn">查询</button>
+            </form>
+        </div>
+
+        <div id="result" style="padding: 10px; border: 2px solid red; margin: 10px;">
+            <label>查询结果：</label>
+            <table border="1px" cellspacing="0" cellpadding="5px">
+                <tr>
+                    <th>id</th>
+                    <th>identifier</th>
+                    <th>name</th>
+                    <th>disabled</th>
+                    <th>typeOf</th>
+                    <th>isType</th>
+                    <th>isAggregation</th>
+                    <th>isMobile</th>
+                    <th>isInsitu</th>
+                </tr>
+                <tr th:each="procedures:${procedures}">
+                    <td th:text="${procedures.procedureId}"></td>
+                    <td><a th:href="@{${procedures.descriptionFile}}" th:text="${procedures.identifier}"></a></td>
+                    <td th:text="${procedures.name}"></td>
+                    <td th:text="${procedures.disabled}"></td>
+                    <td th:text="${procedures.typeOf}"></td>
+                    <td th:text="${procedures.isType}"></td>
+                    <td th:text="${procedures.isAggregation}"></td>
+                    <td th:text="${procedures.isMobile}"></td>
+                    <td th:text="${procedures.isInsitu}"></td>
+                </tr>
+            </table>
+        </div >
+    </div>
+
+    <div id="content" style="padding: 10px; margin: 10px; width: 45%; float: right">
+        <textarea id="code" name="code" th:text="${sensorMLContent}"></textarea>
+        <script>
+            var editor = CodeMirror.fromTextArea(document.getElementById("code"), {
+                mode: "text/html",
+                lineNumbers: true,
+                lineWrapping: true,
+                foldGutter: true,
+                smartIndent: true,
+                lineSeparator: "\n\r"
+            });
+        </script>
+    </div>
+
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.5.1/jquery.min.js" crossorigin="anonymous"></script>
+    <script th:src="@{/js/index.js}"></script>
+</body>
+</html>

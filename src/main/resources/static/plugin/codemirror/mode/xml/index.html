@@ -1,0 +1,23 @@
+<!doctype html>
+
+<title>CodeMirror: XML mode</title>
+<meta charset="utf-8"/>
+<link rel=stylesheet href="../../doc/docs.css">
+
+<link rel="stylesheet" href="../../lib/codemirror.css">
+<script src="../../lib/codemirror.js"></script>
+<script src="xml.js"></script>
+<style>.CodeMirror {border-top: 1px solid black; border-bottom: 1px solid black;}</style>
+
+<article>
+<h2>XML mode</h2>
+<form><textarea id="code" name="code">
+
+</textarea></form>
+    <script>
+      var editor = CodeMirror.fromTextArea(document.getElementById("code"), {
+        mode: "text/html",
+        lineNumbers: true
+      });
+    </script>
+  </article>

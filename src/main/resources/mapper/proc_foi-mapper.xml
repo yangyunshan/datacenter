@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sensorweb.datacenter.dao.ProcFoiMapper">
+    <sql id="insertFields">
+        procedure_id, feature_of_interest_id
+    </sql>
+
+    <sql id="selectFields">
+        procedure_id, feature_of_interest_id
+    </sql>
+
+    <insert id="insertData" parameterType="ProcFoi">
+        INSERT INTO proc_foi (<include refid="insertFields"></include>)
+        VALUES (#{procedureId}, #{foiId})
+    </insert>
+
+    <select id="selectProcFois" resultMap="procfoi">
+        SELECT (<include refid="selectFields"></include>)
+        FROM proc_foi
+        WHERE 1 = 1
+        <if test="procedureIds!=null">
+            <foreach collection="procedureIds" item="procedureId" open="and procedure_id IN(" close=")" separator=",">
+                #{procedureId}
+            </foreach>
+        </if>
+        <if test="fois!=null">
+            <foreach collection="fois" item="foi" open="and feature_of_interest_id IN(" close=")" separator=",">
+                #{foi}
+            </foreach>
+        </if>
+    </select>
+
+    <resultMap id="procfoi" type="ProcFoi">
+        <id property="procedureId" column="procedure_id"/>
+        <result property="foiId" column="feature_of_interest_id"/>
+    </resultMap>
+
+</mapper>

@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sensorweb.datacenter.dao.ObservationMapper">
+    <sql id="insertFields">
+        observation_id, observation_time, procedure_id, feature_of_interest_id, phenomenon_id, observation_value, filepath
+    </sql>
+
+    <sql id="selectFields">
+        observation_id, observation_time, procedure_id, feature_of_interest_id, phenomenon_id, observation_value, filepath
+    </sql>
+
+    <insert id="insertData" parameterType="Observation">
+        INSERT INTO observation (<include refid="insertFields"></include>)
+        VALUES (#{id}, #{time}, #{procedureId}, #{foiId}, #{phenomenonId}, #{value}, #{filePath})
+    </insert>
+
+    <select id="selectObservations" resultMap="observation">
+        SELECT <include refid="selectFields"></include>
+        FROM observation
+        WHERE 1 = 1
+        <if test="procedureIds!=null">
+            <foreach collection="procedureIds" item="procedureId" open="and procedure_id IN(" close=")" separator=",">
+                #{procedureId}
+            </foreach>
+        </if>
+        <if test="fois!=null">
+            <foreach collection="procedureIds" item="fois" open="and feature_of_interest_id IN(" close=")" separator=",">
+                #{fois}
+            </foreach>
+        </if>
+    </select>
+
+    <resultMap id="observation" type="Observation">
+        <id property="id" column="observation_id"/>
+        <result property="time" column="observation_time"/>
+        <result property="procedureId" column="procedure_id"/>
+        <result property="foiId" column="feature_of_interest_id"/>
+        <result property="phenomenonId" column="phenomenon_id"/>
+        <result property="value" column="observation_value"/>
+        <result property="filePath" column="filepath"/>
+    </resultMap>
+
+</mapper>

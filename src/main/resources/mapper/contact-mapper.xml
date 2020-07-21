@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sensorweb.datacenter.dao.ContactMapper">
+    <sql id="insertFields">
+        contact_identifier, contact_individualname, contact_positionname, contact_organizationname, contact_role
+    </sql>
+
+    <sql id="selectFields">
+        c.contact_id contact_id, c.contact_identifier contact_identifier, c.contact_individualname contact_individualname, c.contact_positionname contact_positionname, c.contact_organizationname contact_organizationname, c.contact_role contact_role,
+        t.telephone_id telephone_id, t.telephone_identifier telephone_identifier, t.telephone_voice telephone_voice, t.telephone_facsimile telephone_facsimile,
+        a.address_id address_id, a.address_identifier address_identifier, a.address_deliverypoint address_deliverypoint, a.address_city address_city, a.address_administrativearea address_administrativearea, a.address_postalcode address_postalcode, a.address_country address_country, a.address_electronicmailaddress address_electronicmailaddress
+    </sql>
+
+    <insert id="insertData" parameterType="Classification">
+        INSERT INTO contact (<include refid="insertFields"></include>)
+        VALUES (#{identifier}, #{individualName}, #{positionName}, #{organizationName}, #{role})
+    </insert>
+
+    <delete id="deleteByIdentifier">
+        DELETE FROM contact
+        WHERE contact_identifier = #{identifier}
+    </delete>
+
+    <delete id="deleteByIdentifierNoNum">
+        DELETE FROM contact
+        WHERE contact_identifier like concat(#{identifier},%)
+    </delete>
+
+    <delete id="deleteById" parameterType="int">
+        DELETE FROM contact
+        WHERE contact_id = #{id}
+    </delete>
+
+    <update id="updateRoleById">
+        UPDATE contact SET contact_role = #{role}
+        WHERE contact_id = #{id}
+    </update>
+
+    <update id="updateNameById">
+        UPDATE contact SET contact_name = #{name}
+        WHERE contact_id = #{id}
+    </update>
+
+    <select id="selectById" parameterType="int" resultMap="contact">
+        SELECT <include refid="selectFields"></include>
+        FROM (contact c JOIN telephone t ON c.contact_identifier = t.telephone_identifier) JOIN address a ON a.address_identifier = c.contact_identifier
+        WHERE c.contact_id = #{id}
+    </select>
+
+    <select id="selectByIdentifier" resultMap="contact">
+        SELECT <include refid="selectFields"></include>
+        FROM (contact c JOIN telephone t ON c.contact_identifier = t.telephone_identifier) JOIN address a ON a.address_identifier = c.contact_identifier
+        WHERE c.contact_identifier = #{identifier}
+    </select>
+
+    <select id="selectByIdentifierNoNum" resultMap="contact">
+        SELECT <include refid="selectFields"></include>
+        FROM (contact c JOIN telephone t ON c.contact_identifier = t.telephone_identifier) JOIN address a ON a.address_identifier = c.contact_identifier
+        WHERE c.contact_identifier like concat(#{identifier},%)
+    </select>
+
+    <select id="selectByName" resultMap="contact">
+        SELECT <include refid="selectFields"></include>
+        FROM (contact c JOIN telephone t ON c.contact_identifier = t.telephone_identifier) JOIN address a ON a.address_identifier = c.contact_identifier
+        WHERE c.contact_organizationname = #{organizationName}
+    </select>
+
+    <select id="selectByRole" resultMap="contact">
+        SELECT <include refid="selectFields"></include>
+        FROM (contact c JOIN telephone t ON c.contact_identifier = t.telephone_identifier) JOIN address a ON a.address_identifier = c.contact_identifier
+        WHERE c.contact_role = #{role}
+    </select>
+
+    <resultMap id="contact" type="Contact">
+        <id property="id" column="contact_id"/>
+        <result property="identifier" column="contact_identifier"/>
+        <result property="individualName" column="contact_individualname"/>
+        <result property="positionName" column="contact_positionname"/>
+        <result property="organizationName" column="contact_organizationname"/>
+        <result property="role" column="contact_role"/>
+        <association property="telephone">
+            <id property="id" column="telephone_id"/>
+            <result property="identifier" column="telephone_identifier"/>
+            <result property="voice" column="telephone_voice"/>
+            <result property="facsimile" column="telephone_facsimile"/>
+        </association>
+        <association property="address">
+            <id property="id" column="address_id"/>
+            <result property="identifier" column="address_identifier"/>
+            <result property="deliveryPoint" column="address_deliverypoint"/>
+            <result property="city" column="address_city"/>
+            <result property="administrativeArea" column="address_administrativearea"/>
+            <result property="postalCode" column="address_postalCode"/>
+            <result property="country" column="address_country"/>
+            <result property="electronicMailAddress" column="address_electronicmailaddress"/>
+        </association>
+    </resultMap>
+
+</mapper>

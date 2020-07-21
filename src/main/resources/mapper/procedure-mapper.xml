@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sensorweb.datacenter.dao.ProcedureMapper">
+    <sql id="insertFields">
+        proceduredescriptionformat, identifier, name, description, disabled, descriptionfile, typeof, istype, isaggregation, ismobile, isinsitu
+    </sql>
+
+    <sql id="selectFields">
+        procedureid, proceduredescriptionformat, identifier, name, description, disabled, descriptionfile, typeof, istype, isaggregation, ismobile, isinsitu
+    </sql>
+
+    <insert id="insertData" parameterType="Procedure">
+        INSERT INTO procedure (<include refid="insertFields"></include>)
+        VALUES (#{procedureDescriptionFormat}, #{identifier}, #{name}, #{description}, #{disabled}, #{descriptionFile}, #{typeOf}, #{isType}, #{isAggregation}, #{isMobile}, #{isInsitu})
+    </insert>
+
+    <delete id="deleteByIdentifier">
+        DELETE FROM procedure
+        WHERE identifier = #{identifier}
+    </delete>
+
+    <delete id="deleteById" parameterType="int">
+        DELETE FROM procedure
+        WHERE procedureid = #{id}
+    </delete>
+
+    <update id="updateStatusByIdentifier">
+        UPDATE procedure SET disabled = #{status}
+        WHERE identifier = #{identifier}
+    </update>
+
+    <select id="selectById" parameterType="int" resultMap="procedure">
+        SELECT <include refid="selectFields"></include>
+        FROM procedure
+        WHERE procedureid = #{id}
+    </select>
+
+    <select id="selectAll" parameterType="int" resultMap="procedure">
+        SELECT <include refid="selectFields"></include>
+        FROM procedure
+    </select>
+
+    <select id="selectByIdentifier" resultMap="procedure">
+        SELECT <include refid="selectFields"></include>
+        FROM procedure
+        WHERE identifier = #{identifier}
+    </select>
+
+    <select id="selectByFuzzyIdentifier" resultMap="procedure">
+        SELECT <include refid="selectFields"></include>
+        FROM procedure
+        WHERE identifier like concat('%',#{identifier},'%')
+    </select>
+
+    <select id="selectByName" resultMap="procedure">
+        SELECT <include refid="selectFields"></include>
+        FROM procedure
+        WHERE name like concat('%',#{name},'%')
+    </select>
+
+    <select id="selectByDescription" resultMap="procedure">
+        SELECT <include refid="selectFields"></include>
+        FROM procedure
+        WHERE description like concat('%',#{description},'%')
+    </select>
+
+    <select id="selectByStatus" resultMap="procedure">
+        SELECT <include refid="selectFields"></include>
+        FROM procedure
+        WHERE disabled = #{status}
+    </select>
+
+    <select id="selectByIsType" resultMap="procedure">
+        SELECT <include refid="selectFields"></include>
+        FROM procedure
+        WHERE istype = #{isType}
+    </select>
+
+    <select id="selectByIsAggregation" resultMap="procedure">
+        SELECT <include refid="selectFields"></include>
+        FROM procedure
+        WHERE Isaggregation = #{isAggregation}
+    </select>
+
+    <select id="selectByIsMobile" resultMap="procedure">
+        SELECT <include refid="selectFields"></include>
+        FROM procedure
+        WHERE ismobile = #{isMobile}
+    </select>
+    <select id="selectByIsInsitu" resultMap="procedure">
+        SELECT <include refid="selectFields"></include>
+        FROM procedure
+        WHERE isinsitu = #{isInsitu}
+    </select>
+
+    <resultMap id="procedure" type="Procedure">
+        <id property="procedureId" column="address_id"/>
+        <result property="procedureDescriptionFormat" column="proceduredescriptionformat"/>
+        <result property="identifier" column="identifier"/>
+        <result property="description" column="description"/>
+        <result property="disabled" column="disabled"/>
+        <result property="descriptionFile" column="descriptionfile"/>
+        <result property="typeOf" column="typeof"/>
+        <result property="isType" column="istype"/>
+        <result property="isAggregation" column="isaggregation"/>
+        <result property="isMobile" column="ismobile"/>
+        <result property="isInstitu" column="isinstitu"/>
+    </resultMap>
+
+</mapper>
