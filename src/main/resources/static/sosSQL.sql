@@ -164,3 +164,15 @@ CREATE TABLE observation (observation_id VARCHAR(255) PRIMARY KEY, observation_d
 
 
 CREATE TABLE phenomenon (phenomenon_id VARCHAR(255) PRIMARY KEY, phenomenon_description TEXT, unit VARCHAR(45));
+
+-- Truncate Table
+TRUNCATE TABLE procedure;
+TRUNCATE TABLE feature_of_interest;
+TRUNCATE TABLE observation;
+TRUNCATE TABLE offering;
+
+-- Drop table
+DROP TABLE procedure;
+DROP TABLE feature_of_interest;
+DROP TABLE observation;
+DROP TABLE offering;
