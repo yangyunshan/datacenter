@@ -14,7 +14,13 @@ import java.util.Set;
 public interface ObservationMapper {
     int insertData(Observation observation);
 
-    List<Observation> selectObservations(@Param("procedureIds") Set<String> procedureIds,
-                                         @Param("fois") Set<String> fois,
-                                         @Param("temporal") Instant[] temporal);
+    List<Observation> selectObservationsByConditions(@Param("offeringIds") Set<String> offerings,
+                                                     @Param("procedureIds") Set<String> procedureIds,
+                                                     @Param("fois") Set<String> fois,
+                                                     @Param("observedProperties") Set<String> observedProperties,
+                                                     @Param("begin") Instant begin,
+                                                     @Param("end") Instant end);
+
+    List<Observation> selectObservationsBySpatial(@Param("minX") double minX, @Param("minY") double minY,
+                                                  @Param("maxX") double maxX, @Param("maxY") double maxY);
 }

@@ -420,11 +420,11 @@ public class HandleSensorMLService {
         Procedure procedure = new Procedure();
 
         if (physicalSystem!=null) {
-            procedure.setIdentifier(physicalSystem.getUniqueIdentifier());
+            procedure.setId(physicalSystem.getUniqueIdentifier());
             procedure.setDescription(physicalSystem.getDescription());
             procedure.setDescriptionFile(url);
-            procedure.setProcedureDescriptionFormat(physicalSystem.getQName().getNamespaceURI());
-            procedure.setTypeOf(physicalSystem.getTypeOf().getHref());
+            procedure.setDescriptionFormat(physicalSystem.getQName().getNamespaceURI());
+//            procedure.setTypeOf(physicalSystem.getTypeOf().getHref());
         }
         return procedure;
     }

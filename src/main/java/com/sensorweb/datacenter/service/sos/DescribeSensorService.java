@@ -4,6 +4,7 @@ import com.sensorweb.datacenter.dao.ProcedureMapper;
 import com.sensorweb.datacenter.entity.Procedure;
 import com.sensorweb.datacenter.util.DataCenterUtils;
 import net.opengis.sensorml.v20.AbstractProcess;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.vast.ows.OWSException;
@@ -42,46 +43,56 @@ public class DescribeSensorService {
         return describeSensorRequest;
     }
 
-    public Procedure getProcedureById(String produceId) {
-        return procedureMapper.selectByIdentifier(produceId);
-    }
-
+    /**
+     * 解析DescribeSensorRequest，获取procedureId参数
+     * @param request
+     * @return
+     */
     public String getProcedureId(DescribeSensorRequest request) {
         return request.getProcedureID();
     }
 
-    public TimeExtent getTimeExtend(DescribeSensorRequest request) {
-        return request.getTime();
+    /**
+     * 解析DescribeSensorRequest，获取procedureDescriptionFormat参数
+     * @param request
+     * @return
+     */
+    public String getDescriptionFormat(DescribeSensorRequest request) {
+        return request.getFormat();
     }
 
     /**
      * 根据查询返回的Procedure生成DescribeSensorResponse文档，以字符串格式返回
-     * @param procedure
+     * @param
      * @return
      * @throws OWSException
      * @throws FileNotFoundException
      * @throws XMLReaderException
      */
-    public String getDescribeSensorResponse(Procedure procedure) throws OWSException, XMLReaderException, DOMHelperException {
+    public String getDescribeSensorResponse(String procedureId, String descriptionFormat) throws OWSException, XMLReaderException, DOMHelperException {
         String result = null;
-        if (procedure!=null) {
-            DescribeSensorResponse response = new DescribeSensorResponse();
-            DOMHelper domHelper = new DOMHelper(new ByteArrayInputStream(DataCenterUtils.readFromFile(procedure.getDescriptionFile()).getBytes()),false);
+        if (!StringUtils.isBlank(procedureId)) {
+            Procedure procedure = procedureMapper.selectByIdAndFormat(procedureId, descriptionFormat);
+            if (procedure!=null) {
+                DescribeSensorResponse response = new DescribeSensorResponse();
+                DOMHelper domHelper = new DOMHelper(new ByteArrayInputStream(DataCenterUtils.readFromFile(procedure.getDescriptionFile()).getBytes()),false);
 
-            //获取sensorml的AbstractProcess对象
-            SMLUtils smlUtils = new SMLUtils(SMLUtils.SENSORML);
-            AbstractProcess abstractProcess = smlUtils.readProcess(domHelper, domHelper.getRootElement());
-            response.setProcedureDescription(abstractProcess);
-            response.setProcedureDescriptionFormat(procedure.getProcedureDescriptionFormat());
+                //获取sensorml的AbstractProcess对象
+                SMLUtils smlUtils = new SMLUtils(SMLUtils.SENSORML);
+                AbstractProcess abstractProcess = smlUtils.readProcess(domHelper, domHelper.getRootElement());
+                response.setProcedureDescription(abstractProcess);
+                response.setProcedureDescriptionFormat(procedure.getDescriptionFormat());
 
-            //生成Response对象，并且写入Element
-            DescribeSensorResponseWriterV20 responseWriter = new DescribeSensorResponseWriterV20();
-            DOMHelper domHelper1 = new DOMHelper();
-            Element element = responseWriter.buildXMLResponse(domHelper1, response, "2.0");
+                //生成Response对象，并且写入Element
+                DescribeSensorResponseWriterV20 responseWriter = new DescribeSensorResponseWriterV20();
+                DOMHelper domHelper1 = new DOMHelper();
+                Element element = responseWriter.buildXMLResponse(domHelper1, response, "2.0");
 
-            //Element转字符串，返回
-            result = DataCenterUtils.element2String(element);
+                //Element转字符串，返回
+                result = DataCenterUtils.element2String(element);
+            }
         }
+
         return result;
     }
 }

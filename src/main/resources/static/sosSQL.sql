@@ -146,3 +146,21 @@ DROP TABLE phen_off;
 DROP TABLE foi_off;
 DROP TABLE proc_phen;
 DROP TABLE proc_off;
+
+
+
+
+-- 数据库修改
+CREATE TABLE procedure (procedure_id VARCHAR(255) NOT NULL PRIMARY KEY, procedure_name VARCHAR(255), procedure_description TEXT, description_format VARCHAR(255) NOT NULL, description_file VARCHAR(255) NOT NULL);
+
+CREATE TABLE offering (offering_id VARCHAR(255) PRIMARY KEY, offering_name VARCHAR(255), procedure_id VARCHAR(255), observable_property TEXT);
+
+
+
+CREATE TABLE feature_of_interest (feature_of_interest_id VARCHAR(255) PRIMARY KEY, feature_of_interest_name VARCHAR(255), feature_of_interest_description TEXT, geom GEOMETRY);
+
+CREATE TABLE observation (observation_id VARCHAR(255) PRIMARY KEY, observation_description TEXT, observation_time TIMESTAMP, procedure_id VARCHAR(255), offering_id VARCHAR(255), feature_of_interest_id VARCHAR(255), observed_property VARCHAR(255), observation_value TEXT);
+
+
+
+CREATE TABLE phenomenon (phenomenon_id VARCHAR(255) PRIMARY KEY, phenomenon_description TEXT, unit VARCHAR(45));

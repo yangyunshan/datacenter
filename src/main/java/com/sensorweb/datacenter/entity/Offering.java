@@ -5,8 +5,9 @@ import java.util.Date;
 public class Offering {
     private String id;
     private String name;
-    private Date minTime;
-    private Date maxTime;
+    private String procedureId;
+    private String observableProperty;
+    private String relatedFeature;
 
     public String getId() {
         return id;
@@ -24,19 +25,27 @@ public class Offering {
         this.name = name;
     }
 
-    public Date getMinTime() {
-        return minTime;
+    public String getProcedureId() {
+        return procedureId;
     }
 
-    public void setMinTime(Date minTime) {
-        this.minTime = minTime;
+    public void setProcedureId(String procedureId) {
+        this.procedureId = procedureId;
     }
 
-    public Date getMaxTime() {
-        return maxTime;
+    public String getObservableProperty() {
+        return observableProperty;
     }
 
-    public void setMaxTime(Date maxTime) {
-        this.maxTime = maxTime;
+    public void setObservableProperty(String observableProperty) {
+        this.observableProperty = observableProperty;
+    }
+
+    public String getRelatedFeature() {
+        return relatedFeature;
+    }
+
+    public void setRelatedFeature(String relatedFeature) {
+        this.relatedFeature = relatedFeature;
     }
 }

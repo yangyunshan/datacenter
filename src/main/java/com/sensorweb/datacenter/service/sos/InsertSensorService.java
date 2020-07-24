@@ -9,6 +9,7 @@ import net.opengis.gml.v32.impl.GMLFactory;
 import net.opengis.sensorml.v20.*;
 import net.opengis.swe.v20.DataComponent;
 import net.opengis.swe.v20.Factory;
+import org.apache.commons.lang3.StringUtils;
 import org.isotc211.v2005.gco.impl.GCOFactory;
 import org.isotc211.v2005.gmd.CIAddress;
 import org.isotc211.v2005.gmd.CIResponsibleParty;
@@ -48,37 +49,7 @@ public class InsertSensorService {
     private ProcedureMapper procedureMapper;
 
     @Autowired
-    private AddressMapper addressMapper;
-
-    @Autowired
-    private CapabilityMapper capabilityMapper;
-
-    @Autowired
-    private CharacteristicMapper characteristicMapper;
-
-    @Autowired
-    private ClassificationMapper classificationMapper;
-
-    @Autowired
-    private ContactMapper contactMapper;
-
-    @Autowired
-    private EventMapper eventMapper;
-
-    @Autowired
-    private IdentificationMapper identificationMapper;
-
-    @Autowired
-    private KeywordMapper keywordMapper;
-
-    @Autowired
-    private PositionMapper positionMapper;
-
-    @Autowired
-    private  TelephoneMapper telephoneMapper;
-
-    @Autowired
-    private ValidTimeMapper validTimeMapper;
+    private OfferingMapper offeringMapper;
 
     @Value("${datacenter.path.upload}")
     private String uploadPath;
@@ -105,8 +76,11 @@ public class InsertSensorService {
      * @throws OWSException
      */
     public InsertSensorRequest getInsertSensorRequest(String requestContent) throws IOException, OWSException {
-        DOMHelper domHelper = new DOMHelper(new ByteArrayInputStream(requestContent.getBytes()),false);
+        if (StringUtils.isBlank(requestContent)) {
+            return null;
+        }
 
+        DOMHelper domHelper = new DOMHelper(new ByteArrayInputStream(requestContent.getBytes()),false);
         InsertSensorReaderV20 insertSensorReader = new InsertSensorReaderV20();
         InsertSensorRequest insertSensorRequest = insertSensorReader.readXMLQuery(domHelper, domHelper.getRootElement());
 
@@ -143,52 +117,31 @@ public class InsertSensorService {
      * @throws XMLStreamException
      */
     @Transactional(isolation = Isolation.DEFAULT, propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
-    public String[] insertSensor(InsertSensorRequest insertSensorRequest) throws XMLStreamException, FileNotFoundException, OWSException, ParseException {
+    public String[] insertSensor(InsertSensorRequest insertSensorRequest) throws OWSException {
         String[] results = new String[2];
 
-        //add keywords
-        keywordMapper.insertData(getKeyword(insertSensorRequest));
-
-        //add identifier
-        List<Identification> identifications = getIdentification(insertSensorRequest);
-        for (Identification identification : identifications) {
-            identificationMapper.insertData(identification);
-        }
-
-        //add classifier
-        List<Classification> classifications = getClassification(insertSensorRequest);
-        for (Classification classification : classifications) {
-            classificationMapper.insertData(classification);
-        }
-
-        //add validtime
-        validTimeMapper.insertData(getValidTime(insertSensorRequest));
-
-        //add characteristic
-        List<Characteristic> characteristics = getCharacteristic(insertSensorRequest);
-        for (Characteristic characteristic : characteristics) {
-            characteristicMapper.insertData(characteristic);
-        }
-
-        //add capability
-        List<Capability> capabilities = getCapability(insertSensorRequest);
-        for (Capability capability : capabilities) {
-            capabilityMapper.insertData(capability);
-        }
-
-        //add contact
-        List<Contact> contacts = getContact(insertSensorRequest);
-        for (Contact contact : contacts) {
-            addressMapper.insertData(contact.getAddress());
-            telephoneMapper.insertData(contact.getTelephone());
-            contactMapper.insertData(contact);
-        }
-
         //add procedure
-        procedureMapper.insertData(getProcedure(insertSensorRequest));
+        Procedure procedure = getProcedure(insertSensorRequest);
+        if (procedure!=null) {
+            int flag = procedureMapper.insertData(procedure);
+            if (flag>0) {
+                results[0] = procedure.getId();
+            }
+        }
 
-        results[0] = getProcedure(insertSensorRequest).getIdentifier();
-//        results[1] = getProcedure(insertSensorRequest).
+
+        //add offering
+        List<String> offeringIds = new ArrayList<>();
+        List<Offering> offerings = getOfferings(insertSensorRequest);
+        if (offerings!=null && offerings.size()>0) {
+            for (Offering offering : offerings) {
+                int count = offeringMapper.insertData(offering);
+                if (count>0) {
+                    offeringIds.add(offering.getId());
+                }
+            }
+        }
+        results[1] = DataCenterUtils.list2String(offeringIds);
 
         return results;
     }
@@ -208,17 +161,51 @@ public class InsertSensorService {
         return keywords;
     }
 
-    public Procedure getProcedure(InsertSensorRequest insertSensorRequest) throws FileNotFoundException, XMLStreamException, OWSException {
+    /**
+     * 解析InsertSensorRequest请求，获取传感器基本信息，并以Procedure对象返回
+     * @param insertSensorRequest
+     * @return
+     * @throws OWSException
+     */
+    public Procedure getProcedure(InsertSensorRequest insertSensorRequest) throws OWSException {
         Procedure procedure = new Procedure();
 
         if (insertSensorRequest!=null) {
-            procedure.setIdentifier(insertSensorRequest.getProcedureDescription().getUniqueIdentifier());
+            procedure.setId(insertSensorRequest.getProcedureDescription().getUniqueIdentifier());
             procedure.setDescription(insertSensorRequest.getProcedureDescription().getDescription());
             procedure.setDescriptionFile(getSensorML(insertSensorRequest));
-            procedure.setProcedureDescriptionFormat(insertSensorRequest.getProcedureDescription().getQName().getNamespaceURI());
-            procedure.setTypeOf(insertSensorRequest.getProcedureDescription().getTypeOf().getHref());
+            procedure.setDescriptionFormat(insertSensorRequest.getProcedureDescriptionFormat());
+            procedure.setName(insertSensorRequest.getProcedureDescription().getName());
         }
         return procedure;
+    }
+
+    /**
+     * 解析InsertSensorRequest请求，获取Offering信息，offering与procedure存在1:n的关系
+     * @param request
+     * @return
+     */
+    public List<Offering> getOfferings(InsertSensorRequest request) {
+        List<Offering> result = new ArrayList<>();
+        if (request!=null) {
+            AbstractProcess abstractProcess = request.getProcedureDescription();
+            if (abstractProcess!=null) {
+                CapabilityList offeringCap = abstractProcess.getCapabilities("offerings");
+                if (offeringCap!=null && offeringCap.getCapabilityList()!=null && offeringCap.getCapabilityList().size()>0) {
+                    OgcPropertyList<DataComponent> datas = offeringCap.getCapabilityList();
+                    for (int i=0; i<datas.size();i++) {
+                        Offering temp = new Offering();
+                        temp.setProcedureId(request.getProcedureDescription().getUniqueIdentifier());
+                        temp.setObservableProperty(DataCenterUtils.list2String(request.getObservableProperties()));
+                        temp.setId(datas.get(i).getData().getStringValue());
+                        temp.setName(datas.get(i).getLabel());
+
+                        result.add(temp);
+                    }
+                }
+            }
+        }
+        return result;
     }
 
     /**
@@ -306,6 +293,7 @@ public class InsertSensorService {
         List<Capability> result = new ArrayList<>();
 
         OgcPropertyList<CapabilityList> capabilityLists = insertSensorRequest.getProcedureDescription().getCapabilitiesList();
+        CapabilityList ss = capabilityLists.get("offerings");
         if (capabilityLists!=null && capabilityLists.size()>0) {
             OgcPropertyList<DataComponent> capabilityList = capabilityLists.get(0).getCapabilityList();
             if (capabilityList!=null && capabilityList.size()>0) {

@@ -4,37 +4,33 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.sensorweb.datacenter.dao.ProcedureMapper">
     <sql id="insertFields">
-        proceduredescriptionformat, identifier, name, description, disabled, descriptionfile, typeof, istype, isaggregation, ismobile, isinsitu
+        procedure_id, procedure_name, procedure_description, description_format, description_file
     </sql>
 
     <sql id="selectFields">
-        procedureid, proceduredescriptionformat, identifier, name, description, disabled, descriptionfile, typeof, istype, isaggregation, ismobile, isinsitu
+        procedure_id, procedure_name, procedure_description, description_format, description_file
     </sql>
 
     <insert id="insertData" parameterType="Procedure">
         INSERT INTO procedure (<include refid="insertFields"></include>)
-        VALUES (#{procedureDescriptionFormat}, #{identifier}, #{name}, #{description}, #{disabled}, #{descriptionFile}, #{typeOf}, #{isType}, #{isAggregation}, #{isMobile}, #{isInsitu})
+        VALUES (#{id}, #{name}, #{description}, #{descriptionFormat}, #{descriptionFile})
     </insert>
 
-    <delete id="deleteByIdentifier">
+    <delete id="deleteById" parameterType="java.lang.String">
         DELETE FROM procedure
-        WHERE identifier = #{identifier}
+        WHERE procedure_id = #{id}
     </delete>
 
-    <delete id="deleteById" parameterType="int">
-        DELETE FROM procedure
-        WHERE procedureid = #{id}
-    </delete>
-
-    <update id="updateStatusByIdentifier">
-        UPDATE procedure SET disabled = #{status}
-        WHERE identifier = #{identifier}
-    </update>
-
-    <select id="selectById" parameterType="int" resultMap="procedure">
+    <select id="selectById" parameterType="java.lang.String" resultMap="procedure">
         SELECT <include refid="selectFields"></include>
         FROM procedure
-        WHERE procedureid = #{id}
+        WHERE procedure_id = #{id}
+    </select>
+
+    <select id="selectByIdAndFormat" parameterType="java.lang.String" resultMap="procedure">
+        SELECT <include refid="selectFields"></include>
+        FROM procedure
+        WHERE procedure_id = #{id} AND description_format = #{descriptionFormat}
     </select>
 
     <select id="selectAll" parameterType="int" resultMap="procedure">
@@ -42,71 +38,12 @@
         FROM procedure
     </select>
 
-    <select id="selectByIdentifier" resultMap="procedure">
-        SELECT <include refid="selectFields"></include>
-        FROM procedure
-        WHERE identifier = #{identifier}
-    </select>
-
-    <select id="selectByFuzzyIdentifier" resultMap="procedure">
-        SELECT <include refid="selectFields"></include>
-        FROM procedure
-        WHERE identifier like concat('%',#{identifier},'%')
-    </select>
-
-    <select id="selectByName" resultMap="procedure">
-        SELECT <include refid="selectFields"></include>
-        FROM procedure
-        WHERE name like concat('%',#{name},'%')
-    </select>
-
-    <select id="selectByDescription" resultMap="procedure">
-        SELECT <include refid="selectFields"></include>
-        FROM procedure
-        WHERE description like concat('%',#{description},'%')
-    </select>
-
-    <select id="selectByStatus" resultMap="procedure">
-        SELECT <include refid="selectFields"></include>
-        FROM procedure
-        WHERE disabled = #{status}
-    </select>
-
-    <select id="selectByIsType" resultMap="procedure">
-        SELECT <include refid="selectFields"></include>
-        FROM procedure
-        WHERE istype = #{isType}
-    </select>
-
-    <select id="selectByIsAggregation" resultMap="procedure">
-        SELECT <include refid="selectFields"></include>
-        FROM procedure
-        WHERE Isaggregation = #{isAggregation}
-    </select>
-
-    <select id="selectByIsMobile" resultMap="procedure">
-        SELECT <include refid="selectFields"></include>
-        FROM procedure
-        WHERE ismobile = #{isMobile}
-    </select>
-    <select id="selectByIsInsitu" resultMap="procedure">
-        SELECT <include refid="selectFields"></include>
-        FROM procedure
-        WHERE isinsitu = #{isInsitu}
-    </select>
-
     <resultMap id="procedure" type="Procedure">
-        <id property="procedureId" column="address_id"/>
-        <result property="procedureDescriptionFormat" column="proceduredescriptionformat"/>
-        <result property="identifier" column="identifier"/>
-        <result property="description" column="description"/>
-        <result property="disabled" column="disabled"/>
-        <result property="descriptionFile" column="descriptionfile"/>
-        <result property="typeOf" column="typeof"/>
-        <result property="isType" column="istype"/>
-        <result property="isAggregation" column="isaggregation"/>
-        <result property="isMobile" column="ismobile"/>
-        <result property="isInstitu" column="isinstitu"/>
+        <id property="id" column="procedure_id"/>
+        <result property="name" column="procedure_name"/>
+        <result property="description" column="procedure_description"/>
+        <result property="descriptionFormat" column="description_format"/>
+        <result property="descriptionFile" column="description_file"/>
     </resultMap>
 
 </mapper>

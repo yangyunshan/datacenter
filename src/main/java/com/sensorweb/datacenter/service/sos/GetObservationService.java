@@ -1,10 +1,14 @@
 package com.sensorweb.datacenter.service.sos;
 
+import com.google.inject.internal.cglib.core.$CollectionUtils;
+import com.sensorweb.datacenter.dao.FoiMapper;
 import com.sensorweb.datacenter.dao.ObservationMapper;
 import com.sensorweb.datacenter.dao.ProcFoiMapper;
+import com.sensorweb.datacenter.entity.FeatureOfInterest;
 import com.sensorweb.datacenter.entity.Observation;
 import com.sensorweb.datacenter.entity.ProcFoi;
 import com.sensorweb.datacenter.entity.Procedure;
+import com.sensorweb.datacenter.util.DataCenterUtils;
 import net.opengis.fes.v20.BBOX;
 import net.opengis.fes.v20.BinaryTemporalOp;
 import net.opengis.fes.v20.SpatialOps;
@@ -38,7 +42,7 @@ public class GetObservationService {
     private ObservationMapper observationMapper;
 
     @Autowired
-    private ProcFoiMapper procFoiMapper;
+    private FoiMapper foiMapper;
 
     /**
      * 根据查询获得的O&M数据内容，封装成Response，并以Element的形式返回
@@ -69,28 +73,28 @@ public class GetObservationService {
 
         Set<String> procedureIds = getProcedureId(request);
         Set<String> offerings = getOffering(request);
-        Set<String> observables = getObservable(request); //暂不考虑
+        Set<String> observedProperties = getObservable(request); //暂不考虑
         Set<String> fois = getFoi(request);
         Instant[] temporal = getTemporalFilter(request);
         double[] spatial = getSpatialFilter(request);
 
-        //获得满足条件的observation
-        List<Observation> observations = observationMapper.selectObservations(procedureIds, fois, temporal);
-        Observation observationss = observations.get(0);
-        //从上一步结果中进一步筛选
-        List<ProcFoi> procFois = procFoiMapper.selectProcFois(procedureIds, fois);
-        if (procFois!=null && procFois.size()>0) {
-            for (ProcFoi procFoi : procFois) {
-                for (Observation observation : observations) {
-                    if (procFoi.getProcedureId().equals(observation.getProcedureId())) {
-                        result.add(observation);
-                    }
-                }
-            }
-        } else {
-            result = null;
-        }
-        //进一步筛选
+        //获得满足offering、procedureId、observedProperties、foi、temporal条件的observation
+        List<Observation> observations = observationMapper.selectObservationsByConditions(offerings, procedureIds, fois, observedProperties,
+                temporal[0], temporal[1]);
+        //从上面的查询结果中进一步筛选出满足空间条件的结果
+//        if (observations!=null && observations.size()>0) {
+//            for (Observation temp : observations) {
+//                //将空间参数转为wkt字符串
+//                String spatialCondition = DataCenterUtils.coodinate2Wkt(spatial[0], spatial[1], spatial[2], spatial[3]);
+//                //查询此观测结果对应的foi
+//                FeatureOfInterest featureOfInterest = foiMapper.selectByIdAndGeom(temp.getFoiId(), spatialCondition);
+//                if (featureOfInterest!=null) {
+//
+//                }
+//
+//            }
+//        }
+
         return observations;
     }
 

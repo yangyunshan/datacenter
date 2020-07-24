@@ -74,8 +74,9 @@ public class SOSWebServiceImpl implements SOSWebservice {
 
         try {
             DescribeSensorRequest request = describeSensorService.getDescribeSensorRequest(requestContent);
-            Procedure procedure = describeSensorService.getProcedureById(describeSensorService.getProcedureId(request));
-            str = describeSensorService.getDescribeSensorResponse(procedure);
+            String procedureId = describeSensorService.getProcedureId(request);
+            String descriptionFormat = describeSensorService.getDescriptionFormat(request);
+            str = describeSensorService.getDescribeSensorResponse(procedureId, descriptionFormat);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -89,9 +90,9 @@ public class SOSWebServiceImpl implements SOSWebservice {
 
         try {
             InsertObservationRequest request = insertObservationService.getInsertObservationRequest(requestContent);
-            String obsId = insertObservationService.insertObservation(request);
-            if (!StringUtils.isBlank(obsId)) {
-                Element element = insertObservationService.getInsertObservationResponse(obsId);
+            List<String> obsIds = insertObservationService.insertObservation(request);
+            if (obsIds!=null && obsIds.size()>0) {
+                Element element = insertObservationService.getInsertObservationResponse(obsIds);
                 str = DataCenterUtils.element2String(element);
             }
         } catch (Exception e) {
@@ -110,7 +111,7 @@ public class SOSWebServiceImpl implements SOSWebservice {
             List<Observation> observations = getObservationService.getObservationContent(request);
             if (observations!=null && observations.size()>0) {
                 for (Observation observation : observations) {
-                    Element element = getObservationService.getObservationResponse(DataCenterUtils.readFromFile(observation.getFilePath()));
+                    Element element = getObservationService.getObservationResponse(observation.getValue());
                     stringBuilder.append(DataCenterUtils.element2String(element));
                 }
             }

@@ -7,12 +7,13 @@ import java.util.Date;
 
 public class Observation {
     private String id;
+    private String description;
     private LocalDateTime time;
     private String procedureId;
+    private String offeringId;
     private String foiId;
-    private String phenomenonId;
+    private String observedProperty;
     private String value;
-    private String filePath;
 
     public String getId() {
         return id;
@@ -20,6 +21,14 @@ public class Observation {
 
     public void setId(String id) {
         this.id = id;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     public LocalDateTime getTime() {
@@ -38,6 +47,14 @@ public class Observation {
         this.procedureId = procedureId;
     }
 
+    public String getOfferingId() {
+        return offeringId;
+    }
+
+    public void setOfferingId(String offeringId) {
+        this.offeringId = offeringId;
+    }
+
     public String getFoiId() {
         return foiId;
     }
@@ -46,12 +63,12 @@ public class Observation {
         this.foiId = foiId;
     }
 
-    public String getPhenomenonId() {
-        return phenomenonId;
+    public String getObservedProperty() {
+        return observedProperty;
     }
 
-    public void setPhenomenonId(String phenomenonId) {
-        this.phenomenonId = phenomenonId;
+    public void setObservedProperty(String observedProperty) {
+        this.observedProperty = observedProperty;
     }
 
     public String getValue() {
@@ -60,13 +77,5 @@ public class Observation {
 
     public void setValue(String value) {
         this.value = value;
-    }
-
-    public String getFilePath() {
-        return filePath;
-    }
-
-    public void setFilePath(String filePath) {
-        this.filePath = filePath;
     }
 }

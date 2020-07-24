@@ -2,6 +2,7 @@ package com.sensorweb.datacenter.dao;
 
 import com.sensorweb.datacenter.entity.FeatureOfInterest;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -15,4 +16,5 @@ public interface FoiMapper {
     int deleteByName(String name);
 
     FeatureOfInterest selectById(String id);
+    FeatureOfInterest selectByIdAndGeom(@Param("id") String id, @Param("polygon") String polygon);
 }

@@ -45,91 +45,77 @@ public class InsertObservationService {
     @Autowired
     private ObservationMapper observationMapper;
 
-    @Autowired
-    private OfferingMapper offeringMapper;
+    private String offeringId;
 
-    @Value("${datacenter.path.upload}")
-    private String uploadPath;
-
-    public Element getInsertObservationResponse(String obsId) throws OWSException {
+    /**
+     * 根据返回的插入成功的观测id，自动生成InsertObservationResponse
+     * @param obsIds
+     * @return
+     * @throws OWSException
+     */
+    public Element getInsertObservationResponse(List<String> obsIds) throws OWSException {
         InsertObservationResponseWriterV20 writer = new InsertObservationResponseWriterV20();
         InsertObservationResponse response = new InsertObservationResponse();
-        response.setObsId(obsId);
+        response.setObsId(DataCenterUtils.list2String(obsIds));
         DOMHelper domHelper = new DOMHelper();
-        Element element = writer.buildXMLResponse(domHelper, response, "2.0");
-        return element;
+
+        return writer.buildXMLResponse(domHelper, response, "2.0");
     }
 
     /**
      * 通过InsertObservation请求，将Observation插入到数据库中，返回插入成功的Observation的id
-     * 注：理论上可以支持一次性插入多条观测数据，但因为后续生成Response文档的时候，参数为一个字符串而不是字符串数组，因此，此处应该每次插入一条观测数据
-     * 如有一次性插入多条数据的需求，可以再改
      * @param request
      * @return
      * @throws ParseException
      */
     @Transactional(isolation = Isolation.DEFAULT, propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
-    public String insertObservation(InsertObservationRequest request) throws ParseException, XMLWriterException {
+    public List<String> insertObservation(InsertObservationRequest request) throws ParseException, XMLWriterException {
         String obsId = "";
-        Offering offering = getOffering(request);
         List<Observation> observations = new ArrayList<>();
         List<FeatureOfInterest> fois = new ArrayList<>();
 
-        //确认文件是否保存，
-        String filePath = getOM(getObservation(request));
-        if (StringUtils.isBlank(filePath)) {
-            return "";
-        }
-
         List<IObservation> iObservations = getObservation(request);
-        if (observations!=null && iObservations.size()>0) {
-            for (IObservation observation : iObservations) {
-                Observation temp = getObservation(observation);
-                temp.setFilePath(filePath);
+        if (iObservations!=null && iObservations.size()>0) {
+            for (IObservation iObservation : iObservations) {
+                Observation temp = getObservation(iObservation);
                 observations.add(temp);
-                FeatureOfInterest featureOfInterest = getFoi(observation);
+                FeatureOfInterest featureOfInterest = getFoi(iObservation);
                 fois.add(featureOfInterest);
             }
         }
 
-        if (observations!=null && observations.size()>0) {
-            obsId = observations.get(0).getId();
+        //定义一个list存储插入的obs
+        List<String> obsIds = new ArrayList<>();
+        //插入观测数据
+        if (observations.size()>0) {
             for (Observation observation : observations) {
                 observationMapper.insertData(observation);
+                obsIds.add(observation.getId());
             }
         }
 
-        if (fois!=null && fois.size()>0) {
+        //将FOI数据写入数据库
+        if (fois.size()>0) {
             for (FeatureOfInterest featureOfInterest : fois) {
                 foiMapper.insertData(featureOfInterest);
             }
         }
 
-        offeringMapper.insertData(offering);
-
-        return obsId;
+        return obsIds;
     }
 
     /**
-     * 解析InsertSensor请求文档，将其中的om内容写入文件保存，返回文件路径
-     * @param observations
+     * 解析InsertObservation请求文档，将其中的om内容以字符串形式返回
+     * @param observation
      * @return
      * @throws XMLWriterException
      */
-    public String getOM(List<IObservation> observations) throws XMLWriterException {
+    public String getOM(IObservation observation) throws XMLWriterException {
         OMUtils omUtils = new OMUtils(OMUtils.V2_0);
         DOMHelper domHelper = new DOMHelper();
-        Element element = omUtils.writeObservation(domHelper, observations.get(0), "2.0");
-        String ss = DataCenterUtils.element2String(element);
+        Element element = omUtils.writeObservation(domHelper, observation, "2.0");
 
-        //写入文件
-        String fileName = DataCenterUtils.generateUUID() + ".xml";
-        try {
-            DataCenterUtils.write2File(uploadPath + "/om/" + fileName, DataCenterUtils.element2String(element));
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return uploadPath + "/om/" + fileName;
+        return DataCenterUtils.element2String(element);
     }
 
     /**
@@ -147,13 +133,11 @@ public class InsertObservationService {
         InsertObservationReaderV20 reader = new InsertObservationReaderV20();
         InsertObservationRequest request = reader.readXMLQuery(domHelper, domHelper.getRootElement());
 
-//        Element element = domHelper.getElement("observation/OM_Observation");
-//        String str = DataCenterUtils.element2String(element);
         return request;
     }
 
     /**
-     * 解析InsertObservation请求对象，获取Observation集合
+     * 解析InsertObservationRequestion请求对象，获取Observation集合
      * @param request
      * @return
      */
@@ -161,22 +145,9 @@ public class InsertObservationService {
         if (request==null) {
             return null;
         } else {
+            offeringId = request.getOffering();
             return request.getObservations();
         }
-    }
-
-    /**
-     * 解析InsertObservation请求对象，获取并封装成Offering对象
-     * @param request
-     * @return
-     */
-    public Offering getOffering(InsertObservationRequest request) {
-        Offering offering = new Offering();
-
-        if (request!=null) {
-            offering.setId(request.getOffering());
-        }
-        return offering;
     }
 
     /**
@@ -204,29 +175,18 @@ public class InsertObservationService {
      * @return
      * @throws ParseException
      */
-    public Observation getObservation(IObservation iObservation) throws ParseException {
+    public Observation getObservation(IObservation iObservation) throws ParseException, XMLWriterException {
         Observation observation = new Observation();
         if (iObservation!=null) {
             observation.setId(iObservation.getUniqueIdentifier());
+            observation.setDescription(iObservation.getDescription());
             observation.setFoiId(iObservation.getFeatureOfInterest().getUniqueIdentifier());
-            observation.setPhenomenonId(iObservation.getUniqueIdentifier());
-
-            IProcedure procedure = iObservation.getProcedure();
             observation.setProcedureId(iObservation.getProcedure().getUniqueIdentifier());
-            Instant time = iObservation.getResultTime();
+            observation.setOfferingId(offeringId);
             observation.setTime(DataCenterUtils.instant2LocalDateTime(iObservation.getResultTime()));
-            observation.setValue(iObservation.getResult().getData().getStringValue());
+            observation.setValue(getOM(iObservation));
+            observation.setObservedProperty(iObservation.getObservedProperty().getHref());
         }
         return observation;
     }
-
-//    public Phenomenon getPhenomenon(IObservation iObservation) {
-//        Phenomenon phenomenon = null;
-//        if (iObservation!=null) {
-//            iObservation.getPhenomenonTime().
-//        }
-//        return phenomenon;
-//    }
-
-
 }

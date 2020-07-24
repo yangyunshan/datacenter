@@ -12,21 +12,10 @@ import java.util.List;
 public interface ProcedureMapper {
     int insertData(Procedure procedure);
 
-    int deleteById(int id);
-    int deleteByIdentifier(String identifier);
+    int deleteById(String id);
 
-    int updateStatusByIdentifier(@Param("identifier") String identifier, @Param("status") char status);
-
-    Procedure selectById(int id);
-    Procedure selectByIdentifier(String identifier);
-    List<Procedure> selectByFuzzyIdentifier(String identifier);
-    List<Procedure> selectByName(String name);
-    List<Procedure> selectByDescription(String description);
-    List<Procedure> selectByStatus(char status);
-    List<Procedure> selectByIsType(char isType);
-    List<Procedure> selectByIsAggregation(char isAggregation);
-    List<Procedure> selectByIsMobile(char isMobile);
-    List<Procedure> selectByIsInsitu(char isInsitu);
+    Procedure selectById(String id);
+    Procedure selectByIdAndFormat(@Param("id") String id, @Param("descriptionFormat") String descriptionFormat);
     List<Procedure> selectAll();
 
 }

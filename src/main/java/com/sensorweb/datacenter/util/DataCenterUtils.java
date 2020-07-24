@@ -17,15 +17,12 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-import java.util.Date;
-import java.util.List;
-import java.util.TimeZone;
-import java.util.UUID;
+import java.util.*;
 
 public class DataCenterUtils {
 
     /**
-     * 讲列表内的字符串信息拼成一个字符串，以英文冒号“:”分割
+     * 讲列表内的字符串信息拼成一个字符串，以英文冒号“|”分割
      * @param list
      * @return
      */
@@ -34,10 +31,21 @@ public class DataCenterUtils {
 
         if (list!=null && list.size()>0) {
             for (String temp : list) {
-                result.append(":"+temp);
+                result.append("|"+temp);
             }
         }
         return result.toString();
+    }
+
+    public static List<String> string2List(String str) {
+        List<String> res = new ArrayList<>();
+
+        if(!StringUtils.isBlank(str)) {
+            String[] temp = str.split("|");
+            res = Arrays.asList(temp);
+        }
+
+        return res;
     }
 
     /**
@@ -163,6 +171,11 @@ public class DataCenterUtils {
         return DigestUtils.md5DigestAsHex(key.getBytes());
     }
 
+    /**
+     * Element转字符串
+     * @param element
+     * @return
+     */
     public static String element2String(Element element) {
         String str = "";
         try {
@@ -176,6 +189,23 @@ public class DataCenterUtils {
             e.printStackTrace();
         }
         return str;
+    }
+
+    /**
+     * 给矩形框的四个角坐标，生成对应的wkt
+     * @return
+     */
+    public static String coodinate2Wkt(double minX, double minY, double maxX, double maxY) {
+        StringBuilder stringBuilder = new StringBuilder("POLYGON(");
+        stringBuilder.append(minX);
+        stringBuilder.append(minY);
+        stringBuilder.append(minX);
+        stringBuilder.append(maxY);
+        stringBuilder.append(maxX);
+        stringBuilder.append(minY);
+        stringBuilder.append(maxX);
+        stringBuilder.append(maxY);
+        return stringBuilder.toString();
     }
 
 }
