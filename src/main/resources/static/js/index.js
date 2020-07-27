@@ -1,20 +1,18 @@
-$('#identifier_btn').click(function () {
-    $('#form1').submit(
-    );
+$('#insertSensor_btn').click(function () {
+    $('insertSensor_form').submit();
+})
+$('#describeSensor_btn').click(function () {
+    $('#describeSensor_form').submit();
 })
 
-$('#uploadFile').click(function () {
-    $('#addFile').submit();
+$('#insertObservation_btn').click(function () {
+    $('#insertObservation_form').submit();
 })
 
-$('#queryAll_btn').click(function () {
-    $('#queryAll').submit();
+$('#getObservation_btn').click(function () {
+    $('#getObservation_form').submit();
 })
 
-$('#queryByStatus_btn').click(function () {
-    $('#queryByStatus').submit();
-})
-
-$('#queryByName_btn').click(function () {
-    $('#queryByName').submit();
+$('#getCapabilities_btn').click(function () {
+    $('#getCapabilities_form').submit();
 })

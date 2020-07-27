@@ -16,6 +16,10 @@
         VALUES (#{id}, #{name}, #{procedureId}, #{observableProperty})
     </insert>
 
+    <delete id="deleteByProcedure" parameterType="java.lang.String">
+        DELETE FROM offering WHERE procedure_id = #{procedureId}
+    </delete>
+
     <select id="selecyById" resultMap="offering">
         SELECT <include refid="selectFields"></include>
         FROM offering

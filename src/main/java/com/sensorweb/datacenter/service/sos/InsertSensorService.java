@@ -27,6 +27,7 @@ import org.vast.ows.sos.InsertSensorReaderV20;
 import org.vast.ows.sos.InsertSensorRequest;
 import org.vast.ows.sos.InsertSensorResponse;
 import org.vast.ows.sos.InsertSensorWriterV20;
+import org.vast.ows.swe.InsertSensorResponseWriterV20;
 import org.vast.sensorML.SMLFactory;
 import org.vast.sensorML.SMLUtils;
 import org.vast.util.TimeExtent;
@@ -61,11 +62,15 @@ public class InsertSensorService {
      * @param offering
      * @return
      */
-    public InsertSensorResponse getInsertSensorResponse(String procedureId, String offering) {
+    public Element getInsertSensorResponse(String procedureId, String offering) throws OWSException {
         InsertSensorResponse response = new InsertSensorResponse();
         response.setAssignedOffering(offering);
         response.setAssignedProcedureId(procedureId);
-        return response;
+
+        InsertSensorResponseWriterV20 writer = new InsertSensorResponseWriterV20();
+        DOMHelper domHelper = new DOMHelper();
+
+        return writer.buildXMLResponse(domHelper, response, "2.0");
     }
 
     /**

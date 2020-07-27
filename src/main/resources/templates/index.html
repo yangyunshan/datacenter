@@ -29,6 +29,176 @@
         <p>Welcome!</p>
     </div>
 
+    <div id="insertSensor">
+        <div style="width: 50%; float: left">
+            <Label>InsertSensorRequest</Label>
+            <form th:action="@{/sensor/insertSensor}" method="post" id="insertSensor_form">
+                <textarea id="insertSensorRequest" name="requestContent" th:text="${InsertSensorRequest}"></textarea>
+                <script>
+                    var editor = CodeMirror.fromTextArea(document.getElementById("insertSensorRequest"), {
+                        mode: "text/html",
+                        lineNumbers: true,
+                        lineWrapping: true,
+                        foldGutter: true,
+                        smartIndent: true,
+                        lineSeparator: "\n\r"
+                    });
+                </script>
+                <button type="submit" id="insertSensor_btn">传感器注册</button>
+            </form>
+        </div>
+        <div style="padding: 10px; margin: 10px; width: 45%; float: right">
+            <Label>InsertSensorResponse</Label>
+            <textarea id="insertSensorResponse" name="responseContent" th:text="${InsertSensorResponse}"></textarea>
+            <script>
+                var editor = CodeMirror.fromTextArea(document.getElementById("insertSensorResponse"), {
+                    mode: "text/html",
+                    lineNumbers: true,
+                    lineWrapping: true,
+                    foldGutter: true,
+                    smartIndent: true,
+                    lineSeparator: "\n\r"
+                });
+            </script>
+        </div>
+    </div>
+
+    <div id="describeSensor">
+        <div style="width: 50%; float: left">
+            <Label>DescribeSensorRequest</Label>
+            <form th:action="@{/sensor/describeSensor}" method="post" id="describeSensor_form">
+                <textarea id="describeSensorRequest" name="requestContent" th:text="${DescribeSensorRequest}"></textarea>
+                <script>
+                    var editor = CodeMirror.fromTextArea(document.getElementById("describeSensorRequest"), {
+                        mode: "text/html",
+                        lineNumbers: true,
+                        lineWrapping: true,
+                        foldGutter: true,
+                        smartIndent: true,
+                        lineSeparator: "\n\r"
+                    });
+                </script>
+                <button type="submit" id="describeSensor_btn">传感器查询</button>
+            </form>
+        </div>
+        <div style="padding: 10px; margin: 10px; width: 45%; float: right">
+            <Label>DescribeSensorResponse</Label>
+            <textarea id="describeSensorResponse" name="responseContent" th:text="${DescribeSensorResponse}"></textarea>
+            <script>
+                var editor = CodeMirror.fromTextArea(document.getElementById("describeSensorResponse"), {
+                    mode: "text/html",
+                    lineNumbers: true,
+                    lineWrapping: true,
+                    foldGutter: true,
+                    smartIndent: true,
+                    lineSeparator: "\n\r"
+                });
+            </script>
+        </div>
+    </div>
+
+    <div id="insertObservation">
+        <div style="width: 50%; float: left">
+            <Label>InsertObservationRequest</Label>
+            <form th:action="@{/observation/insertObservation}" method="post" id="insertObservation_form">
+                <textarea id="insertObservationRequest" name="requestContent" th:text="${InsertObservationRequest}"></textarea>
+                <script>
+                    var editor = CodeMirror.fromTextArea(document.getElementById("insertObservationRequest"), {
+                        mode: "text/html",
+                        lineNumbers: true,
+                        lineWrapping: true,
+                        foldGutter: true,
+                        smartIndent: true,
+                        lineSeparator: "\n\r"
+                    });
+                </script>
+                <button type="submit" id="insertObservation_btn">观测数据注册</button>
+            </form>
+        </div>
+        <div style="padding: 10px; margin: 10px; width: 45%; float: right">
+            <Label>InsertObservationResponse</Label>
+            <textarea id="insertObservationResponse" name="responseContent" th:text="${InsertObservationResponse}"></textarea>
+            <script>
+                var editor = CodeMirror.fromTextArea(document.getElementById("insertObservationResponse"), {
+                    mode: "text/html",
+                    lineNumbers: true,
+                    lineWrapping: true,
+                    foldGutter: true,
+                    smartIndent: true,
+                    lineSeparator: "\n\r"
+                });
+            </script>
+        </div>
+    </div>
+
+    <div id="getObservation">
+        <div style="width: 50%; float: left">
+            <Label>GetObservationRequest</Label>
+            <form th:action="@{/observation/getObservation}" method="post" id="getObservation_form">
+                <textarea id="getObservationRequest" name="requestContent" th:text="${GetObservationRequest}"></textarea>
+                <script>
+                    var editor = CodeMirror.fromTextArea(document.getElementById("getObservationRequest"), {
+                        mode: "text/html",
+                        lineNumbers: true,
+                        lineWrapping: true,
+                        foldGutter: true,
+                        smartIndent: true,
+                        lineSeparator: "\n\r"
+                    });
+                </script>
+                <button type="submit" id="getObservation_btn">观测数据查询</button>
+            </form>
+        </div>
+        <div style="padding: 10px; margin: 10px; width: 45%; float: right">
+            <Label>GetObservationResponse</Label>
+            <textarea id="getObservationResponse" name="responseContent" th:text="${GetObservationResponse}"></textarea>
+            <script>
+                var editor = CodeMirror.fromTextArea(document.getElementById("getObservationResponse"), {
+                    mode: "text/html",
+                    lineNumbers: true,
+                    lineWrapping: true,
+                    foldGutter: true,
+                    smartIndent: true,
+                    lineSeparator: "\n\r"
+                });
+            </script>
+        </div>
+    </div>
+
+    <div id="getCapabilities">
+        <div style="width: 50%; float: left">
+            <Label>GetCapabilitiesRequest</Label>
+            <form th:action="@{/getCapabilities}" method="post" id="getCapabilities_form">
+                <textarea id="getCapabilitiesRequest" name="requestContent" th:text="${GetCapabilitiesRequest}"></textarea>
+                <script>
+                    var editor = CodeMirror.fromTextArea(document.getElementById("getCapabilitiesRequest"), {
+                        mode: "text/html",
+                        lineNumbers: true,
+                        lineWrapping: true,
+                        foldGutter: true,
+                        smartIndent: true,
+                        lineSeparator: "\n\r"
+                    });
+                </script>
+                <button type="submit" id="getCapabilities_btn">服务能力查询</button>
+            </form>
+        </div>
+        <div style="padding: 10px; margin: 10px; width: 45%; float: right">
+            <Label>GetCapabilitiesResponse</Label>
+            <textarea id="getCapabilitiesResponse" name="responseContent" th:text="${GetCapabilitiesResponse}"></textarea>
+            <script>
+                var editor = CodeMirror.fromTextArea(document.getElementById("getCapabilitiesResponse"), {
+                    mode: "text/html",
+                    lineNumbers: true,
+                    lineWrapping: true,
+                    foldGutter: true,
+                    smartIndent: true,
+                    lineSeparator: "\n\r"
+                });
+            </script>
+        </div>
+    </div>
+
     <div style="width: 50%; float: left">
         <div id="addContent" style="padding: 10px; border: 2px solid red; margin: 10px;">
             <label>传感器注册:</label>

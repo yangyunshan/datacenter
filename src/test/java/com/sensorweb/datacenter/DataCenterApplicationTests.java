@@ -14,6 +14,7 @@ import org.vast.ows.OWSException;
 import org.vast.ows.OWSServiceCapabilities;
 import org.vast.ows.OWSUtils;
 import org.vast.ows.sos.*;
+import org.vast.ows.swe.DeleteSensorRequest;
 import org.vast.ows.swe.DescribeSensorRequest;
 import org.vast.xml.DOMHelper;
 import org.vast.xml.DOMHelperException;
@@ -38,39 +39,20 @@ class DataCenterApplicationTests {
     @Autowired
     private DescribeSensorService describeSensorService;
 
-    @Test
-    public void test01() throws OWSException, IOException {
-        InsertSensorRequest request = sensorService.getInsertSensorRequest(DataCenterUtils.readFromFile("d://Others/InsertSensor.xml"));
-
-        String[] res = sensorService.insertSensor(request);
-        System.out.println(res);
-    }
-
-    @Test
-    public void test02() throws OWSException, DOMHelperException, XMLReaderException {
-        DescribeSensorRequest request = describeSensorService.getDescribeSensorRequest(DataCenterUtils.readFromFile("d://Others/DescribeSensor.xml"));
-        String ss = describeSensorService.getDescribeSensorResponse(describeSensorService.getProcedureId(request), describeSensorService.getDescriptionFormat(request));
-        System.out.println(ss);
-    }
-
     @Autowired
-    private InsertObservationService insertObservationService;
-
-    @Test
-    public void test03() throws OWSException, DOMHelperException, ParseException, XMLWriterException {
-        InsertObservationRequest request = insertObservationService.getInsertObservationRequest(DataCenterUtils.readFromFile("d://Others/InsertObservation.xml"));
-        List<String> ss = insertObservationService.insertObservation(request);
-        System.out.println();
-    }
+    private DeleteSensorService deleteSensorService;
 
     @Autowired
     private GetObservationService getObservationService;
 
     @Test
     public void test() throws OWSException, DOMHelperException {
-        GetObservationRequest request = getObservationService.getObservationRequest(DataCenterUtils.readFromFile("d://Others/GetObservation.xml"));
-        List<Observation> ss = getObservationService.getObservationContent(request);
-        System.out.println(ss);
+        DeleteSensorRequest request = deleteSensorService.getDeleteSensorRequest(DataCenterUtils.readFromFile("d://Others/DeleteSensor.xml"));
+//        deleteSensorService.deleteSensor(deleteSensorService.getProcedureId(request));
+        Element element = deleteSensorService.getDeleteSensorResponse(deleteSensorService.deleteSensor(deleteSensorService.getProcedureId(request)));
+        String ss = DataCenterUtils.element2String(element);
+
+        System.out.println("");
     }
 
 }
