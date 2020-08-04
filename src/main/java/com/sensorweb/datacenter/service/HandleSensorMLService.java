@@ -1,8 +1,8 @@
 package com.sensorweb.datacenter.service;
 
 import com.sensorweb.datacenter.dao.*;
-import com.sensorweb.datacenter.entity.*;
-import com.sensorweb.datacenter.entity.Event;
+import com.sensorweb.datacenter.entity.sos.*;
+import com.sensorweb.datacenter.entity.sos.Event;
 import com.sensorweb.datacenter.util.DataCenterUtils;
 import net.opengis.OgcPropertyList;
 import net.opengis.gml.v32.impl.GMLFactory;

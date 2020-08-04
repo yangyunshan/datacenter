@@ -1,6 +1,6 @@
 package com.sensorweb.datacenter.dao;
 
-import com.sensorweb.datacenter.entity.Keyword;
+import com.sensorweb.datacenter.entity.sos.Keyword;
 import org.apache.ibatis.annotations.Mapper;
 import org.springframework.stereotype.Repository;
 import java.util.List;

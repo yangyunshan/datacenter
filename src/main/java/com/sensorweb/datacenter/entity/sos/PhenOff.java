@@ -1,4 +1,4 @@
-package com.sensorweb.datacenter.entity;
+package com.sensorweb.datacenter.entity.sos;
 
 /**
  * phenomenon表与offering表关联模型

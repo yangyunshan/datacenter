@@ -1,21 +1,21 @@
-package com.sensorweb.datacenter.entity.meteorological;
+package com.sensorweb.datacenter.entity.meteorology;
 
 import java.util.Date;
 
 /**
- * 任意时间小时数据
+ * 日均数据
  */
-public class HourAqi {
+public class DayAqi {
     private String stationName;
     private String uniqueCode;
     private Date queryTime;
-    private double pm25OneHour;
-    private double pm10OneHour;
-    private double so2OneHour;
-    private double no2OneHour;
-    private double coOneHour;
-    private double o3OneHour;
-    private double aqi;
+    private String pm25;
+    private String pm10;
+    private String so2;
+    private String no2;
+    private String co;
+    private String o3EightHour;
+    private String aqi;
     private String primaryEP;
     private String aqDegree;
     private String aqType;
@@ -44,59 +44,59 @@ public class HourAqi {
         this.queryTime = queryTime;
     }
 
-    public double getPm25OneHour() {
-        return pm25OneHour;
+    public String getPm25() {
+        return pm25;
     }
 
-    public void setPm25OneHour(double pm25OneHour) {
-        this.pm25OneHour = pm25OneHour;
+    public void setPm25(String pm25) {
+        this.pm25 = pm25;
     }
 
-    public double getPm10OneHour() {
-        return pm10OneHour;
+    public String getPm10() {
+        return pm10;
     }
 
-    public void setPm10OneHour(double pm10OneHour) {
-        this.pm10OneHour = pm10OneHour;
+    public void setPm10(String pm10) {
+        this.pm10 = pm10;
     }
 
-    public double getSo2OneHour() {
-        return so2OneHour;
+    public String getSo2() {
+        return so2;
     }
 
-    public void setSo2OneHour(double so2OneHour) {
-        this.so2OneHour = so2OneHour;
+    public void setSo2(String so2) {
+        this.so2 = so2;
     }
 
-    public double getNo2OneHour() {
-        return no2OneHour;
+    public String getNo2() {
+        return no2;
     }
 
-    public void setNo2OneHour(double no2OneHour) {
-        this.no2OneHour = no2OneHour;
+    public void setNo2(String no2) {
+        this.no2 = no2;
     }
 
-    public double getCoOneHour() {
-        return coOneHour;
+    public String getCo() {
+        return co;
     }
 
-    public void setCoOneHour(double coOneHour) {
-        this.coOneHour = coOneHour;
+    public void setCo(String co) {
+        this.co = co;
     }
 
-    public double getO3OneHour() {
-        return o3OneHour;
+    public String getO3EightHour() {
+        return o3EightHour;
     }
 
-    public void setO3OneHour(double o3OneHour) {
-        this.o3OneHour = o3OneHour;
+    public void setO3EightHour(String o3EightHour) {
+        this.o3EightHour = o3EightHour;
     }
 
-    public double getAqi() {
+    public String getAqi() {
         return aqi;
     }
 
-    public void setAqi(double aqi) {
+    public void setAqi(String aqi) {
         this.aqi = aqi;
     }
 

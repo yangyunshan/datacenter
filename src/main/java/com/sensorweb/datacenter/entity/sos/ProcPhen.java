@@ -1,4 +1,4 @@
-package com.sensorweb.datacenter.entity;
+package com.sensorweb.datacenter.entity.sos;
 
 /**
  * proceduere表与phenomenon表关联模型

@@ -1,7 +1,7 @@
 package com.sensorweb.datacenter.service.sos;
 
 import com.sensorweb.datacenter.dao.ProcedureMapper;
-import com.sensorweb.datacenter.entity.Procedure;
+import com.sensorweb.datacenter.entity.sos.Procedure;
 import com.sensorweb.datacenter.util.DataCenterUtils;
 import net.opengis.sensorml.v20.AbstractProcess;
 import org.apache.commons.lang3.StringUtils;
@@ -10,15 +10,12 @@ import org.springframework.stereotype.Service;
 import org.vast.ows.OWSException;
 import org.vast.ows.swe.*;
 import org.vast.sensorML.SMLUtils;
-import org.vast.util.TimeExtent;
 import org.vast.xml.DOMHelper;
 import org.vast.xml.DOMHelperException;
 import org.vast.xml.XMLReaderException;
 import org.w3c.dom.Element;
 
 import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 
 @Service

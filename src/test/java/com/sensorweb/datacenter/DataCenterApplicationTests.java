@@ -1,37 +1,26 @@
 package com.sensorweb.datacenter;
 
-import com.sensorweb.datacenter.entity.Capability;
-import com.sensorweb.datacenter.entity.Observation;
-import com.sensorweb.datacenter.entity.Offering;
-import com.sensorweb.datacenter.entity.Procedure;
+import com.sensorweb.datacenter.entity.sos.Observation;
+import com.sensorweb.datacenter.service.MeteorologyService;
 import com.sensorweb.datacenter.service.sos.*;
+import com.sensorweb.datacenter.util.DataCenterConstant;
 import com.sensorweb.datacenter.util.DataCenterUtils;
+import net.opengis.swe.v20.DataBlock;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.vast.data.DataBlockString;
 import org.vast.ows.GetCapabilitiesRequest;
 import org.vast.ows.OWSException;
-import org.vast.ows.OWSServiceCapabilities;
-import org.vast.ows.OWSUtils;
 import org.vast.ows.sos.*;
-import org.vast.ows.swe.DeleteSensorRequest;
-import org.vast.ows.swe.DescribeSensorRequest;
-import org.vast.xml.DOMHelper;
 import org.vast.xml.DOMHelperException;
-import org.vast.xml.XMLReaderException;
-import org.vast.xml.XMLWriterException;
 import org.w3c.dom.Element;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.text.ParseException;
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
+import java.net.URLEncoder;
 import java.util.List;
 
 @SpringBootTest
-class DataCenterApplicationTests {
+class DataCenterApplicationTests implements DataCenterConstant {
 
     @Autowired
     private InsertSensorService sensorService;
@@ -45,14 +34,49 @@ class DataCenterApplicationTests {
     @Autowired
     private GetObservationService getObservationService;
 
+    @Autowired
+    private InsertObservationService insertObservationService;
+
+    @Autowired
+    private GetCapabilitiesService getCapabilitiesService;
+
     @Test
     public void test() throws OWSException, DOMHelperException {
-        DeleteSensorRequest request = deleteSensorService.getDeleteSensorRequest(DataCenterUtils.readFromFile("d://Others/DeleteSensor.xml"));
-//        deleteSensorService.deleteSensor(deleteSensorService.getProcedureId(request));
-        Element element = deleteSensorService.getDeleteSensorResponse(deleteSensorService.deleteSensor(deleteSensorService.getProcedureId(request)));
-        String ss = DataCenterUtils.element2String(element);
+        InsertObservationRequest request = insertObservationService.getInsertObservationRequest(DataCenterUtils.readFromFile("d://MEGA/Others/test01.xml"));
+        String s = request.getObservations().get(0).getResult().getComponent(0).getData().getStringValue();
+        DataBlock dataBlock = new DataBlockString();
+        request.getObservations().get(0).getResult().getComponent(1);
+        System.out.println();
+    }
 
-        System.out.println("");
+    @Autowired
+    private MeteorologyService service;
+
+    @Test
+    public void test01() throws Exception {
+        String param = "UsrName=" + DataCenterConstant.USER_NAME + "&passWord=" + DataCenterConstant.PASSWORD + "&date=" + URLEncoder.encode("2019-05-09 12:00:00", "utf-8");
+
+        String document = service.doGet(DataCenterConstant.GET_LAST_HOURS_DATA, param);
+        List<Object> res = service.parseXmlDoc(document);
+//        service.getObservation(res.get(0));
+        Element element = service.writeRequest(res.get(0));
+        String ss = DataCenterUtils.element2String(element);
+        System.out.println(ss);
+    }
+
+    @Test
+    public void test02() throws OWSException, DOMHelperException {
+        GetObservationRequest request = getObservationService.getObservationRequest(DataCenterUtils.readFromFile("d://MEGA/Others/GetObservation.xml"));
+        List<Observation> observations = getObservationService.getObservationContent(request);
+        System.out.println();
+    }
+
+    @Test
+    public void test03() throws OWSException, DOMHelperException {
+        GetCapabilitiesRequest request = getCapabilitiesService.getGetCapabilitiesRequest(DataCenterUtils.readFromFile("d://MEGA/Others/GetCapabilitiesRequest.xml"));
+        Element element = getCapabilitiesService.getGetCapabilitiesResponse(request);
+        String ss = DataCenterUtils.element2String(element);
+        System.out.println();
     }
 
 }

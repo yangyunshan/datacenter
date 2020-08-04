@@ -1,7 +1,7 @@
 package com.sensorweb.datacenter.service.sos;
 
 import com.sensorweb.datacenter.dao.*;
-import com.sensorweb.datacenter.entity.*;
+import com.sensorweb.datacenter.entity.sos.*;
 import com.sensorweb.datacenter.util.DataCenterUtils;
 import net.opengis.fes.v20.*;
 import net.opengis.fes.v20.impl.*;
@@ -13,6 +13,7 @@ import org.vast.ows.*;
 import org.vast.ows.sos.SOSCapabilitiesWriterV20;
 import org.vast.ows.sos.SOSOfferingCapabilities;
 import org.vast.ows.sos.SOSServiceCapabilities;
+import org.vast.ows.sos.SOSUtils;
 import org.vast.util.ResponsibleParty;
 import org.vast.xml.DOMHelper;
 import org.vast.xml.DOMHelperException;
@@ -67,6 +68,7 @@ public class GetCapabilitiesService {
      */
     public Element getGetCapabilitiesResponse(GetCapabilitiesRequest request) throws OWSException {
         SOSServiceCapabilities sosServiceCapabilities = new SOSServiceCapabilities();
+        SOSUtils.loadRegistry();
 
         Set<String> contents = request.getSections();
         if (contents!=null && contents.size()>0) {
@@ -217,8 +219,6 @@ public class GetCapabilitiesService {
      * @return
      */
     public SOSServiceCapabilities setContents(SOSServiceCapabilities sosServiceCapabilities) {
-        List<SOSOfferingCapabilities> result = new ArrayList<>();
-
         List<Offering> offerings = offeringMapper.getAll();
         if (offerings!=null && offerings.size()>0) {
             SOSOfferingCapabilities offeringCapabilities = new SOSOfferingCapabilities();
@@ -237,31 +237,32 @@ public class GetCapabilitiesService {
                 }
 
                 //根据offeringId查Phenomenon
-                List<PhenOff> phenOffs = phenOffMapper.getPhenOff(offeringId);
-                if (phenOffs!=null && phenOffs.size()>0) {
-                    for (PhenOff phenOff : phenOffs) {
-                        String phenomenonId = phenOff.getPhenomenonId();
-                        Phenomenon phenomenon = phenomenonMapper.getPhenomenon(phenomenonId);
+//                List<PhenOff> phenOffs = phenOffMapper.getPhenOff(offeringId);
+//                if (phenOffs!=null && phenOffs.size()>0) {
+//                    for (PhenOff phenOff : phenOffs) {
+//                        String phenomenonId = phenOff.getPhenomenonId();
+//                        Phenomenon phenomenon = phenomenonMapper.getPhenomenon(phenomenonId);
 //                        offeringCapabilities.setPhenomenonTime(phenomenon);
-                    }
-                }
+//
+//                    }
+//                }
 
                 //根据offeringId查featureOfInterest
-                List<FoiOff> foiOffs = foiOffMapper.getFoiOff(offeringId);
-                if (foiOffs!=null && foiOffs.size()>0) {
-                    for (FoiOff foiOff : foiOffs) {
-                        String foiId = foiOff.getFoiId();
-                        FeatureOfInterest featureOfInterest = foiMapper.selectById(foiId);
-                        offeringCapabilities.getFoiTypes().add(featureOfInterest.getName());
-                    }
-                }
+//                List<FoiOff> foiOffs = foiOffMapper.getFoiOff(offeringId);
+//                if (foiOffs!=null && foiOffs.size()>0) {
+//                    for (FoiOff foiOff : foiOffs) {
+//                        String foiId = foiOff.getFoiId();
+//                        FeatureOfInterest featureOfInterest = foiMapper.selectById(foiId);
+//                        offeringCapabilities.getFoiTypes().add(featureOfInterest.getName());
+//                    }
+//                }
 
-
+//                offeringCapabilities.getResponseFormats().add("application/json");
+                offeringCapabilities.getResponseFormats().add("http://www.opengis.net/om/2.0");
+                offeringCapabilities.getResponseFormats().add("http://www.opengis.net/def/observationType/OGC-OM/2.0/OM_Measurement");
             }
-            result.add(offeringCapabilities);
+            sosServiceCapabilities.getLayers().add(offeringCapabilities);
         }
-
-        sosServiceCapabilities.setLayers(result);
         return sosServiceCapabilities;
     }
 }

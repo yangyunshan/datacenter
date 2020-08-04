@@ -16,4 +16,9 @@
         VALUES (#{foiId}, #{offeringId})
     </insert>
 
+    <select id="getFoiOff">
+        SELECT <include refid="selectFields"></include>
+        FROM foi_off
+    </select>
+
 </mapper>

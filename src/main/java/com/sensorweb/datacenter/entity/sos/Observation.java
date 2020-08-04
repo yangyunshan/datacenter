@@ -1,4 +1,4 @@
-package com.sensorweb.datacenter.entity;
+package com.sensorweb.datacenter.entity.sos;
 
 import org.apache.commons.lang3.StringUtils;
 

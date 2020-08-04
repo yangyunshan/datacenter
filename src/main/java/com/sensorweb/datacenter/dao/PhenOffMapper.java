@@ -1,6 +1,6 @@
 package com.sensorweb.datacenter.dao;
 
-import com.sensorweb.datacenter.entity.PhenOff;
+import com.sensorweb.datacenter.entity.sos.PhenOff;
 import org.apache.ibatis.annotations.Mapper;
 import org.springframework.stereotype.Repository;
 

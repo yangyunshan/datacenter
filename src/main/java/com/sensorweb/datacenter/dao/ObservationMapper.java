@@ -1,6 +1,6 @@
 package com.sensorweb.datacenter.dao;
 
-import com.sensorweb.datacenter.entity.Observation;
+import com.sensorweb.datacenter.entity.sos.Observation;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;

@@ -37,7 +37,6 @@ public abstract class AbstractRecordImpl<ComponentType extends DataComponent> ex
     private static final long serialVersionUID = -8053251170642596902L;
     protected DataComponentPropertyList<ComponentType> fieldList;
 
-        
     public AbstractRecordImpl()
     {
         fieldList = new DataComponentPropertyList<>(this);

@@ -1,7 +1,6 @@
 package com.sensorweb.datacenter.dao;
 
-import com.sensorweb.datacenter.entity.Position;
-import com.sensorweb.datacenter.entity.ValidTime;
+import com.sensorweb.datacenter.entity.sos.ValidTime;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;

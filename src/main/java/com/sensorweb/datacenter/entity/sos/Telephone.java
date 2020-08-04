@@ -1,4 +1,4 @@
-package com.sensorweb.datacenter.entity;
+package com.sensorweb.datacenter.entity.sos;
 
 public class Telephone {
     private int id;

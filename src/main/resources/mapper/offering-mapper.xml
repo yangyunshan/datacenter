@@ -20,13 +20,13 @@
         DELETE FROM offering WHERE procedure_id = #{procedureId}
     </delete>
 
-    <select id="selecyById" resultMap="offering">
+    <select id="getById" resultMap="offering">
         SELECT <include refid="selectFields"></include>
         FROM offering
         WHERE offering_id = #{id}
     </select>
 
-    <select id="selecyAll" resultMap="offering">
+    <select id="getAll" resultMap="offering">
         SELECT <include refid="selectFields"></include>
         FROM offering
     </select>

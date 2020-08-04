@@ -1,4 +1,4 @@
-package com.sensorweb.datacenter.entity;
+package com.sensorweb.datacenter.entity.sos;
 
 /**
  * feature_of_interest表与offering表关联模型

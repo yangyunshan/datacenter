@@ -27,6 +27,12 @@
         WHERE feature_of_interest_id = #{id}
     </select>
 
+    <select id="selectByIdAndGeom" resultMap="foi">
+        SELECT ST_Contains(ST_GeomFromText(#{polygon}, 4326), geom)
+        FROM feature_of_interest
+        WHERE feature_of_interest_id = #{id}
+    </select>
+
     <resultMap id="foi" type="FeatureOfInterest">
         <id property="id" column="feature_of_interest_id"/>
         <result property="name" column="feature_of_interest_name"/>

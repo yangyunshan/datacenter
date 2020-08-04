@@ -1,4 +1,4 @@
-package com.sensorweb.datacenter.entity.meteorological;
+package com.sensorweb.datacenter.entity.meteorology;
 
 import java.util.Date;
 
@@ -10,21 +10,21 @@ public class IDayAqi {
     private Date queryTime;
     private String city;
     private String stationName;
-    private double pm25;
-    private double pm25IAqi;
-    private double pm10;
-    private double pm10IAqi;
-    private double so2;
-    private double so2IAqi;
-    private double no2;
-    private double no2IAqi;
-    private double co;
-    private double coIAqi;
-    private double o3OneHour;
-    private double o3OneHourIAqi;
-    private double o3EightHour;
-    private double o3EightHourIAqi;
-    private double aqi;
+    private String pm25;
+    private String pm25IAqi;
+    private String pm10;
+    private String pm10IAqi;
+    private String so2;
+    private String so2IAqi;
+    private String no2;
+    private String no2IAqi;
+    private String co;
+    private String coIAqi;
+    private String o3OneHour;
+    private String o3OneHourIAqi;
+    private String o3EightHour;
+    private String o3EightHourIAqi;
+    private String aqi;
     private String primaryEP;
     private String aqDegree;
     private String aqType;
@@ -61,123 +61,123 @@ public class IDayAqi {
         this.stationName = stationName;
     }
 
-    public double getPm25() {
+    public String getPm25() {
         return pm25;
     }
 
-    public void setPm25(double pm25) {
+    public void setPm25(String pm25) {
         this.pm25 = pm25;
     }
 
-    public double getPm25IAqi() {
+    public String getPm25IAqi() {
         return pm25IAqi;
     }
 
-    public void setPm25IAqi(double pm25IAqi) {
+    public void setPm25IAqi(String pm25IAqi) {
         this.pm25IAqi = pm25IAqi;
     }
 
-    public double getPm10() {
+    public String getPm10() {
         return pm10;
     }
 
-    public void setPm10(double pm10) {
+    public void setPm10(String pm10) {
         this.pm10 = pm10;
     }
 
-    public double getPm10IAqi() {
+    public String getPm10IAqi() {
         return pm10IAqi;
     }
 
-    public void setPm10IAqi(double pm10IAqi) {
+    public void setPm10IAqi(String pm10IAqi) {
         this.pm10IAqi = pm10IAqi;
     }
 
-    public double getSo2() {
+    public String getSo2() {
         return so2;
     }
 
-    public void setSo2(double so2) {
+    public void setSo2(String so2) {
         this.so2 = so2;
     }
 
-    public double getSo2IAqi() {
+    public String getSo2IAqi() {
         return so2IAqi;
     }
 
-    public void setSo2IAqi(double so2IAqi) {
+    public void setSo2IAqi(String so2IAqi) {
         this.so2IAqi = so2IAqi;
     }
 
-    public double getNo2() {
+    public String getNo2() {
         return no2;
     }
 
-    public void setNo2(double no2) {
+    public void setNo2(String no2) {
         this.no2 = no2;
     }
 
-    public double getNo2IAqi() {
+    public String getNo2IAqi() {
         return no2IAqi;
     }
 
-    public void setNo2IAqi(double no2IAqi) {
+    public void setNo2IAqi(String no2IAqi) {
         this.no2IAqi = no2IAqi;
     }
 
-    public double getCo() {
+    public String getCo() {
         return co;
     }
 
-    public void setCo(double co) {
+    public void setCo(String co) {
         this.co = co;
     }
 
-    public double getCoIAqi() {
+    public String getCoIAqi() {
         return coIAqi;
     }
 
-    public void setCoIAqi(double coIAqi) {
+    public void setCoIAqi(String coIAqi) {
         this.coIAqi = coIAqi;
     }
 
-    public double getO3OneHour() {
+    public String getO3OneHour() {
         return o3OneHour;
     }
 
-    public void setO3OneHour(double o3OneHour) {
+    public void setO3OneHour(String o3OneHour) {
         this.o3OneHour = o3OneHour;
     }
 
-    public double getO3OneHourIAqi() {
+    public String getO3OneHourIAqi() {
         return o3OneHourIAqi;
     }
 
-    public void setO3OneHourIAqi(double o3OneHourIAqi) {
+    public void setO3OneHourIAqi(String o3OneHourIAqi) {
         this.o3OneHourIAqi = o3OneHourIAqi;
     }
 
-    public double getO3EightHour() {
+    public String getO3EightHour() {
         return o3EightHour;
     }
 
-    public void setO3EightHour(double o3EightHour) {
+    public void setO3EightHour(String o3EightHour) {
         this.o3EightHour = o3EightHour;
     }
 
-    public double getO3EightHourIAqi() {
+    public String getO3EightHourIAqi() {
         return o3EightHourIAqi;
     }
 
-    public void setO3EightHourIAqi(double o3EightHourIAqi) {
+    public void setO3EightHourIAqi(String o3EightHourIAqi) {
         this.o3EightHourIAqi = o3EightHourIAqi;
     }
 
-    public double getAqi() {
+    public String getAqi() {
         return aqi;
     }
 
-    public void setAqi(double aqi) {
+    public void setAqi(String aqi) {
         this.aqi = aqi;
     }
 

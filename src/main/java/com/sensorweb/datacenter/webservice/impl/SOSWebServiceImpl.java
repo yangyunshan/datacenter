@@ -1,7 +1,6 @@
 package com.sensorweb.datacenter.webservice.impl;
 
-import com.sensorweb.datacenter.entity.Observation;
-import com.sensorweb.datacenter.entity.Procedure;
+import com.sensorweb.datacenter.entity.sos.Observation;
 import com.sensorweb.datacenter.service.sos.DescribeSensorService;
 import com.sensorweb.datacenter.service.sos.GetObservationService;
 import com.sensorweb.datacenter.service.sos.InsertObservationService;

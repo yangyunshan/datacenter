@@ -1,31 +1,21 @@
 package com.sensorweb.datacenter.controller;
 
-import com.sensorweb.datacenter.entity.Procedure;
-import com.sensorweb.datacenter.service.HandleSensorMLService;
-import com.sensorweb.datacenter.service.QueryDataService;
+import com.sensorweb.datacenter.service.sos.DeleteSensorService;
 import com.sensorweb.datacenter.service.sos.DescribeSensorService;
 import com.sensorweb.datacenter.service.sos.InsertSensorService;
 import com.sensorweb.datacenter.util.DataCenterUtils;
-import net.opengis.sensorml.v20.Mode;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.multipart.MultipartFile;
 import org.vast.ows.sos.InsertSensorRequest;
+import org.vast.ows.swe.DeleteSensorRequest;
 import org.vast.ows.swe.DescribeSensorRequest;
 import org.w3c.dom.Element;
-
-import javax.servlet.http.HttpServletResponse;
-import java.io.*;
-import java.util.List;
 
 @Controller
 @RequestMapping(path = "/sensor")
@@ -36,6 +26,9 @@ public class SensorController {
 
     @Autowired
     private DescribeSensorService describeSensorService;
+
+    @Autowired
+    private DeleteSensorService deleteSensorService;
 
     private static Logger LOGGER = LoggerFactory.getLogger(HdfsController.class);
 
@@ -52,9 +45,10 @@ public class SensorController {
         }
 
         if (element!=null) {
-            model.addAttribute("InsertSensorRequest", requestContent);
             model.addAttribute("InsertSensorResponse", DataCenterUtils.element2String(element));
         }
+        model.addAttribute("InsertSensorRequest", requestContent);
+        model.addAttribute("tag", "InsertSensor");
 
         return "index";
     }
@@ -70,9 +64,33 @@ public class SensorController {
         }
 
         if (!StringUtils.isBlank(result)) {
-            model.addAttribute("DescribeSensorRequest", requestContent);
             model.addAttribute("DescribeSensorResponse", result);
         }
+        model.addAttribute("DescribeSensorRequest", requestContent);
+        model.addAttribute("tag","DescribeSensor");
+
+        return "index";
+    }
+
+    @RequestMapping(path = "/deleteSensor", method = RequestMethod.POST)
+    public String deleteSensor(Model model, String requestContent) {
+        String result = null;
+        try {
+            DeleteSensorRequest request = deleteSensorService.getDeleteSensorRequest(requestContent);
+            String procedureId = deleteSensorService.getProcedureId(request);
+            Element element = deleteSensorService.getDeleteSensorResponse(deleteSensorService.deleteSensor(procedureId));
+            result = DataCenterUtils.element2String(element);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        if (!StringUtils.isBlank(result)) {
+
+            model.addAttribute("DeleteSensorResponse", result);
+
+        }
+        model.addAttribute("DeleteSensorRequest", requestContent);
+        model.addAttribute("tag","DeleteSensor");
 
         return "index";
     }

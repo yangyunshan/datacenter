@@ -2,24 +2,17 @@ package com.sensorweb.datacenter.service.sos;
 
 import com.sensorweb.datacenter.dao.FoiMapper;
 import com.sensorweb.datacenter.dao.ObservationMapper;
-import com.sensorweb.datacenter.dao.OfferingMapper;
-import com.sensorweb.datacenter.entity.FeatureOfInterest;
-import com.sensorweb.datacenter.entity.Observation;
-import com.sensorweb.datacenter.entity.Offering;
-import com.sensorweb.datacenter.entity.Phenomenon;
+import com.sensorweb.datacenter.entity.sos.FeatureOfInterest;
+import com.sensorweb.datacenter.entity.sos.Observation;
 import com.sensorweb.datacenter.util.DataCenterUtils;
-import net.opengis.swe.v20.DataBlock;
-import net.opengis.swe.v20.DataComponent;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.vast.ogc.gml.IGeoFeature;
 import org.vast.ogc.om.IObservation;
-import org.vast.ogc.om.IProcedure;
 import org.vast.ogc.om.OMUtils;
 import org.vast.ows.OWSException;
 import org.vast.ows.sos.*;
@@ -27,13 +20,10 @@ import org.vast.xml.DOMHelper;
 import org.vast.xml.DOMHelperException;
 import org.vast.xml.XMLWriterException;
 import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
 
 import java.io.ByteArrayInputStream;
 import java.text.ParseException;
-import java.time.Instant;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 @Service

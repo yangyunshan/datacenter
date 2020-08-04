@@ -10,6 +10,7 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import java.io.*;
+import java.lang.reflect.Field;
 import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -56,6 +57,19 @@ public class DataCenterUtils {
     public static LocalDateTime instant2LocalDateTime(Instant instant) {
         LocalDateTime localDateTime = LocalDateTime.ofInstant(instant, ZoneId.systemDefault());
         return localDateTime;
+    }
+
+    public static Instant string2Instant(String date) {
+        Date time = null;
+        try {
+            time = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(date);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        if (time!=null) {
+            return time.toInstant();
+        }
+        return null;
     }
 
     /**
@@ -198,14 +212,56 @@ public class DataCenterUtils {
     public static String coodinate2Wkt(double minX, double minY, double maxX, double maxY) {
         StringBuilder stringBuilder = new StringBuilder("POLYGON(");
         stringBuilder.append(minX);
+        stringBuilder.append(" ");
         stringBuilder.append(minY);
+        stringBuilder.append(",");
         stringBuilder.append(minX);
+        stringBuilder.append(" ");
         stringBuilder.append(maxY);
+        stringBuilder.append(",");
         stringBuilder.append(maxX);
+        stringBuilder.append(" ");
         stringBuilder.append(minY);
+        stringBuilder.append(",");
         stringBuilder.append(maxX);
+        stringBuilder.append(" ");
         stringBuilder.append(maxY);
+        stringBuilder.append(")");
         return stringBuilder.toString();
     }
 
+    /**
+     * 将bean中的字段和属性值写入到map中
+     * @param bean
+     * @return
+     */
+    public static Map<String, Object> bean2Map(Object bean) {
+        Map<String, Object> res = new HashMap<>();
+        Field[] fields = bean.getClass().getDeclaredFields();
+        if (fields.length>0) {
+            for (Field field : fields) {
+                boolean accessible = field.isAccessible();
+                if(!accessible){
+                    field.setAccessible(true);
+                }
+                try {
+                    res.put(field.getName(), field.get(bean));
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                field.setAccessible(accessible);
+            }
+        }
+        return res;
+    }
+
+    /**
+     * 日期转字符串
+     * @param date
+     * @return
+     */
+    public static String date2Str(Date date) {
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        return format.format(date);
+    }
 }

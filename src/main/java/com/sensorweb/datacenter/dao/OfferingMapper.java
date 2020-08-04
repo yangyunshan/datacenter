@@ -1,7 +1,6 @@
 package com.sensorweb.datacenter.dao;
 
-import com.sensorweb.datacenter.entity.Offering;
-import org.apache.commons.lang3.StringUtils;
+import com.sensorweb.datacenter.entity.sos.Offering;
 import org.apache.ibatis.annotations.Mapper;
 import org.springframework.stereotype.Repository;
 

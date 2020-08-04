@@ -1,12 +1,6 @@
 package com.sensorweb.datacenter.service;
 
-import com.sensorweb.datacenter.dao.ProcedureMapper;
-import com.sensorweb.datacenter.entity.Procedure;
-import com.sensorweb.datacenter.util.DataCenterUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @Service
 public class QueryDataService {

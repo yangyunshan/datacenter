@@ -1,17 +1,9 @@
 package com.sensorweb.datacenter.controller;
 
-import com.sensorweb.datacenter.entity.meteorological.*;
-import com.sensorweb.datacenter.service.HttpService;
 import com.sensorweb.datacenter.util.DataCenterConstant;
-import com.sensorweb.datacenter.util.ParseAQIDocument;
-import org.springframework.beans.factory.annotation.Autowired;
 //import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.net.URLEncoder;
-import java.util.List;
 
 
 @RestController
@@ -24,8 +16,6 @@ public class HttpController implements DataCenterConstant {
 //    @Autowired
 //    private ParseAQIDocument parseAQIDocument;
 //
-//    @Autowired
-//    private MongoTemplate mongoTemplate;
 //
 //    @RequestMapping(path = "getLast24HourData", method = RequestMethod.GET)
 //    public String getLast24HourData() throws Exception {

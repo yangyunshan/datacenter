@@ -1,11 +1,10 @@
-package com.sensorweb.datacenter.entity;
+package com.sensorweb.datacenter.entity.sos;
 
-public class Capability {
+public class Classification {
     private int id;
     private String identifier;
-    private String name;
-    private String definition;
     private String label;
+    private String definition;
     private String value;
 
     public int getId() {
@@ -24,12 +23,12 @@ public class Capability {
         this.identifier = identifier;
     }
 
-    public String getName() {
-        return name;
+    public String getLabel() {
+        return label;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setLabel(String label) {
+        this.label = label;
     }
 
     public String getDefinition() {
@@ -40,14 +39,6 @@ public class Capability {
         this.definition = definition;
     }
 
-    public String getLabel() {
-        return label;
-    }
-
-    public void setLabel(String label) {
-        this.label = label;
-    }
-
     public String getValue() {
         return value;
     }
@@ -55,4 +46,5 @@ public class Capability {
     public void setValue(String value) {
         this.value = value;
     }
+
 }

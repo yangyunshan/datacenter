@@ -1,9 +1,9 @@
-package com.sensorweb.datacenter.entity;
+package com.sensorweb.datacenter.entity.sos;
 
 /**
- * procedure表与feature_of_interest表关联模型
+ * procedure表与offering表关联模型
  */
-public class ProcFoi {
+public class ProcOff {
     private String procedureId;
     private String offeringId;
 

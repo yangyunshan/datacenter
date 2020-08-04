@@ -1,14 +1,12 @@
-package com.sensorweb.datacenter.entity;
+package com.sensorweb.datacenter.entity.sos;
 
-import java.sql.Timestamp;
-import java.time.LocalDateTime;
 
-public class Event {
+public class Identification {
     private int id;
     private String identifier;
+    private String definition;
     private String label;
-    private String documentationUrl;
-    private LocalDateTime time;
+    private String value;
 
     public int getId() {
         return id;
@@ -34,19 +32,19 @@ public class Event {
         this.label = label;
     }
 
-    public String getDocumentationUrl() {
-        return documentationUrl;
+    public String getValue() {
+        return value;
     }
 
-    public void setDocumentationUrl(String documentationUrl) {
-        this.documentationUrl = documentationUrl;
+    public void setValue(String value) {
+        this.value = value;
     }
 
-    public LocalDateTime getTime() {
-        return time;
+    public String getDefinition() {
+        return definition;
     }
 
-    public void setTime(LocalDateTime time) {
-        this.time = time;
+    public void setDefinition(String definition) {
+        this.definition = definition;
     }
 }

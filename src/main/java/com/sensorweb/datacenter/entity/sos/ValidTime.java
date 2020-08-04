@@ -1,4 +1,4 @@
-package com.sensorweb.datacenter.entity;
+package com.sensorweb.datacenter.entity.sos;
 
 import java.sql.Timestamp;
 import java.time.LocalDateTime;

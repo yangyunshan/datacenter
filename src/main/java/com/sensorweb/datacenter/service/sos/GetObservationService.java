@@ -1,17 +1,10 @@
 package com.sensorweb.datacenter.service.sos;
 
-import com.google.inject.internal.cglib.core.$CollectionUtils;
 import com.sensorweb.datacenter.dao.FoiMapper;
 import com.sensorweb.datacenter.dao.ObservationMapper;
-import com.sensorweb.datacenter.dao.ProcFoiMapper;
-import com.sensorweb.datacenter.entity.FeatureOfInterest;
-import com.sensorweb.datacenter.entity.Observation;
-import com.sensorweb.datacenter.entity.ProcFoi;
-import com.sensorweb.datacenter.entity.Procedure;
+import com.sensorweb.datacenter.entity.sos.FeatureOfInterest;
+import com.sensorweb.datacenter.entity.sos.Observation;
 import com.sensorweb.datacenter.util.DataCenterUtils;
-import net.opengis.fes.v20.BBOX;
-import net.opengis.fes.v20.BinaryTemporalOp;
-import net.opengis.fes.v20.SpatialOps;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -82,18 +75,17 @@ public class GetObservationService {
         List<Observation> observations = observationMapper.selectObservationsByConditions(offerings, procedureIds, fois, observedProperties,
                 temporal[0], temporal[1]);
         //从上面的查询结果中进一步筛选出满足空间条件的结果
-//        if (observations!=null && observations.size()>0) {
-//            for (Observation temp : observations) {
-//                //将空间参数转为wkt字符串
-//                String spatialCondition = DataCenterUtils.coodinate2Wkt(spatial[0], spatial[1], spatial[2], spatial[3]);
-//                //查询此观测结果对应的foi
-//                FeatureOfInterest featureOfInterest = foiMapper.selectByIdAndGeom(temp.getFoiId(), spatialCondition);
-//                if (featureOfInterest!=null) {
-//
-//                }
-//
-//            }
-//        }
+        if (observations!=null && observations.size()>0 && !(spatial[0]==0.0 && spatial[1]==0.0 && spatial[2]==0.0) && spatial[3]==0.0) {
+            for (Observation temp : observations) {
+                //将空间参数转为wkt字符串
+                String spatialCondition = DataCenterUtils.coodinate2Wkt(spatial[0], spatial[1], spatial[2], spatial[3]);
+                //查询此观测结果对应的foi
+                boolean flag = foiMapper.selectByIdAndGeom(temp.getFoiId(), spatialCondition);
+                if (!flag) {
+                    observations.remove(temp);
+                }
+            }
+        }
 
         return observations;
     }

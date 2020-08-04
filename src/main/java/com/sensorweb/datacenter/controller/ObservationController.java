@@ -1,10 +1,9 @@
 package com.sensorweb.datacenter.controller;
 
-import com.sensorweb.datacenter.entity.Observation;
+import com.sensorweb.datacenter.entity.sos.Observation;
 import com.sensorweb.datacenter.service.sos.GetObservationService;
 import com.sensorweb.datacenter.service.sos.InsertObservationService;
 import com.sensorweb.datacenter.util.DataCenterUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -12,7 +11,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.vast.ows.sos.GetObservationRequest;
 import org.vast.ows.sos.InsertObservationRequest;
-import org.vast.ows.swe.DescribeSensorRequest;
 import org.w3c.dom.Element;
 
 import java.util.List;
@@ -39,9 +37,10 @@ public class ObservationController {
         }
 
         if (element!=null) {
-            model.addAttribute("InsertObservationRequest", requestContent);
             model.addAttribute("InsertObservationResponse", DataCenterUtils.element2String(element));
         }
+        model.addAttribute("InsertObservationRequest", requestContent);
+        model.addAttribute("tag", "InsertObservation");
 
         return "index";
     }
@@ -64,9 +63,10 @@ public class ObservationController {
         }
 
         if (element!=null) {
-            model.addAttribute("GetObservationRequest", requestContent);
             model.addAttribute("GetObservationResponse", DataCenterUtils.element2String(element));
         }
+        model.addAttribute("GetObservationRequest", requestContent);
+        model.addAttribute("tag", "GetObservation");
 
         return "index";
     }
