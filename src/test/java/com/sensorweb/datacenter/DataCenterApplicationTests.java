@@ -1,10 +1,13 @@
 package com.sensorweb.datacenter;
 
-import com.sensorweb.datacenter.entity.sos.Observation;
+import com.sensorweb.datacenter.dao.KeywordMapper;
+import com.sensorweb.datacenter.dao.ValidTimeMapper;
+import com.sensorweb.datacenter.entity.sos.*;
 import com.sensorweb.datacenter.service.MeteorologyService;
 import com.sensorweb.datacenter.service.sos.*;
 import com.sensorweb.datacenter.util.DataCenterConstant;
 import com.sensorweb.datacenter.util.DataCenterUtils;
+import javafx.geometry.Pos;
 import net.opengis.swe.v20.DataBlock;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,8 +19,15 @@ import org.vast.ows.sos.*;
 import org.vast.xml.DOMHelperException;
 import org.w3c.dom.Element;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.URLEncoder;
+import java.text.ParseException;
+import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @SpringBootTest
 class DataCenterApplicationTests implements DataCenterConstant {
@@ -76,6 +86,31 @@ class DataCenterApplicationTests implements DataCenterConstant {
         GetCapabilitiesRequest request = getCapabilitiesService.getGetCapabilitiesRequest(DataCenterUtils.readFromFile("d://MEGA/Others/GetCapabilitiesRequest.xml"));
         Element element = getCapabilitiesService.getGetCapabilitiesResponse(request);
         String ss = DataCenterUtils.element2String(element);
+        System.out.println();
+    }
+
+    @Test
+    public void test04() {
+        Process process;
+        try {
+            process = Runtime.getRuntime().exec("python D://demo.py");
+            BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+            String line = null;
+            while ((line = reader.readLine())!=null) {
+                System.out.println(line);
+            }
+            reader.close();
+            process.waitFor();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Test
+    public void test05() throws Exception {
+        String filePath = "d://MEGA/Others/InsertSensor.xml";
+        InsertSensorRequest request = sensorService.getInsertSensorRequest(DataCenterUtils.readFromFile(filePath));
+        String str = sensorService.insertSensor(request);
         System.out.println();
     }
 

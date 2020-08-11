@@ -4,8 +4,7 @@ import java.util.List;
 
 public class Characteristic {
     private int id;
-    private String identifier;
-    private String label;
+    private String procedureId;
     private String name;
     private String value;
 
@@ -17,20 +16,12 @@ public class Characteristic {
         this.id = id;
     }
 
-    public String getIdentifier() {
-        return identifier;
+    public String getProcedureId() {
+        return procedureId;
     }
 
-    public void setIdentifier(String identifier) {
-        this.identifier = identifier;
-    }
-
-    public String getLabel() {
-        return label;
-    }
-
-    public void setLabel(String label) {
-        this.label = label;
+    public void setProcedureId(String procedureId) {
+        this.procedureId = procedureId;
     }
 
     public String getName() {

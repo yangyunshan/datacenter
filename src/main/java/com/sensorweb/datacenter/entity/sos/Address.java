@@ -2,7 +2,7 @@ package com.sensorweb.datacenter.entity.sos;
 
 public class Address {
     private int id;
-    private String identifier;
+    private String procedureId;
     private String deliveryPoint;
     private String city;
     private String administrativeArea;
@@ -18,12 +18,12 @@ public class Address {
         this.id = id;
     }
 
-    public String getIdentifier() {
-        return identifier;
+    public String getProcedureId() {
+        return procedureId;
     }
 
-    public void setIdentifier(String identifier) {
-        this.identifier = identifier;
+    public void setProcedureId(String procedureId) {
+        this.procedureId = procedureId;
     }
 
     public String getDeliveryPoint() {

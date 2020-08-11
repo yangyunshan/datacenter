@@ -173,7 +173,7 @@ public class InsertObservationService {
             observation.setFoiId(iObservation.getFeatureOfInterest().getUniqueIdentifier());
             observation.setProcedureId(iObservation.getProcedure().getUniqueIdentifier());
             observation.setOfferingId(offeringId);
-            observation.setTime(DataCenterUtils.instant2LocalDateTime(iObservation.getResultTime()));
+            observation.setTime(iObservation.getResultTime());
             observation.setValue(getOM(iObservation));
             observation.setObservedProperty(iObservation.getObservedProperty().getHref());
         }

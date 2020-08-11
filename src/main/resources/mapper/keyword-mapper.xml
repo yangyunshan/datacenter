@@ -4,26 +4,24 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.sensorweb.datacenter.dao.KeywordMapper">
     <sql id="insertFields">
-        keyword_identifier, keyword_value
+        keyword_value, procedure_id
     </sql>
 
     <sql id="selectFields">
-        keyword_id, keyword_identifier, keyword_value
+        procedure_id
     </sql>
 
     <insert id="insertData" parameterType="Keyword">
         INSERT INTO keyword (<include refid="insertFields"></include>)
-        VALUES (#{identifier}, #{values})
+        VALUES
+        <foreach collection="values" item="item" index="index" separator=",">
+            (#{item}, #{procedureId})
+        </foreach>
     </insert>
 
-    <delete id="deleteByIdentifier">
+    <delete id="deleteByProcedureId">
         DELETE FROM keyword
-        WHERE keyword_identifier = #{identifier}
-    </delete>
-
-    <delete id="deleteByIdentifierNoNum">
-        DELETE FROM keyword
-        WHERE keyword_identifier like concat(#{identifier},%)
+        WHERE procedure_id = #{procedureId}
     </delete>
 
     <delete id="deleteById" parameterType="int">
@@ -31,28 +29,16 @@
         WHERE keyword_id = #{id}
     </delete>
 
-    <select id="selectById" parameterType="int" resultMap="keyword">
+    <select id="selectById" parameterType="int" resultType="java.lang.String">
         SELECT <include refid="selectFields"></include>
         FROM keyword
         WHERE keyword_id = #{id}
     </select>
 
-    <select id="selectByIdentifier" resultMap="keyword">
-        SELECT <include refid="selectFields"></include>
-        FROM keyword
-        WHERE keyword_identifier = #{identifier}
-    </select>
-
-    <select id="selectByValue" resultMap="keyword">
+    <select id="selectByValue" resultType="java.lang.String">
         SELECT <include refid="selectFields"></include>
         FROM keyword
         WHERE keyword_value like concat(%,#{value},%)
     </select>
-
-    <resultMap id="keyword" type="Keyword">
-        <id property="id" column="keyword_id"/>
-        <result property="identifier" column="keyword_identifier"/>
-        <result property="values" column="keyword_value"/>
-    </resultMap>
 
 </mapper>

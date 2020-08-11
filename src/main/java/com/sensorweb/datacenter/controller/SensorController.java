@@ -37,9 +37,9 @@ public class SensorController {
         Element element = null;
         try {
             InsertSensorRequest request = insertSensorService.getInsertSensorRequest(requestContent);
-            String[] result = insertSensorService.insertSensor(request);
+            String result = insertSensorService.insertSensor(request);
 
-            element = insertSensorService.getInsertSensorResponse(result[0], result[1]);
+            element = insertSensorService.getInsertSensorResponse(result);
         } catch (Exception e) {
             e.printStackTrace();
         }

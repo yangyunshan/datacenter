@@ -4,26 +4,21 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.sensorweb.datacenter.dao.CapabilityMapper">
     <sql id="insertFields">
-        capability_identifier, capability_name, capability_label, capability_definition, capability_value
+        capability_name, capability_value, procedure_id
     </sql>
 
     <sql id="selectFields">
-        capability_id, capability_identifier, capability_name, capability_label, capability_definition, capability_value
+        capability_id, capability_name, capability_value, procedure_id
     </sql>
 
     <insert id="insertData" parameterType="Capability">
         INSERT INTO capability (<include refid="insertFields"></include>)
-        VALUES (#{identifier}, #{name}, #{label}, #{definition}, #{value})
+        VALUES (#{name}, #{value}, #{procedureId})
     </insert>
 
-    <delete id="deleteByIdentifier">
+    <delete id="deleteByProcedureId">
         DELETE FROM capability
-        WHERE capability_identifier = #{identifier}
-    </delete>
-
-    <delete id="deleteByIdentifierNoNum">
-        DELETE FROM capability
-        WHERE capability_identifier like concat(#{identifier},%)
+        WHERE procedure_id = #{procedureId}
     </delete>
 
     <delete id="deleteById" parameterType="int">
@@ -37,36 +32,16 @@
         WHERE capability_id = #{id}
     </select>
 
-    <select id="selectByIdentifier" resultMap="capability">
-        SELECT <include refid="selectFields"></include>
-        FROM capability
-        WHERE capability_identifier = #{identifier}
-    </select>
-
     <select id="selectByName" resultMap="capability">
         SELECT <include refid="selectFields"></include>
         FROM capability
         WHERE capability_name = #{name}
     </select>
 
-    <select id="selectByLabel" resultMap="capability">
-        SELECT <include refid="selectFields"></include>
-        FROM capability
-        WHERE capability_label = #{label}
-    </select>
-
-    <select id="selectByIdentifierNoNum" resultMap="capability">
-        SELECT <include refid="selectFields"></include>
-        FROM capability
-        WHERE capability_identifier like concat(#{label},%)
-    </select>
-
     <resultMap id="capability" type="Capability">
         <id property="id" column="capability_id"/>
-        <result property="identifier" column="capability_identifier"/>
+        <result property="procedureId" column="procedure_id"/>
         <result property="name" column="capability_name"/>
-        <result property="label" column="capability_label"/>
-        <result property="definition" column="capability_definition"/>
         <result property="value" column="capability_value"/>
     </resultMap>
 

@@ -4,21 +4,21 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.sensorweb.datacenter.dao.ValidTimeMapper">
     <sql id="insertFields">
-        validtime_identifier, validtime_begin, validtime_end
+        validtime_begin, validtime_end, procedure_id
     </sql>
 
     <sql id="selectFields">
-        validtime_id, validtime_identifier, validtime_begin, validtime_end
+        validtime_id, validtime_begin, validtime_end, procedure_id
     </sql>
 
     <insert id="insertData" parameterType="ValidTime">
         INSERT INTO validtime (<include refid="insertFields"></include>)
-        VALUES (#{identifier}, #{beginPosition}, #{endPosition})
+        VALUES (#{beginPosition}, #{endPosition}, #{procedureId})
     </insert>
 
-    <delete id="deleteByIdentifier">
+    <delete id="deleteByProcedureId">
         DELETE FROM validtime
-        WHERE validtime_identifier = #{identifier}
+        WHERE procedure_id = #{procedureId}
     </delete>
 
     <delete id="deleteById" parameterType="int">
@@ -30,12 +30,6 @@
         SELECT <include refid="selectFields"></include>
         FROM validtime
         WHERE validtime_id = #{id}
-    </select>
-
-    <select id="selectByIdentifier" resultMap="validtime">
-        SELECT <include refid="selectFields"></include>
-        FROM validtime
-        WHERE validtime_identifier = #{identifier}
     </select>
 
     <select id="selectByTime" resultMap="validtime">
@@ -58,7 +52,7 @@
 
     <resultMap id="validtime" type="ValidTime">
         <id property="id" column="validtime_id"/>
-        <result property="identifier" column="validtime_identifier"/>
+        <result property="procedureId" column="procedure_id"/>
         <result property="beginPosition" column="validtime_begin"/>
         <result property="endPosition" column="validtime_end"/>
     </resultMap>

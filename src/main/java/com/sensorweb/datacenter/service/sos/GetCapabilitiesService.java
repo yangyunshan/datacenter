@@ -227,14 +227,14 @@ public class GetCapabilitiesService {
                 String offeringId = offering.getId();
                 offeringCapabilities.setIdentifier(offeringId);
                 offeringCapabilities.setTitle(offering.getName());
-                offeringCapabilities.getObservableProperties().addAll(DataCenterUtils.string2List(offering.getObservableProperty()));
+//                offeringCapabilities.getObservableProperties().addAll(DataCenterUtils.string2List(offering.getObservableProperty()));
 
                 //根据offeringId查ProcedureId，进而获取procedure相关信息
-                Procedure procedure = procedureMapper.selectById(offering.getProcedureId());
-                if (procedure!=null) {
-                    offeringCapabilities.getProcedures().add(procedure.getId());
-                    offeringCapabilities.getProcedureFormats().add(procedure.getDescriptionFormat());
-                }
+//                Procedure procedure = procedureMapper.selectById(offering.getProcedureId());
+//                if (procedure!=null) {
+//                    offeringCapabilities.getProcedures().add(procedure.getId());
+//                    offeringCapabilities.getProcedureFormats().add(procedure.getDescriptionFormat());
+//                }
 
                 //根据offeringId查Phenomenon
 //                List<PhenOff> phenOffs = phenOffMapper.getPhenOff(offeringId);

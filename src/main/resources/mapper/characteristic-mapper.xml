@@ -4,26 +4,21 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.sensorweb.datacenter.dao.CharacteristicMapper">
     <sql id="insertFields">
-        characteristic_identifier, characteristic_name, characteristic_label, characteristic_value
+        characteristic_name, characteristic_value, procedure_id
     </sql>
 
     <sql id="selectFields">
-        characteristic_id, characteristic_identifier, characteristic_name, characteristic_label, characteristic_value
+        characteristic_id, characteristic_name, characteristic_value, procedure_id
     </sql>
 
     <insert id="insertData" parameterType="Characteristic">
         INSERT INTO characteristic (<include refid="insertFields"></include>)
-        VALUES (#{identifier}, #{name}, #{label}, #{value})
+        VALUES (#{name}, #{value}, #{procedureId})
     </insert>
 
-    <delete id="deleteByIdentifier">
+    <delete id="deleteByProcedureId">
         DELETE FROM characteristic
-        WHERE characteristic_identifier = #{identifier}
-    </delete>
-
-    <delete id="deleteByIdentifierNoNum">
-        DELETE FROM characteristic
-        WHERE characteristic_identifier like concat(#{identifier},%)
+        WHERE procedure_id = #{procedureId}
     </delete>
 
     <delete id="deleteById" parameterType="int">
@@ -37,36 +32,17 @@
         WHERE characteristic_id = #{id}
     </select>
 
-    <select id="selectByIdentifier" resultMap="characteristic">
-        SELECT <include refid="selectFields"></include>
-        FROM characteristic
-        WHERE characteristic_identifier = #{identifier}
-    </select>
-
-    <select id="selectByIdentifierNoNum" resultMap="characteristic">
-        SELECT <include refid="selectFields"></include>
-        FROM characteristic
-        WHERE characteristic_identifier like concat(#{identifier},%)
-    </select>
-
     <select id="selectByName" resultMap="characteristic">
         SELECT <include refid="selectFields"></include>
         FROM characteristic
         WHERE characteristic_name = #{name}
     </select>
 
-    <select id="selectByLabel" resultMap="characteristic">
-        SELECT <include refid="selectFields"></include>
-        FROM characteristic
-        WHERE characteristic_label = #{label}
-    </select>
-
     <resultMap id="characteristic" type="Characteristic">
         <id property="id" column="characteristic_id"/>
-        <result property="identifier" column="characteristic_identifier"/>
         <result property="name" column="characteristic_name"/>
-        <result property="label" column="characteristic_label"/>
         <result property="value" column="characteristic_value"/>
+        <result property="procedureId" column="procedure_id"/>
     </resultMap>
 
 </mapper>

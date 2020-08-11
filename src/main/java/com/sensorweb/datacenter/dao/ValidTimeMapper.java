@@ -6,6 +6,8 @@ import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
 import java.sql.Timestamp;
+import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Repository
@@ -14,11 +16,10 @@ public interface ValidTimeMapper {
     int insertData(ValidTime validTime);
 
     int deleteById(int id);
-    int deleteByIdentifier(String identifier);
+    int deleteByProcedureId(String procedureId);
 
     ValidTime selectById(int id);
-    ValidTime selectByIdentifier(String identifier);
-    List<ValidTime> selectByTime(@Param("begin") Timestamp beginTime, @Param("end") Timestamp endTime);
-    List<ValidTime> selectByBeginTime(Timestamp begin);
-    List<ValidTime> selectByEndTime(Timestamp end);
+    List<ValidTime> selectByTime(@Param("begin") Instant beginTime, @Param("end") Instant endTime);
+    List<ValidTime> selectByBeginTime(Instant begin);
+    List<ValidTime> selectByEndTime(Instant end);
 }

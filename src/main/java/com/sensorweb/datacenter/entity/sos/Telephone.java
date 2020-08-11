@@ -2,7 +2,7 @@ package com.sensorweb.datacenter.entity.sos;
 
 public class Telephone {
     private int id;
-    private String identifier;
+    private String procedureId;
     private String voice;
     private String facsimile;
 
@@ -14,12 +14,12 @@ public class Telephone {
         this.id = id;
     }
 
-    public String getIdentifier() {
-        return identifier;
+    public String getProcedureId() {
+        return procedureId;
     }
 
-    public void setIdentifier(String identifier) {
-        this.identifier = identifier;
+    public void setProcedureId(String procedureId) {
+        this.procedureId = procedureId;
     }
 
     public String getVoice() {

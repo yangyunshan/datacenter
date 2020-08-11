@@ -2,7 +2,8 @@ package com.sensorweb.datacenter.entity.sos;
 
 public class Contact {
     private int id;
-    private String identifier;
+    private String title;
+    private String procedureId;
     private String individualName;
     private String positionName;
     private String organizationName;
@@ -18,12 +19,20 @@ public class Contact {
         this.id = id;
     }
 
-    public String getIdentifier() {
-        return identifier;
+    public String getTitle() {
+        return title;
     }
 
-    public void setIdentifier(String identifier) {
-        this.identifier = identifier;
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public String getProcedureId() {
+        return procedureId;
+    }
+
+    public void setProcedureId(String procedureId) {
+        this.procedureId = procedureId;
     }
 
     public String getIndividualName() {

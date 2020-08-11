@@ -11,10 +11,8 @@ public interface KeywordMapper {
     int insertData(Keyword keyword);
 
     int deleteById(int id);
-    int deleteByIdentifier(String identifier);
-    int deleteByIdentifierNoNum(String identifier);
+    int deleteByProcedureId(String procedureId);
 
-    Keyword selectById(int id);
-    Keyword selectByIdentifier(String identifier);
-    List<Keyword> selectByValue(String value);
+    String selectById(int id);
+    List<String> selectByValue(String value);
 }

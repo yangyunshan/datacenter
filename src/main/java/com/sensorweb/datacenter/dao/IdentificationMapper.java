@@ -12,12 +12,9 @@ public interface IdentificationMapper {
     int insertData(Identification identification);
 
     int deleteById(int id);
-    int deleteByIdentifier(String identifier);
-    int deleteByIdentifierNoNum(String identifier);
+    int deleteByProcedureId(String procedureId);
 
     Identification selectById(int id);
-    Identification selectByIdentifier(String identifeir);
-    List<Identification> selectByIdentifierNoNum(String identifier);
     List<Identification> selectByLabel(String label);
     List<Identification> selectByValue(String value);
 }

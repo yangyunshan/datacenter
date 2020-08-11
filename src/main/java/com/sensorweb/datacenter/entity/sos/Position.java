@@ -2,7 +2,8 @@ package com.sensorweb.datacenter.entity.sos;
 
 public class Position {
     private int id;
-    private String identifier;
+    private String name;
+    private String procedureId;
     private double longitude;
     private double latitude;
     private double altitude;
@@ -15,12 +16,20 @@ public class Position {
         this.id = id;
     }
 
-    public String getIdentifier() {
-        return identifier;
+    public String getName() {
+        return name;
     }
 
-    public void setIdentifier(String identifier) {
-        this.identifier = identifier;
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getProcedureId() {
+        return procedureId;
+    }
+
+    public void setProcedureId(String procedureId) {
+        this.procedureId = procedureId;
     }
 
     public double getAltitude() {
@@ -46,4 +55,5 @@ public class Position {
     public void setAltitude(double altitude) {
         this.altitude = altitude;
     }
+
 }

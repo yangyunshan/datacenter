@@ -1,10 +1,12 @@
 package com.sensorweb.datacenter.entity.sos;
 
 
+import java.util.List;
+
 public class Keyword {
     private int id;
-    private String identifier;
-    private String values;//关键字拼接成一个字符串，中间以英文冒号":"分开
+    private List<String> values;
+    private String procedureId;
 
     public int getId() {
         return id;
@@ -14,19 +16,19 @@ public class Keyword {
         this.id = id;
     }
 
-    public String getIdentifier() {
-        return identifier;
-    }
-
-    public void setIdentifier(String identifier) {
-        this.identifier = identifier;
-    }
-
-    public String getValues() {
+    public List<String> getValues() {
         return values;
     }
 
-    public void setValues(String values) {
+    public void setValues(List<String> values) {
         this.values = values;
+    }
+
+    public String getProcedureId() {
+        return procedureId;
+    }
+
+    public void setProcedureId(String procedureId) {
+        this.procedureId = procedureId;
     }
 }

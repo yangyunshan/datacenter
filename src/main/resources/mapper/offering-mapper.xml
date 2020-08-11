@@ -4,21 +4,17 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.sensorweb.datacenter.dao.OfferingMapper">
     <sql id="insertFields">
-        offering_id, offering_name, procedure_id, observable_property
+        offering_id, offering_name
     </sql>
 
     <sql id="selectFields">
-        offering_id, offering_name, procedure_id, observable_property
+        offering_id, offering_name
     </sql>
 
     <insert id="insertData" parameterType="Offering">
         INSERT INTO offering (<include refid="insertFields"></include>)
-        VALUES (#{id}, #{name}, #{procedureId}, #{observableProperty})
+        VALUES (#{id}, #{name})
     </insert>
-
-    <delete id="deleteByProcedure" parameterType="java.lang.String">
-        DELETE FROM offering WHERE procedure_id = #{procedureId}
-    </delete>
 
     <select id="getById" resultMap="offering">
         SELECT <include refid="selectFields"></include>
@@ -34,7 +30,5 @@
     <resultMap id="offering" type="Offering">
         <id property="id" column="offering_id"/>
         <result property="name" column="offering_name"/>
-        <result property="procedureId" column="procedure_id"/>
-        <result property="observableProperty" column="observable_property"/>
     </resultMap>
 </mapper>

@@ -13,15 +13,9 @@ public interface ClassificationMapper {
     int insertData(Classification classification);
 
     int deleteById(int id);
-
-    int deleteByIdentifer(String identifier);
-    int deleteByIdentifierNoNum(String identifier);
-
-    int updateValueByIdentifierAndLabel(@Param("identifier") String identifier, @Param("label") String label, @Param("value") String value);
+    int deleteByProcedureId(String identifier);
 
     Classification selectById(int id);
-    Classification selectByIdentifier(String identifier);
-    List<Classification> selectByIdentifierNoNum(String identifier);
     List<Classification> selectByValue(String value);
     List<Classification> selectByLabel(String label);
 }

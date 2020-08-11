@@ -4,26 +4,21 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.sensorweb.datacenter.dao.PositionMapper">
     <sql id="insertFields">
-        position_identifier, position_longitude, position_latitude, position_altitude
+        position_name, position_longitude, position_latitude, position_altitude, procedure_id
     </sql>
 
     <sql id="selectFields">
-        position_id, position_identifier, position_longitude, position_latitude, position_altitude
+        position_id, position_name, position_longitude, position_latitude, position_altitude, procedure_id
     </sql>
 
     <insert id="insertData" parameterType="Position">
         INSERT INTO position (<include refid="insertFields"></include>)
-        VALUES (#{identifier}, #{longitude}, #{latitude}. #{altitude})
+        VALUES (#{name}, #{longitude}, #{latitude}, #{altitude}, #{procedureId})
     </insert>
 
-    <delete id="deleteByIdentifier">
+    <delete id="deleteByProcedureId">
         DELETE FROM position
-        WHERE position_identifier = #{identifier}
-    </delete>
-
-    <delete id="deleteByIdentifierNoNum">
-        DELETE FROM position
-        WHERE position_identifier like concat(#{identifier},%)
+        WHERE procedure-id = #{procedureId}
     </delete>
 
     <delete id="deleteById" parameterType="int">
@@ -37,16 +32,10 @@
         WHERE position_id = #{id}
     </select>
 
-    <select id="selectByIdentifier" resultMap="position">
+    <select id="selectByName" parameterType="java.lang.String" resultMap="position">
         SELECT <include refid="selectFields"></include>
         FROM position
-        WHERE position_identifier = #{identifier}
-    </select>
-
-    <select id="selectByIdentifierNoNum" resultMap="position">
-        SELECT <include refid="selectFields"></include>
-        FROM position
-        WHERE position_identifier like concat(#{identifier},%)
+        WHERE position_name = #{name}
     </select>
 
     <select id="selectByEnvelope" resultMap="position">
@@ -57,7 +46,8 @@
 
     <resultMap id="position" type="Position">
         <id property="id" column="position_id"/>
-        <result property="identifier" column="position_identifier"/>
+        <result property="name" column="position_name"/>
+        <result property="procedureId" column="procedure_id"/>
         <result property="longitude" column="position_longitude"/>
         <result property="latitude" column="position_latitude"/>
         <result property="altitude" column="position_altitude"/>

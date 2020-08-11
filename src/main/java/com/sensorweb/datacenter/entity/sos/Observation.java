@@ -2,13 +2,14 @@ package com.sensorweb.datacenter.entity.sos;
 
 import org.apache.commons.lang3.StringUtils;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.Date;
 
 public class Observation {
     private String id;
     private String description;
-    private LocalDateTime time;
+    private Instant time;
     private String procedureId;
     private String offeringId;
     private String foiId;
@@ -31,11 +32,11 @@ public class Observation {
         this.description = description;
     }
 
-    public LocalDateTime getTime() {
+    public Instant getTime() {
         return time;
     }
 
-    public void setTime(LocalDateTime time) {
+    public void setTime(Instant time) {
         this.time = time;
     }
 

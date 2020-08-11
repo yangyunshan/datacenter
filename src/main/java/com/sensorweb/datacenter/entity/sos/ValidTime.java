@@ -1,14 +1,15 @@
 package com.sensorweb.datacenter.entity.sos;
 
 import java.sql.Timestamp;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.Date;
 
 public class ValidTime {
     private int id;
-    private String identifier;
-    private LocalDateTime beginPosition;
-    private LocalDateTime endPosition;
+    private String procedureId;
+    private Instant beginPosition;
+    private Instant endPosition;
 
     public int getId() {
         return id;
@@ -18,27 +19,27 @@ public class ValidTime {
         this.id = id;
     }
 
-    public String getIdentifier() {
-        return identifier;
+    public String getProcedureId() {
+        return procedureId;
     }
 
-    public void setIdentifier(String identifier) {
-        this.identifier = identifier;
+    public void setProcedureId(String procedureId) {
+        this.procedureId = procedureId;
     }
 
-    public LocalDateTime getBeginPosition() {
+    public Instant getBeginPosition() {
         return beginPosition;
     }
 
-    public void setBeginPosition(LocalDateTime beginPosition) {
+    public void setBeginPosition(Instant beginPosition) {
         this.beginPosition = beginPosition;
     }
 
-    public LocalDateTime getEndPosition() {
+    public Instant getEndPosition() {
         return endPosition;
     }
 
-    public void setEndPosition(LocalDateTime endPosition) {
+    public void setEndPosition(Instant endPosition) {
         this.endPosition = endPosition;
     }
 }

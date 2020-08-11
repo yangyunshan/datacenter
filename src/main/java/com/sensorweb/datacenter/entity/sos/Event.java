@@ -1,14 +1,15 @@
 package com.sensorweb.datacenter.entity.sos;
 
 import java.sql.Timestamp;
+import java.time.Instant;
 import java.time.LocalDateTime;
 
 public class Event {
     private int id;
-    private String identifier;
+    private String procedureId;
     private String label;
     private String documentationUrl;
-    private LocalDateTime time;
+    private Instant time;
 
     public int getId() {
         return id;
@@ -18,12 +19,12 @@ public class Event {
         this.id = id;
     }
 
-    public String getIdentifier() {
-        return identifier;
+    public String getProcedureId() {
+        return procedureId;
     }
 
-    public void setIdentifier(String identifier) {
-        this.identifier = identifier;
+    public void setProcedureId(String procedureId) {
+        this.procedureId = procedureId;
     }
 
     public String getLabel() {
@@ -42,11 +43,11 @@ public class Event {
         this.documentationUrl = documentationUrl;
     }
 
-    public LocalDateTime getTime() {
+    public Instant getTime() {
         return time;
     }
 
-    public void setTime(LocalDateTime time) {
+    public void setTime(Instant time) {
         this.time = time;
     }
 }

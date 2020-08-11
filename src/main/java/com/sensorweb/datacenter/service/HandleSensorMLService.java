@@ -160,12 +160,12 @@ public class HandleSensorMLService {
     public Keyword getKeyword(PhysicalSystem physicalSystem) {
         Keyword keywords = new Keyword();
         String identifier = physicalSystem.getUniqueIdentifier();
-        keywords.setIdentifier(identifier + ":keywords");
+        keywords.setProcedureId(identifier);
 
         KeywordList keywordsList = physicalSystem.getKeywordsList().get(0);
         List<String> temp = keywordsList.getKeywordList();
         if (temp!=null && temp.size()>0) {
-            keywords.setValues(DataCenterUtils.list2String(temp));
+            keywords.setValues(temp);
         }
 
         return keywords;
@@ -186,7 +186,7 @@ public class HandleSensorMLService {
                 for (int i = 0; i<identifiers.size(); i++) {
                     Identification identification = new Identification();
                     identification.setDefinition(identifiers.get(i).getDefinition());
-                    identification.setIdentifier(physicalSystem.getUniqueIdentifier() + ":Identification_No" + (i+1));
+                    identification.setProcedureId(physicalSystem.getUniqueIdentifier() + ":Identification_No" + (i+1));
                     identification.setLabel(identifiers.get(i).getLabel());
                     identification.setValue(identifiers.get(i).getValue());
 
@@ -212,7 +212,7 @@ public class HandleSensorMLService {
             if (terms!=null && terms.size()>0) {
                 for (int i=0; i<terms.size(); i++) {
                     Classification classification = new Classification();
-                    classification.setIdentifier(physicalSystem.getUniqueIdentifier() + ":Classification_No"+(i+1));
+                    classification.setProcedureId(physicalSystem.getUniqueIdentifier() + ":Classification_No"+(i+1));
                     classification.setDefinition(terms.get(i).getDefinition());
                     classification.setLabel(terms.get(i).getLabel());
                     classification.setValue(terms.get(i).getValue());
@@ -235,12 +235,12 @@ public class HandleSensorMLService {
 
         TimeExtent timeExtent = physicalSystem.getValidTime();
         if (timeExtent!=null) {
-            result.setIdentifier(physicalSystem.getUniqueIdentifier()+":ValidTime");
+            result.setProcedureId(physicalSystem.getUniqueIdentifier()+":ValidTime");
             if (timeExtent.begin()!=null) {
-                result.setBeginPosition(DataCenterUtils.instant2LocalDateTime(timeExtent.begin()));
+//                result.setBeginPosition(DataCenterUtils.instant2LocalDateTime(timeExtent.begin()));
             }
             if (!timeExtent.end().toString().equals("+1000000000-12-31T23:59:59.999999999Z")) {
-                result.setEndPosition(DataCenterUtils.instant2LocalDateTime(timeExtent.end()));
+//                result.setEndPosition(DataCenterUtils.instant2LocalDateTime(timeExtent.end()));
             }
         }
 
@@ -261,9 +261,7 @@ public class HandleSensorMLService {
             if (capabilityList!=null && capabilityList.size()>0) {
                 for (int i=0; i<capabilityList.size(); i++) {
                     Capability capability = new Capability();
-                    capability.setIdentifier(physicalSystem.getUniqueIdentifier()+":Capability_No"+(i+1));
-                    capability.setDefinition(capabilityList.get(i).getDefinition());
-                    capability.setLabel(capabilityList.get(i).getLabel());
+                    capability.setProcedureId(physicalSystem.getUniqueIdentifier()+":Capability_No"+(i+1));
                     capability.setName(capabilityList.get(i).getName());
                     capability.setValue(capabilityList.get(i).getData().getStringValue());
 
@@ -289,8 +287,7 @@ public class HandleSensorMLService {
             if (characteristicList!=null && characteristicList.size()>0) {
                 for (int i = 0;i<characteristicList.size(); i++) {
                     Characteristic characteristic = new Characteristic();
-                    characteristic.setIdentifier(physicalSystem.getUniqueIdentifier()+":Characteristic_No"+(i+1));
-                    characteristic.setLabel(characteristicList.get(i).getLabel());
+                    characteristic.setProcedureId(physicalSystem.getUniqueIdentifier()+":Characteristic_No"+(i+1));
                     characteristic.setName(characteristicList.get(i).getName());
                     characteristic.setValue(characteristicList.get(i).getData().getStringValue());
 
@@ -318,7 +315,7 @@ public class HandleSensorMLService {
                     Contact contact = new Contact();
                     Address address = new Address();
                     Telephone telephone = new Telephone();
-                    contact.setIdentifier(physicalSystem.getUniqueIdentifier()+":Contact_No"+(i+1));
+                    contact.setProcedureId(physicalSystem.getUniqueIdentifier()+":Contact_No"+(i+1));
                     if (org.apache.commons.lang3.StringUtils.isBlank(contactList.get(i).getIndividualName())) {
                         contact.setIndividualName(contactList.get(i).getIndividualName());
                     }
@@ -352,7 +349,7 @@ public class HandleSensorMLService {
                         if (addressTemp.getElectronicMailAddressList()!=null && addressTemp.getElectronicMailAddressList().size()>0) {
                             address.setElectronicMailAddress(DataCenterUtils.list2String(addressTemp.getElectronicMailAddressList()));
                         }
-                        address.setIdentifier(physicalSystem.getUniqueIdentifier()+":Contact_No"+(i+1)+":Address_No"+(i+1));
+                        address.setProcedureId(physicalSystem.getUniqueIdentifier()+":Contact_No"+(i+1)+":Address_No"+(i+1));
                         contact.setAddress(address);
                     }
                     //phone info
@@ -364,7 +361,7 @@ public class HandleSensorMLService {
                         if (phoneTemp.getFacsimileList()!=null && phoneTemp.getFacsimileList().size()>0) {
                             telephone.setFacsimile(DataCenterUtils.list2String(phoneTemp.getFacsimileList()));
                         }
-                        telephone.setIdentifier(physicalSystem.getUniqueIdentifier()+":Contact_No"+(i+1)+":Telephone_No"+(i+1));
+                        telephone.setProcedureId(physicalSystem.getUniqueIdentifier()+":Contact_No"+(i+1)+":Telephone_No"+(i+1));
                         contact.setTelephone(telephone);
                     }
                     result.add(contact);
@@ -389,7 +386,7 @@ public class HandleSensorMLService {
             if (eventList!=null && eventList.size()>0) {
                 for (int i=0; i<eventList.size(); i++) {
                     Event event = new Event();
-                    event.setIdentifier(physicalSystem.getUniqueIdentifier()+":Event_No"+(i+1));
+                    event.setProcedureId(physicalSystem.getUniqueIdentifier()+":Event_No"+(i+1));
 
                 }
             }

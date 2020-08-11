@@ -2,10 +2,8 @@ package com.sensorweb.datacenter.entity.sos;
 
 public class Capability {
     private int id;
-    private String identifier;
+    private String procedureId;
     private String name;
-    private String definition;
-    private String label;
     private String value;
 
     public int getId() {
@@ -16,12 +14,12 @@ public class Capability {
         this.id = id;
     }
 
-    public String getIdentifier() {
-        return identifier;
+    public String getProcedureId() {
+        return procedureId;
     }
 
-    public void setIdentifier(String identifier) {
-        this.identifier = identifier;
+    public void setProcedureId(String procedureId) {
+        this.procedureId = procedureId;
     }
 
     public String getName() {
@@ -30,22 +28,6 @@ public class Capability {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public String getDefinition() {
-        return definition;
-    }
-
-    public void setDefinition(String definition) {
-        this.definition = definition;
-    }
-
-    public String getLabel() {
-        return label;
-    }
-
-    public void setLabel(String label) {
-        this.label = label;
     }
 
     public String getValue() {

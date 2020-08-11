@@ -46,15 +46,10 @@ public class SOSWebServiceImpl implements SOSWebservice {
         InsertSensorResponse response = new InsertSensorResponse();
         try {
             InsertSensorRequest request = insertSensorService.getInsertSensorRequest(requestContent);
-            String[] result = insertSensorService.insertSensor(request);
-            if (result!=null && result.length>0) {
-                if (!StringUtils.isBlank(result[0])) {
-                    response.setAssignedProcedureId(result[0]);
-                }
-                if (!StringUtils.isBlank(result[1])) {
-                    response.setAssignedProcedureId(result[1]);
-                }
-
+            String result = insertSensorService.insertSensor(request);
+            if (!StringUtils.isBlank(result)) {
+                response.setAssignedProcedureId("");
+                response.setAssignedProcedureId(result);
                 InsertSensorResponseWriterV20 responseWriter = new InsertSensorResponseWriterV20();
                 DOMHelper domHelper = new DOMHelper();
                 Element element = responseWriter.buildXMLResponse(domHelper, response, "2.0");

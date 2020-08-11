@@ -11,6 +11,7 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import java.io.*;
 import java.lang.reflect.Field;
+import java.nio.charset.StandardCharsets;
 import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -23,7 +24,60 @@ import java.util.*;
 public class DataCenterUtils {
 
     /**
-     * 讲列表内的字符串信息拼成一个字符串，以英文冒号“|”分割
+     * 分割=两边的值
+     * @param str
+     * @return
+     */
+    public static String splitEqula(String str) {
+        if (StringUtils.isBlank(str)) {
+            return null;
+        }
+        String[] temp = str.split("=");
+        return temp[1].trim();
+    }
+
+    /**
+     * 解析SWE数据模型字符串，转换为K-V形式
+     * @param str
+     * @return
+     */
+    public static Map<String, String> string2Map(String str) {
+        if (StringUtils.isBlank(str)) {
+            return null;
+        }
+        Map<String, String> res = new HashMap<>();
+
+        if (str.startsWith("DataRecord")) {
+            String[] temp = str.split("\n");
+            for (int i = 1; i< temp.length; i++) {
+                String[] kvValue = temp[i].split(":");
+                if (kvValue.length>1) {
+                    res.put(kvValue[0].trim(), splitEqula(kvValue[1].trim()));
+                }
+            }
+        } else if (str.startsWith("Text")) {
+            String[] temp = str.split("=");
+            res.put(temp[0].trim(), temp[1].trim());
+        } else if (str.startsWith("POINT")) {
+            String temp = str.substring(str.indexOf("("));
+            //StringUtils.strip();去掉字符串两边的字符
+            String[] xy = StringUtils.strip(temp,"()").split(" ");
+            if (xy.length>1) {
+                res.put("Lon", xy[0]);
+                res.put("Lat", xy[1]);
+            }
+        } else if (str.startsWith("Vector")) {
+            String[] temp = str.split("\n");
+            for (int i = 1; i< temp.length; i = i+2) {
+                res.put(temp[i].trim().substring(0, temp[i].trim().indexOf(":")), splitEqula(temp[i+1]));
+            }
+        }
+
+        return res;
+    }
+
+    /**
+     * 讲列表内的字符串信息拼成一个字符串，以英文空格“ ”分割
      * @param list
      * @return
      */
@@ -32,10 +86,11 @@ public class DataCenterUtils {
 
         if (list!=null && list.size()>0) {
             for (String temp : list) {
-                result.append("|"+temp);
+                result.append(temp);
+                result.append(" ");
             }
         }
-        return result.toString();
+        return result.toString().trim();
     }
 
     public static List<String> string2List(String str) {
@@ -55,6 +110,7 @@ public class DataCenterUtils {
      * @return
      */
     public static LocalDateTime instant2LocalDateTime(Instant instant) {
+        Set<String> ss = ZoneId.getAvailableZoneIds();
         LocalDateTime localDateTime = LocalDateTime.ofInstant(instant, ZoneId.systemDefault());
         return localDateTime;
     }
@@ -99,7 +155,7 @@ public class DataCenterUtils {
         try {
             if (file.length()!=0) {
                 fis = new FileInputStream(file);
-                InputStreamReader isr = new InputStreamReader(fis);
+                InputStreamReader isr = new InputStreamReader(fis, StandardCharsets.UTF_8);
                 BufferedReader bufferedReader = new BufferedReader(isr);
                 String line;
                 stringBuilder = new StringBuilder();

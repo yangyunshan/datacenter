@@ -14,6 +14,7 @@ Copyright (C) 2012-2015 Sensia Software LLC. All Rights Reserved.
 
 package org.vast.ows.swe;
 
+import com.sensorweb.datacenter.util.DataCenterUtils;
 import net.opengis.sensorml.v20.AbstractProcess;
 import org.vast.xml.DOMHelper;
 import org.vast.xml.XMLReaderException;
