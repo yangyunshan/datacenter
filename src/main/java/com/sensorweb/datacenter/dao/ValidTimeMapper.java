@@ -18,8 +18,8 @@ public interface ValidTimeMapper {
     int deleteById(int id);
     int deleteByProcedureId(String procedureId);
 
-    ValidTime selectById(int id);
-    List<ValidTime> selectByTime(@Param("begin") Instant beginTime, @Param("end") Instant endTime);
-    List<ValidTime> selectByBeginTime(Instant begin);
-    List<ValidTime> selectByEndTime(Instant end);
+    String selectById(int id);
+    List<String> selectByTime(@Param("begin") Instant beginTime, @Param("end") Instant endTime);
+    List<String> selectByBeginTime(Instant begin);
+    List<String> selectByEndTime(Instant end);
 }

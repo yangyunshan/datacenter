@@ -34,16 +34,31 @@
         WHERE c.contact_id = #{id}
     </select>
 
-<!--    <select id="selectByName" resultMap="contact">-->
-<!--        SELECT <include refid="selectFields"></include>-->
-<!--        FROM (contact c JOIN telephone t ON c.procedure_id = t.procedure_id) JOIN address a ON a.procedure_id = c.procedure_id-->
-<!--        WHERE c.contact_organizationname = #{organizationName}-->
-<!--    </select>-->
-
     <select id="selectByRole" resultMap="contact">
         SELECT <include refid="selectFields"></include>
         FROM (contact c JOIN telephone t ON c.procedure_id = t.procedure_id) JOIN address a ON a.procedure_id = c.procedure_id
         WHERE c.contact_role = #{role}
+    </select>
+
+    <select id="selectByIndividualName" resultType="java.lang.String">
+        SELECT procedure_id
+        FROM contact
+        WHERE
+        contact_individualname like concat('%', #{individualName}, '%')
+    </select>
+
+    <select id="selectByOrganizationName" resultType="java.lang.String">
+        SELECT procedure_id
+        FROM contact
+        WHERE
+        contact_organizationname like concat('%', #{organizationName}, '%')
+    </select>
+
+    <select id="selectByPositionName" resultType="java.lang.String">
+        SELECT procedure_id
+        FROM contact
+        WHERE
+        contact_positionname like concat('%', #{positionName}, '%');
     </select>
 
     <resultMap id="contact" type="Contact">

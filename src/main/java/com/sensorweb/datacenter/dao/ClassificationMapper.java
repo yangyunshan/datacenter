@@ -16,6 +16,5 @@ public interface ClassificationMapper {
     int deleteByProcedureId(String identifier);
 
     Classification selectById(int id);
-    List<Classification> selectByValue(String value);
-    List<Classification> selectByLabel(String label);
+    List<Classification> selectByLabelAndValue(@Param("label") String label, @Param("value") String value);
 }

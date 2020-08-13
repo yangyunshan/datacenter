@@ -24,6 +24,35 @@ import java.util.*;
 public class DataCenterUtils {
 
     /**
+     * 去除重复元素
+     * @param lists
+     * @return
+     */
+    public static List<String> removeDuplicate(List<List<String>> lists) {
+        List<String> res = new ArrayList<>();
+        if (lists!=null && lists.size()>0) {
+            res = lists.get(0);
+            for (int i = 0; i < lists.size(); i++) {
+                res.retainAll(lists.get(i));
+            }
+        }
+        return res;
+    }
+
+    /**
+     * 去掉字符串的后缀
+     * @param suffix
+     * @param str
+     * @return
+     */
+    public static String removeSuffix(String suffix, String str) {
+        if (StringUtils.isBlank(str)) {
+            return "";
+        }
+        return str.substring(0, str.indexOf(suffix));
+    }
+
+    /**
      * 分割=两边的值
      * @param str
      * @return

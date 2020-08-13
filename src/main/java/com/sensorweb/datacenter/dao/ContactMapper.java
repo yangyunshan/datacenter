@@ -15,6 +15,9 @@ public interface ContactMapper {
     int deleteById(int id);
     int deleteByProcedureId(String procedureId);
 
-    Contact selectById(int id);
+    String selectById(int id);
+    List<String> selectByIndividualName(String individualName);
+    List<String> selectByPositionName(String positionName);
+    List<String> selectByOrganizationName(String organizationName);
     List<Contact> selectByRole(String role);
 }

@@ -1,31 +1,39 @@
 package com.sensorweb.datacenter;
 
-import com.sensorweb.datacenter.dao.KeywordMapper;
-import com.sensorweb.datacenter.dao.ValidTimeMapper;
+import com.alibaba.fastjson.JSONObject;
+import com.sensorweb.datacenter.dao.*;
 import com.sensorweb.datacenter.entity.sos.*;
 import com.sensorweb.datacenter.service.MeteorologyService;
 import com.sensorweb.datacenter.service.sos.*;
 import com.sensorweb.datacenter.util.DataCenterConstant;
 import com.sensorweb.datacenter.util.DataCenterUtils;
 import javafx.geometry.Pos;
+import net.opengis.swe.v20.Category;
 import net.opengis.swe.v20.DataBlock;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.vast.data.CategoryImpl;
 import org.vast.data.DataBlockString;
 import org.vast.ows.GetCapabilitiesRequest;
 import org.vast.ows.OWSException;
 import org.vast.ows.sos.*;
+import org.vast.xml.DOMHelper;
 import org.vast.xml.DOMHelperException;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.w3c.dom.Text;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URLEncoder;
 import java.text.ParseException;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -108,9 +116,29 @@ class DataCenterApplicationTests implements DataCenterConstant {
 
     @Test
     public void test05() throws Exception {
-        String filePath = "d://MEGA/Others/InsertSensor.xml";
+        String filePath = "d://insert.xml";
         InsertSensorRequest request = sensorService.getInsertSensorRequest(DataCenterUtils.readFromFile(filePath));
-        String str = sensorService.insertSensor(request);
+        sensorService.insertSensor(request);
+        System.out.println();
+
+    }
+
+    @Autowired
+    private DescribeSensorExpandService service1;
+    @Test
+    public void test06()  {
+//        Map<String, String> temp = new HashMap<>();
+//        temp.put("id", "def:identifier:OGC:2.0:test");
+//        temp.put("shortName", "委任为");
+//        temp.put("keyword", "气象");
+//        temp.put("intentApplication", "公开");
+//
+//        String condition = JSONObject.toJSONString(temp);
+//
+//        String ss = service1.searchSensor(condition);
+
+
+        List<String> r = service1.getComponentByPlatformId("platform1");
         System.out.println();
     }
 

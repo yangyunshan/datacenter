@@ -15,8 +15,8 @@ public interface PositionMapper {
     int deleteById(int id);
     int deleteByProcedureId(String identifier);
 
-    Position selectById(int id);
-    List<Position> selectByName(String name);
-    List<Position> selectByEnvelope(@Param("minLon") double minLongitude, @Param("minLat") double minLatitude,
+    String selectById(int id);
+    List<String> selectByName(String name);
+    List<String> selectByEnvelope(@Param("minLon") double minLongitude, @Param("minLat") double minLatitude,
                                     @Param("maxLon") double maxLongitude, @Param("maxLat") double maxLatitude);
 }

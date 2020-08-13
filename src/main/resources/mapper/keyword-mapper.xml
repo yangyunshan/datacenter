@@ -38,7 +38,7 @@
     <select id="selectByValue" resultType="java.lang.String">
         SELECT <include refid="selectFields"></include>
         FROM keyword
-        WHERE keyword_value like concat(%,#{value},%)
+        WHERE keyword_value like concat('%',#{value}, '%')
     </select>
 
 </mapper>

@@ -6,6 +6,7 @@ public class Procedure {
     private String descriptionFormat;
     private String name;
     private String description;
+    private int isPlatform;//0代表非平台，1代表平台
     private String descriptionFile;
 
     public String getId() {
@@ -38,6 +39,14 @@ public class Procedure {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public int getIsPlatform() {
+        return isPlatform;
+    }
+
+    public void setIsPlatform(int isPlatForm) {
+        this.isPlatform = isPlatForm;
     }
 
     public String getDescriptionFile() {

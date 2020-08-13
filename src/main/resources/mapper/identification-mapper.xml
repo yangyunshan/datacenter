@@ -32,16 +32,16 @@
         WHERE identification_id = #{id}
     </select>
 
-    <select id="selectByValue" resultMap="identification">
+    <select id="selectByLabelAndProcedureId" resultMap="identification">
         SELECT <include refid="selectFields"></include>
         FROM identification
-        WHERE identification_value = #{value}
+        WHERE identification_label = #{label} AND procedure_id = #{procedureId}
     </select>
 
-    <select id="selectByLabel" resultMap="identification">
+    <select id="selectByLabelAndValue" resultMap="identification">
         SELECT <include refid="selectFields"></include>
         FROM identification
-        WHERE identification_label = #{label}
+        WHERE identification_label = #{label} AND identification_value = #{value}
     </select>
 
     <resultMap id="identification" type="Identification">
@@ -49,6 +49,7 @@
         <result property="value" column="identification_name"/>
         <result property="label" column="identification_label"/>
         <result property="definition" column="identification_definition"/>
+        <result property="value" column="identification_value"/>
         <result property="procedureId" column="procedure_id"/>
     </resultMap>
 

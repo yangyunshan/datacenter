@@ -2,6 +2,7 @@ package com.sensorweb.datacenter.dao;
 
 import com.sensorweb.datacenter.entity.sos.Identification;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -15,6 +16,6 @@ public interface IdentificationMapper {
     int deleteByProcedureId(String procedureId);
 
     Identification selectById(int id);
-    List<Identification> selectByLabel(String label);
-    List<Identification> selectByValue(String value);
+    Identification selectByLabelAndProcedureId(@Param("label") String label, @Param("procedureId") String procedureId);
+    List<Identification> selectByLabelAndValue(@Param("label") String label, @Param("value") String value);
 }

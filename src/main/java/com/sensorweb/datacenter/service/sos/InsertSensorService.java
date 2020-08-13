@@ -2,14 +2,18 @@ package com.sensorweb.datacenter.service.sos;
 
 import com.sensorweb.datacenter.dao.*;
 import com.sensorweb.datacenter.entity.sos.*;
+import com.sensorweb.datacenter.entity.sos.Category;
+import com.sensorweb.datacenter.entity.sos.Quantity;
+import com.sensorweb.datacenter.entity.sos.QuantityRange;
+import com.sensorweb.datacenter.entity.sos.Text;
 import com.sensorweb.datacenter.util.DataCenterUtils;
 import net.opengis.OgcProperty;
 import net.opengis.OgcPropertyList;
 import net.opengis.sensorml.v20.*;
 import net.opengis.sensorml.v20.Event;
-import net.opengis.swe.v20.DataComponent;
+import net.opengis.swe.v20.*;
+import net.opengis.swe.v20.Vector;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.math3.analysis.function.Add;
 import org.isotc211.v2005.gmd.CIAddress;
 import org.isotc211.v2005.gmd.CIResponsibleParty;
 import org.isotc211.v2005.gmd.CITelephone;
@@ -27,6 +31,7 @@ import org.vast.ows.sos.InsertSensorWriterV20;
 import org.vast.ows.swe.InsertSensorResponseWriterV20;
 import org.vast.util.TimeExtent;
 import org.vast.xml.DOMHelper;
+import org.vast.xml.DOMHelperException;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -47,10 +52,7 @@ public class InsertSensorService {
     private ProcedureMapper procedureMapper;
 
     @Autowired
-    private OfferingMapper offeringMapper;
-
-    @Autowired
-    private ProcOffMapper procOffMapper;
+    private ComponentMapper componentMapper;
 
     @Autowired
     private AddressMapper addressMapper;
@@ -81,6 +83,21 @@ public class InsertSensorService {
 
     @Autowired
     private ValidTimeMapper validTimeMapper;
+
+    @Autowired
+    private CategoryMapper categoryMapper;
+
+    @Autowired
+    private VectorMapper vectorMapper;
+
+    @Autowired
+    private TextMapper textMapper;
+
+    @Autowired
+    private QuantityMapper quantityMapper;
+
+    @Autowired
+    private QuantityRangeMapper quantityRangeMapper;
 
     @Value("${datacenter.path.upload}")
     private String uploadPath;
@@ -221,6 +238,17 @@ public class InsertSensorService {
             keywordMapper.insertData(keyword);
         }
 
+        //add component(如果是传感器平台的话)
+        //判断是否为平台还是传感器
+        if (isPlatform(insertSensorRequest)) {
+            List<Component> components = getComponents(insertSensorRequest);
+            if (components!=null && components.size()>0) {
+                for (Component component : components) {
+                    componentMapper.insertData(component);
+                }
+            }
+        }
+
         //add procedure
         Procedure procedure = getProcedure(insertSensorRequest);
         if (procedure!=null) {
@@ -228,6 +256,22 @@ public class InsertSensorService {
                 int flag = procedureMapper.insertData(procedure);
                 if (flag>0) {
                     result = procedure.getId();
+                    //传感器插入成功，更新平台component内容;如果是平台则跳过
+                    if (!isPlatform(insertSensorRequest)) {
+                        String procedureId = getPlatformId(result);
+                        Procedure platform = procedureMapper.selectById(procedureId);
+                        if (platform!=null) {
+                            Component component = new Component();
+                            component.setName(procedure.getName());
+                            component.setTitle(procedure.getDescription());
+                            component.setHref(procedure.getId());
+                            component.setPlatformId(procedureId);
+                            componentMapper.insertData(component);
+                            flushComponent(procedure.getName(), procedure.getDescription(), procedure.getId(), platform.getDescriptionFile());
+                        } else {
+                            throw new Exception("平台不存在");
+                        }
+                    }
                 }
             } catch (Exception e) {
                 new File(procedure.getDescriptionFile()).delete();
@@ -245,12 +289,13 @@ public class InsertSensorService {
      * @return
      */
     public Keyword getKeyword(InsertSensorRequest insertSensorRequest) {
-        Keyword keywords = new Keyword();
+        Keyword keywords = null;
         String identifier = insertSensorRequest.getProcedureDescription().getUniqueIdentifier();
-        keywords.setProcedureId(identifier);
 
         OgcPropertyList<KeywordList> keywordLists = insertSensorRequest.getProcedureDescription().getKeywordsList();
         if (keywordLists!=null && keywordLists.size()>0) {
+            keywords = new Keyword();
+            keywords.setProcedureId(identifier);
             List<String> keywordTemp = keywordLists.get(0).getKeywordList();
             if (keywordTemp!=null && keywordTemp.size()>0) {
                 keywords.setValues(keywordTemp);
@@ -266,14 +311,22 @@ public class InsertSensorService {
      * @throws OWSException
      */
     public Procedure getProcedure(InsertSensorRequest insertSensorRequest) throws OWSException {
-        Procedure procedure = new Procedure();
+        Procedure procedure = null;
 
-        if (insertSensorRequest!=null) {
+        if (insertSensorRequest!=null && insertSensorRequest.getProcedureDescription()!=null) {
+            procedure = new Procedure();
             procedure.setId(insertSensorRequest.getProcedureDescription().getUniqueIdentifier());
             procedure.setDescription(insertSensorRequest.getProcedureDescription().getDescription());
             procedure.setDescriptionFile(getSensorML(insertSensorRequest));
             procedure.setDescriptionFormat(insertSensorRequest.getProcedureDescriptionFormat());
             procedure.setName(insertSensorRequest.getProcedureDescription().getName());
+
+            //判断是否为平台还是传感器
+            if (insertSensorRequest.getProcedureDescription().getQName().getLocalPart().equals("PhysicalSystem")) {
+                procedure.setIsPlatform(1);
+            } else {
+                procedure.setIsPlatform(0);
+            }
         }
         return procedure;
     }
@@ -348,7 +401,7 @@ public class InsertSensorService {
             if (terms!=null && terms.size()>0) {
                 for (int i=0; i<terms.size(); i++) {
                     Classification classification = new Classification();
-                    classification.setProcedureId(insertSensorRequest.getProcedureDescription().getUniqueIdentifier() + ":Classification_No"+(i+1));
+                    classification.setProcedureId(insertSensorRequest.getProcedureDescription().getUniqueIdentifier());
                     classification.setDefinition(terms.get(i).getDefinition());
                     classification.setLabel(terms.get(i).getLabel());
                     classification.setValue(terms.get(i).getValue());
@@ -367,10 +420,11 @@ public class InsertSensorService {
      * @throws ParseException
      */
     public ValidTime getValidTime(InsertSensorRequest insertSensorRequest) throws ParseException {
-        ValidTime result = new ValidTime();
+        ValidTime result = null;
 
         TimeExtent timeExtent = insertSensorRequest.getProcedureDescription().getValidTime();
         if (timeExtent!=null) {
+            result = new ValidTime();
             result.setProcedureId(insertSensorRequest.getProcedureDescription().getUniqueIdentifier());
             if (timeExtent.begin()!=null) {
 
@@ -403,9 +457,12 @@ public class InsertSensorService {
                         Capability temp = new Capability();
                         temp.setProcedureId(insertSensorRequest.getProcedureDescription().getUniqueIdentifier());
                         temp.setName(capability.getName());
-                        temp.setValue(capability.getValue().toString());
-
+                        temp.setValue(temp.getProcedureId() + ":capability");
                         result.add(temp);
+
+                        //解析DataComponent,返回集合对象
+                        DataComponent dataComponent = capability.getValue();
+                        parseAndSaveDataRecord(dataComponent, temp.getValue());
                     }
                 }
             }
@@ -432,7 +489,10 @@ public class InsertSensorService {
                 Characteristic temp = new Characteristic();
                 temp.setProcedureId(insertSensorRequest.getProcedureDescription().getUniqueIdentifier());
                 temp.setName(characteristic.getName());
-                temp.setValue(characteristic.getValue().toString());
+                temp.setValue(temp.getProcedureId() + ":characteristic");
+
+                DataComponent dataComponent = characteristic.getValue();
+                parseAndSaveDataRecord(dataComponent, temp.getValue());
 
                 result.add(temp);
             }
@@ -580,5 +640,136 @@ public class InsertSensorService {
         return res;
     }
 
+    /**
+     * 对于传感器平台，解析Components节点（Component的个数即为该平台下的传感器数）
+     * @param insertSensorRequest
+     * @return
+     */
+    public List<Component> getComponents(InsertSensorRequest insertSensorRequest) {
+        List<Component> res = new ArrayList<>();
 
+        AggregateProcess aggregateProcess = (AggregateProcess) insertSensorRequest.getProcedureDescription();
+        OgcPropertyList<AbstractProcess> components = aggregateProcess.getComponentList();
+        List<OgcProperty<AbstractProcess>> temps = components.getProperties();
+        if (temps!=null && temps.size()>0) {
+            for (OgcProperty<AbstractProcess> temp : temps) {
+                Component component = new Component();
+                component.setName(temp.getName());
+                component.setHref(temp.getHref());
+                component.setTitle(temp.getTitle());
+                component.setRole(temp.getRole());
+                component.setPlatformId(insertSensorRequest.getProcedureDescription().getUniqueIdentifier());
+
+                res.add(component);
+            }
+        }
+        return res;
+    }
+
+    /**
+     * 每当传感器注册成功，实时刷新传感器平台建模文档（添加Component节点）
+     * @param name
+     * @param title
+     * @param href
+     * @param filePath 传感器平台的Procedure
+     * @throws DOMHelperException
+     */
+    public void flushComponent(String name, String title, String href, String filePath) throws DOMHelperException {
+        DOMHelper domHelper = new DOMHelper(new ByteArrayInputStream(DataCenterUtils.readFromFile(filePath).getBytes()), false);
+        Element element = domHelper.getElement("components/ComponentList");
+        if (element==null) {
+            element = domHelper.getElement("/");
+            Element temp0 = domHelper.getParentDocument(element).getDocument().createElement("sml:components");
+            Element temp1 = domHelper.getParentDocument(temp0).getDocument().createElement("sml:ComponentList");
+            temp0.appendChild(temp1);
+            element.appendChild(temp0);
+            element = domHelper.getElement(element, "components/ComponentList");
+        }
+        Element temp = domHelper.getParentDocument(element).getDocument().createElement("sml:component");
+        if (!StringUtils.isBlank(name) || !StringUtils.isBlank(title) || !StringUtils.isBlank(href))
+        temp.setAttribute("name", StringUtils.isBlank(name) ? "" : name);
+        temp.setAttribute("title", StringUtils.isBlank(title) ? "" : title);
+        temp.setAttribute("href",StringUtils.isBlank(href) ? "" : href);
+        domHelper.removeAllText(element);
+        element.appendChild(temp);
+        DataCenterUtils.write2File(filePath, DataCenterUtils.element2String(domHelper.getRootElement()));
+    }
+
+    /**
+     * 通过传感器id查询所属的平台id
+     * @param procedureId
+     * @return
+     */
+    public String getPlatformId(String procedureId) {
+        Identification identification = identificationMapper.selectByLabelAndProcedureId("所属平台标识符", procedureId);
+        return identification!=null ? identification.getValue():"";
+    }
+
+    /**
+     * 判断是否为平台还是传感器
+     * @param insertSensorRequest
+     * @return
+     */
+    public boolean isPlatform(InsertSensorRequest insertSensorRequest) {
+        return insertSensorRequest.getProcedureDescription().getQName().getLocalPart().equals("PhysicalSystem");
+    }
+
+    /**
+     * 解析DataRecord节点，将字段数据类型封装成对应的类型对象返回
+     * @param dataComponent
+     * @return
+     */
+    public void parseAndSaveDataRecord(DataComponent dataComponent, String outId) {
+        if (dataComponent!=null) {
+            int num = dataComponent.getComponentCount();
+            for (int i = 0; i < num; i++) {
+                if (dataComponent.getComponent(i) instanceof net.opengis.swe.v20.Category) {
+                    com.sensorweb.datacenter.entity.sos.Category temp = new com.sensorweb.datacenter.entity.sos.Category();
+                    net.opengis.swe.v20.Category category = (net.opengis.swe.v20.Category) dataComponent.getComponent(i);
+                    temp.setName(category.getName());
+                    temp.setValue(category.getValue());
+                    temp.setOutId(outId);
+                    categoryMapper.insertData(temp);
+                } else if (dataComponent.getComponent(i) instanceof net.opengis.swe.v20.Quantity) {
+                    net.opengis.swe.v20.Quantity quantity = (net.opengis.swe.v20.Quantity) dataComponent.getComponent(i);
+                    com.sensorweb.datacenter.entity.sos.Quantity temp = new com.sensorweb.datacenter.entity.sos.Quantity();
+                    temp.setName(quantity.getName());
+                    temp.setValue(quantity.getValue());
+                    temp.setOutId(outId);
+                    quantityMapper.insertData(temp);
+                } else if (dataComponent.getComponent(i) instanceof net.opengis.swe.v20.QuantityRange) {
+                    net.opengis.swe.v20.QuantityRange quantityRange = (net.opengis.swe.v20.QuantityRange) dataComponent.getComponent(i);
+                    com.sensorweb.datacenter.entity.sos.QuantityRange temp = new com.sensorweb.datacenter.entity.sos.QuantityRange();
+                    temp.setName(quantityRange.getName());
+                    temp.setMinValue(quantityRange.getValue()[0]);
+                    temp.setMaxValue(quantityRange.getValue()[1]);
+                    temp.setOutId(outId);
+                    quantityRangeMapper.insertData(temp);
+                } else if (dataComponent.getComponent(i) instanceof net.opengis.swe.v20.Text) {
+                    net.opengis.swe.v20.Text text = (net.opengis.swe.v20.Text) dataComponent.getComponent(i);
+                    com.sensorweb.datacenter.entity.sos.Text temp = new com.sensorweb.datacenter.entity.sos.Text();
+                    temp.setName(text.getName());
+                    temp.setValue(text.getValue());
+                    temp.setOutId(outId);
+                    textMapper.insertData(temp);
+                } else if (dataComponent.getComponent(i) instanceof net.opengis.swe.v20.Vector) {
+                    net.opengis.swe.v20.Vector vector = (net.opengis.swe.v20.Vector) dataComponent.getComponent(i);
+                    com.sensorweb.datacenter.entity.sos.Vector temp = new com.sensorweb.datacenter.entity.sos.Vector();
+                    temp.setName(vector.getName());
+                    temp.setOutId(outId);
+                    OgcPropertyList<ScalarComponent> coordinateList = vector.getCoordinateList();
+                    for (ScalarComponent component : coordinateList) {
+                        if (component.getName().equals("Lon")) {
+                            temp.setLongitude(component.getData().getDoubleValue());
+                        } else if (component.getName().equals("Lat")) {
+                            temp.setLatitude(component.getData().getDoubleValue());
+                        } else if (component.getName().equals("Alt")) {
+                            temp.setAltitude(component.getData().getDoubleValue());
+                        }
+                    }
+                    vectorMapper.insertData(temp);
+                }
+            }
+        }
+    }
 }

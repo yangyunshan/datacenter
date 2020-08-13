@@ -8,7 +8,7 @@
     </sql>
 
     <sql id="selectFields">
-        validtime_id, validtime_begin, validtime_end, procedure_id
+        procedure_id
     </sql>
 
     <insert id="insertData" parameterType="ValidTime">
@@ -26,25 +26,25 @@
         WHERE validtime_id = #{id}
     </delete>
 
-    <select id="selectById" parameterType="int" resultMap="validtime">
+    <select id="selectById" parameterType="int" resultType="java.lang.String">
         SELECT <include refid="selectFields"></include>
         FROM validtime
         WHERE validtime_id = #{id}
     </select>
 
-    <select id="selectByTime" resultMap="validtime">
+    <select id="selectByTime" resultType="java.lang.String">
         SELECT <include refid="selectFields"></include>
         FROM validtime
         WHERE validtime_begin <![CDATA[>=]]> #{begin} AND validtime_end <![CDATA[<=]]> #{end}
     </select>
 
-    <select id="selectByBeginTime" resultMap="validtime">
+    <select id="selectByBeginTime" resultType="java.lang.String">
         SELECT <include refid="selectFields"></include>
         FROM validtime
         WHERE validtime_begin <![CDATA[>=]]> #{begin}
     </select>
 
-    <select id="selectByEndTime" resultMap="validtime">
+    <select id="selectByEndTime" resultType="java.lang.String">
         SELECT <include refid="selectFields"></include>
         FROM validtime
         WHERE validtime_end <![CDATA[<]]> #{end}

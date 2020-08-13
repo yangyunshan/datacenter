@@ -32,16 +32,10 @@
         WHERE classification_id = #{id}
     </select>
 
-    <select id="selectByValue" resultMap="classification">
+    <select id="selectByLabelAndValue" resultMap="classification">
         SELECT <include refid="selectFields"></include>
         FROM classification
-        WHERE classification_value = #{value}
-    </select>
-
-    <select id="selectByLabel" resultMap="classification">
-        SELECT <include refid="selectFields"></include>
-        FROM classification
-        WHERE classification_label = #{label}
+        WHERE classification_value = #{value} AND classification_label = #{label}
     </select>
 
     <resultMap id="classification" type="Classification">

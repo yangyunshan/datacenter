@@ -8,7 +8,7 @@
     </sql>
 
     <sql id="selectFields">
-        position_id, position_name, position_longitude, position_latitude, position_altitude, procedure_id
+        procedure_id
     </sql>
 
     <insert id="insertData" parameterType="Position">
@@ -26,22 +26,22 @@
         WHERE position_id = #{id}
     </delete>
 
-    <select id="selectById" parameterType="int" resultMap="position">
+    <select id="selectById" parameterType="int" resultType="java.lang.String">
         SELECT <include refid="selectFields"></include>
         FROM position
         WHERE position_id = #{id}
     </select>
 
-    <select id="selectByName" parameterType="java.lang.String" resultMap="position">
+    <select id="selectByName" parameterType="java.lang.String" resultType="java.lang.String">
         SELECT <include refid="selectFields"></include>
         FROM position
-        WHERE position_name = #{name}
+        WHERE position_name like concat('%', #{name}, '%')
     </select>
 
-    <select id="selectByEnvelope" resultMap="position">
+    <select id="selectByEnvelope" resultType="java.lang.String">
         SELECT <include refid="selectFields"></include>
         FROM position
-        WHERE position_longtude <![CDATA[<=]]> #{maxLon} AND position_latitude <![CDATA[<=]]> #{maxLat} AND position_longitude <![CDATA[>=]]> #{minLon} AND position_latitude <![CDATA[>=]]> #{minLat}
+        WHERE position_longitude <![CDATA[<=]]> #{maxLon} AND position_latitude <![CDATA[<=]]> #{maxLat} AND position_longitude <![CDATA[>=]]> #{minLon} AND position_latitude <![CDATA[>=]]> #{minLat}
     </select>
 
     <resultMap id="position" type="Position">

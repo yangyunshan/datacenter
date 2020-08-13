@@ -16,6 +16,10 @@ public interface ProcedureMapper {
 
     Procedure selectById(String id);
     Procedure selectByIdAndFormat(@Param("id") String id, @Param("descriptionFormat") String descriptionFormat);
-    List<Procedure> selectAll();
+    List<String> selectAll();
+    List<String> selectAllSensorIds();
+    List<String> selectAllPlatformIds();
+
+    boolean isExist(String procedureId);
 
 }
