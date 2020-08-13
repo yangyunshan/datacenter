@@ -98,7 +98,7 @@ public class DescribeSensorExpandService {
     public String getSensorContentById(String sensorMLPath) {
         Map<String, Object> res = new HashMap<>();
         if (StringUtils.isBlank(sensorMLPath)) {
-            return "";
+            res.put("content", "");
         }
         res.put("content", DataCenterUtils.readFromFile(sensorMLPath));
         return JSONObject.toJSONString(res);
@@ -387,8 +387,10 @@ public class DescribeSensorExpandService {
      * @param procedureId
      * @return
      */
-    public boolean isExist(String procedureId) {
-        return procedureMapper.isExist(procedureId);
+    public String isExist(String procedureId) {
+        Map<String, String> temp = new HashMap<>();
+        temp.put("isExist", procedureMapper.isExist(procedureId) ? "true":"false");
+        return JSONObject.toJSONString(temp);
     }
 
     /**

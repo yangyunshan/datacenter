@@ -1,10 +1,7 @@
 package com.sensorweb.datacenter.webservice.impl;
 
 import com.sensorweb.datacenter.entity.sos.Observation;
-import com.sensorweb.datacenter.service.sos.DescribeSensorService;
-import com.sensorweb.datacenter.service.sos.GetObservationService;
-import com.sensorweb.datacenter.service.sos.InsertObservationService;
-import com.sensorweb.datacenter.service.sos.InsertSensorService;
+import com.sensorweb.datacenter.service.sos.*;
 import com.sensorweb.datacenter.util.DataCenterUtils;
 import com.sensorweb.datacenter.webservice.SOSWebservice;
 import org.apache.commons.lang3.StringUtils;
@@ -114,5 +111,51 @@ public class SOSWebServiceImpl implements SOSWebservice {
             e.printStackTrace();
         }
         return stringBuilder.toString();
+    }
+
+    @Autowired
+    private DescribeSensorExpandService expandService;
+    /**
+     * 根据查询条件查询procedure
+     *
+     * @param condition
+     * @return
+     */
+    @Override
+    public String SearchSensor(String condition) {
+        return expandService.searchSensor(condition);
+    }
+
+    /**
+     * 判断当前id是否已存在
+     *
+     * @param procedureId
+     * @return
+     */
+    @Override
+    public String isExist(String procedureId) {
+        return expandService.isExist(procedureId);
+    }
+
+    /**
+     * 通过文件地址获取文件内容
+     *
+     * @param filePath
+     * @return
+     */
+    @Override
+    public String getXMLContent(String filePath) {
+        return expandService.getSensorContentById(filePath);
+    }
+
+    /**
+     * 通过平台查传感器
+     *
+     * @param platformId
+     * @return
+     */
+    @Override
+    public String getComponent(String platformId) {
+        return expandService.getSensorByIds(expandService.getComponentByPlatformId(platformId));
     }
 }
