@@ -227,10 +227,8 @@ public class DataCenterUtils {
      * @param file
      * @return
      */
-    public static String readFromMultipartFile(MultipartFile file) {
+    public static String readFromMultipartFile(MultipartFile file) throws IOException {
         StringBuilder stringBuilder = null;
-        FileInputStream fis = null;
-
         try {
             if (file.getSize()>0) {
                 InputStreamReader isr = new InputStreamReader(file.getInputStream());
@@ -241,8 +239,6 @@ public class DataCenterUtils {
                     stringBuilder.append(line);
                 }
                 bufferedReader.close();
-                isr.close();
-                fis.close();
             } else {
                 System.out.println("file is empty");
             }
@@ -316,12 +312,12 @@ public class DataCenterUtils {
     }
 
     /**
-     * 将bean中的字段和属性值写入到map中
+     * 将bean中的字段和属性值写入到list中
      * @param bean
      * @return
      */
-    public static Map<String, Object> bean2Map(Object bean) {
-        Map<String, Object> res = new HashMap<>();
+    public static List<Object> bean2List(Object bean) {
+        List<Object> res = new ArrayList<>();
         Field[] fields = bean.getClass().getDeclaredFields();
         if (fields.length>0) {
             for (Field field : fields) {
@@ -330,7 +326,7 @@ public class DataCenterUtils {
                     field.setAccessible(true);
                 }
                 try {
-                    res.put(field.getName(), field.get(bean));
+                    res.add(field.get(bean));
                 } catch (Exception e) {
                     e.printStackTrace();
                 }

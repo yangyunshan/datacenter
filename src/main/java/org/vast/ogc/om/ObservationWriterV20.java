@@ -24,6 +24,8 @@
 package org.vast.ogc.om;
 
 import java.util.Map.Entry;
+
+import com.sensorweb.datacenter.util.DataCenterUtils;
 import net.opengis.gml.v32.AbstractFeature;
 import net.opengis.swe.v20.DataComponent;
 import org.vast.ogc.OGCRegistry;
@@ -206,7 +208,7 @@ public class ObservationWriterV20 implements IXMLWriterDOM<IObservation>
             {
                 Element componentElt = sweUtils.writeComponent(dom, obs.getResult(), true);
                 resultElt.appendChild(componentElt);
-                
+                String s = DataCenterUtils.element2String(componentElt);
                 String sweQName = componentElt.getLocalName();
                 dom.addUserPrefix("xsi", DOMHelper.XSI_NS_URI);
                 dom.setAttributeValue(resultElt, "xsi:type", "swe:" + sweQName + "PropertyType");

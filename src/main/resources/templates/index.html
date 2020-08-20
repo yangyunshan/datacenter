@@ -1,243 +1,62 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
+
 <head>
-    <meta charset="UTF-8">
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>纯css实现漂亮的文件上传样式</title>
+    <meta name="author" content="四个空格-https://www.4spaces.org">
+    <link href="" rel="stylesheet">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+          integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <style type="text/css">
+        .centerEle {
+            height: 300px;
+            display: -webkit-flex;
+            display: flex;
+            -webkit-align-items: center;
+            align-items: center;
+            -webkit-justify-content: center;
+            justify-content: center;
+        }
+    </style>
 
-    <link rel=stylesheet th:href="@{/plugin/codemirror/doc/docs.css}">
-    <link rel="stylesheet" th:href="@{/plugin/codemirror/lib/codemirror.css}">
+    <script type="text/javascript">
+        function finishSelect() {
+            var content = '', files = [];
+            if (document.getElementById('upload').files === undefined) {
+                files[0] = {
+                    'name': document.getElementById('upload') && document.getElementById('upload').value
+                };
+            } else {
+                files = document.getElementById('upload').files;
+            }
 
-    <link rel="stylesheet" th:href="@{/plugin/codemirror/addon/fold/foldgutter.css}">
+            for (var i = 0; i < files.length; i++) {
+                content += files[i].name.split("\\").pop() + ', ';
+            }
 
-    <script th:src="@{/plugin/codemirror/lib/codemirror.js}"></script>
-    <script th:src="@{/plugin/codemirror/mode/xml/xml.js}"></script>
-
-    <script th:src="@{/plugin/codemirror/addon/fold/foldcode}"></script>
-    <script th:src="@{/plugin/codemirror/addon/fold/foldgutter}"></script>
-    <script th:src="@{/plugin/codemirror/addon/fold/brace-fold}"></script>
-    <script th:src="@{/plugin/codemirror/addon/fold/comment-fold}"></script>
-
-    <title>首页</title>
-    <style>#content {border-top: 1px solid black; border-bottom: 1px solid black;}</style>
+            if (content !== '') {
+                document.getElementById('viewfile').value = content.replace(/\, $/g, '');
+            } else {
+                document.getElementById('viewfile').value = '';
+            }
+        }
+    </script>
 </head>
-<body onload="show()">
-    <div>
-        <p>Welcome!</p>
+<body>
+<div class="centerEle">
+    <div class="form-group col-md-3  mb-2">
+        <form th:action="@{/sensor/registry}" method="post" enctype="multipart/form-data" id="insertSensorML-form">
+            <input type="text" name="viewfile" id="viewfile" placeholder="未选择文件" disabled autocomplete="off" class="form-control">
+            <input type="file" name="files" style="display: none" onchange="finishSelect();" multiple="multiple" id="upload"/>
+        </form>
+
     </div>
-
-    <select id="selectContent" onchange="show()">
-        <option th:value="insertSensor" th:selected="|${tag=='InsertSensor'?true:false}|">InsertSensor</option>
-        <option value="describeSensor" th:selected="|${tag=='DescribeSensor'?true:false}|">DescribeSensor</option>
-        <option value="deleteSensor" th:selected="|${tag=='DeleteSensor'?true:false}|">DeleteSensor</option>
-        <option value="insertObservation" th:selected="|${tag=='InsertObservation'?true:false}|">InsertObservation</option>
-        <option value="getObservation" th:selected="|${tag=='GetObservation'?true:false}|">GetObservation</option>
-        <option value="getCapabilities" th:selected="|${tag=='GetCapabilities'?true:false}|">GetCapabilities</option>
-    </select>
-
-    <div id="insertSensor" style="display: none">
-        <div>
-            <Label>InsertSensorRequest</Label>
-            <form th:action="@{/sensor/insertSensor}" method="post" id="insertSensor_form">
-                <textarea id="insertSensorRequest" name="requestContent" th:utext="${InsertSensorRequest}"></textarea>
-                <script>
-                    var editor = CodeMirror.fromTextArea(document.getElementById("insertSensorRequest"), {
-                        mode: "text/html",
-                        lineNumbers: true,
-                        lineWrapping: true,
-                        foldGutter: true,
-                        smartIndent: true,
-                        lineSeparator: "\n\r"
-                    });
-                </script>
-                <button type="submit" id="insertSensor_btn" style="display:block;margin:0 auto">传感器注册</button>
-            </form>
-        </div>
-        <div>
-            <Label>InsertSensorResponse</Label>
-            <textarea id="insertSensorResponse" name="responseContent" th:utext="${InsertSensorResponse}"></textarea>
-            <script>
-                var editor = CodeMirror.fromTextArea(document.getElementById("insertSensorResponse"), {
-                    mode: "text/html",
-                    lineNumbers: true,
-                    lineWrapping: true,
-                    foldGutter: true,
-                    smartIndent: true,
-                    lineSeparator: "\n\r"
-                });
-            </script>
-        </div>
-    </div>
-
-    <div id="describeSensor" style="display: none">
-        <div>
-            <Label>DescribeSensorRequest</Label>
-            <form th:action="@{/sensor/describeSensor}" method="post" id="describeSensor_form">
-                <textarea id="describeSensorRequest" name="requestContent" th:utext="${DescribeSensorRequest}"></textarea>
-                <script>
-                    var editor = CodeMirror.fromTextArea(document.getElementById("describeSensorRequest"), {
-                        mode: "text/html",
-                        lineNumbers: true,
-                        lineWrapping: true,
-                        foldGutter: true,
-                        smartIndent: true,
-                        lineSeparator: "\n\r"
-                    });
-                </script>
-                <button type="submit" id="describeSensor_btn" style="display:block;margin:0 auto">传感器查询</button>
-            </form>
-        </div>
-        <div>
-            <Label>DescribeSensorResponse</Label>
-            <textarea id="describeSensorResponse" name="responseContent" th:utext="${DescribeSensorResponse}"></textarea>
-            <script>
-                var editor = CodeMirror.fromTextArea(document.getElementById("describeSensorResponse"), {
-                    mode: "text/html",
-                    lineNumbers: true,
-                    lineWrapping: true,
-                    foldGutter: true,
-                    smartIndent: true,
-                    lineSeparator: "\n\r"
-                });
-            </script>
-        </div>
-    </div>
-
-    <div id="deleteSensor" style="display: none">
-        <div>
-            <Label>DeleteSensorRequest</Label>
-            <form th:action="@{/sensor/deleteSensor}" method="post" id="deleteSensor_form">
-                <textarea id="deleteSensorRequest" name="requestContent" th:utext="${DeleteSensorRequest}"></textarea>
-                <script>
-                    var editor = CodeMirror.fromTextArea(document.getElementById("deleteSensorRequest"), {
-                        mode: "text/html",
-                        lineNumbers: true,
-                        lineWrapping: true,
-                        foldGutter: true,
-                        smartIndent: true,
-                        lineSeparator: "\n\r"
-                    });
-                </script>
-                <button type="submit" id="deleteSensor_btn" style="display:block;margin:0 auto">传感器删除</button>
-            </form>
-        </div>
-        <div>
-            <Label>DeleteSensorResponse</Label>
-            <textarea id="deleteSensorResponse" name="responseContent" th:utext="${DeleteSensorResponse}"></textarea>
-            <script>
-                var editor = CodeMirror.fromTextArea(document.getElementById("deleteSensorResponse"), {
-                    mode: "text/html",
-                    lineNumbers: true,
-                    lineWrapping: true,
-                    foldGutter: true,
-                    smartIndent: true,
-                    lineSeparator: "\n\r"
-                });
-            </script>
-        </div>
-    </div>
-
-    <div id="insertObservation" style="display: none">
-        <div>
-            <Label>InsertObservationRequest</Label>
-            <form th:action="@{/observation/insertObservation}" method="post" id="insertObservation_form">
-                <textarea id="insertObservationRequest" name="requestContent" th:utext="${InsertObservationRequest}"></textarea>
-                <script>
-                    var editor = CodeMirror.fromTextArea(document.getElementById("insertObservationRequest"), {
-                        mode: "text/html",
-                        lineNumbers: true,
-                        lineWrapping: true,
-                        foldGutter: true,
-                        smartIndent: true,
-                        lineSeparator: "\n\r"
-                    });
-                </script>
-                <button type="submit" id="insertObservation_btn" style="display:block;margin:0 auto">观测数据注册</button>
-            </form>
-        </div>
-        <div>
-            <Label>InsertObservationResponse</Label>
-            <textarea id="insertObservationResponse" name="responseContent" th:utext="${InsertObservationResponse}"></textarea>
-            <script>
-                var editor = CodeMirror.fromTextArea(document.getElementById("insertObservationResponse"), {
-                    mode: "text/html",
-                    lineNumbers: true,
-                    lineWrapping: true,
-                    foldGutter: true,
-                    smartIndent: true,
-                    lineSeparator: "\n\r"
-                });
-            </script>
-        </div>
-    </div>
-
-    <div id="getObservation" style="display: none">
-        <div>
-            <Label>GetObservationRequest</Label>
-            <form th:action="@{/observation/getObservation}" method="post" id="getObservation_form">
-                <textarea id="getObservationRequest" name="requestContent" th:utext="${GetObservationRequest}"></textarea>
-                <script>
-                    var editor = CodeMirror.fromTextArea(document.getElementById("getObservationRequest"), {
-                        mode: "text/html",
-                        lineNumbers: true,
-                        lineWrapping: true,
-                        foldGutter: true,
-                        smartIndent: true,
-                        lineSeparator: "\n\r"
-                    });
-                </script>
-                <button type="submit" id="getObservation_btn" style="display:block;margin:0 auto">观测数据查询</button>
-            </form>
-        </div>
-        <div>
-            <Label>GetObservationResponse</Label>
-            <textarea id="getObservationResponse" name="responseContent" th:utext="${GetObservationResponse}"></textarea>
-            <script>
-                var editor = CodeMirror.fromTextArea(document.getElementById("getObservationResponse"), {
-                    mode: "text/html",
-                    lineNumbers: true,
-                    lineWrapping: true,
-                    foldGutter: true,
-                    smartIndent: true,
-                    lineSeparator: "\n\r"
-                });
-            </script>
-        </div>
-    </div>
-
-    <div id="getCapabilities" style="display: none">
-        <div>
-            <Label>GetCapabilitiesRequest</Label>
-            <form th:action="@{/getCapabilities}" method="post" id="getCapabilities_form">
-                <textarea id="getCapabilitiesRequest" name="requestContent" th:utext="${GetCapabilitiesRequest}"></textarea>
-                <script>
-                    var editor = CodeMirror.fromTextArea(document.getElementById("getCapabilitiesRequest"), {
-                        mode: "text/html",
-                        lineNumbers: true,
-                        lineWrapping: true,
-                        foldGutter: true,
-                        smartIndent: true,
-                        lineSeparator: "\n\r"
-                    });
-                </script>
-                <button type="submit" id="getCapabilities_btn" style="display:block;margin:0 auto">服务能力查询</button>
-            </form>
-        </div>
-        <div>
-            <Label>GetCapabilitiesResponse</Label>
-            <textarea id="getCapabilitiesResponse" name="responseContent" th:utext="${GetCapabilitiesResponse}"></textarea>
-            <script>
-                var editor = CodeMirror.fromTextArea(document.getElementById("getCapabilitiesResponse"), {
-                    mode: "text/html",
-                    lineNumbers: true,
-                    lineWrapping: true,
-                    foldGutter: true,
-                    smartIndent: true,
-                    lineSeparator: "\n\r"
-                });
-            </script>
-        </div>
-    </div>
-
-    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.5.1/jquery.min.js" crossorigin="anonymous"></script>
-    <script th:src="@{/js/index.js}"></script>
+    <label class="btn btn-primary  mb-2" for="upload">浏览</label>
+    <button class="btn btn-primary  mb-2" type="submit" id="insertSensorML-btn">注册</button>
+</div>
 </body>
+<script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.5.1/jquery.js"></script>
+<script type="text/javascript" th:src="@{/js/index.js}"></script>
 </html>

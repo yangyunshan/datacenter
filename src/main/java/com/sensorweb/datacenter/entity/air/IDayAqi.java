@@ -1,13 +1,13 @@
-package com.sensorweb.datacenter.entity.meteorology;
+package com.sensorweb.datacenter.entity.air;
 
-import java.util.Date;
+import java.time.Instant;
 
 /**
  * 任意时间段日均数据
  */
 public class IDayAqi {
     private String uniqueCode;
-    private Date queryTime;
+    private Instant queryTime;
     private String city;
     private String stationName;
     private String pm25;
@@ -37,11 +37,11 @@ public class IDayAqi {
         this.uniqueCode = uniqueCode;
     }
 
-    public Date getQueryTime() {
+    public Instant getQueryTime() {
         return queryTime;
     }
 
-    public void setQueryTime(Date queryTime) {
+    public void setQueryTime(Instant queryTime) {
         this.queryTime = queryTime;
     }
 

@@ -1,14 +1,11 @@
-package com.sensorweb.datacenter.entity.meteorology;
+package com.sensorweb.datacenter.entity.air;
 
-import java.util.Date;
+import java.time.Instant;
 
-/**
- * 任意时间小时数据
- */
-public class HourAqi {
+public class AirQualityHour {
     private String stationName;
     private String uniqueCode;
-    private Date queryTime;
+    private Instant time;
     private String pm25OneHour;
     private String pm10OneHour;
     private String so2OneHour;
@@ -16,9 +13,6 @@ public class HourAqi {
     private String coOneHour;
     private String o3OneHour;
     private String aqi;
-    private String primaryEP;
-    private String aqDegree;
-    private String aqType;
 
     public String getStationName() {
         return stationName;
@@ -36,12 +30,12 @@ public class HourAqi {
         this.uniqueCode = uniqueCode;
     }
 
-    public Date getQueryTime() {
-        return queryTime;
+    public Instant getTime() {
+        return time;
     }
 
-    public void setQueryTime(Date queryTime) {
-        this.queryTime = queryTime;
+    public void setTime(Instant time) {
+        this.time = time;
     }
 
     public String getPm25OneHour() {
@@ -98,29 +92,5 @@ public class HourAqi {
 
     public void setAqi(String aqi) {
         this.aqi = aqi;
-    }
-
-    public String getPrimaryEP() {
-        return primaryEP;
-    }
-
-    public void setPrimaryEP(String primaryEP) {
-        this.primaryEP = primaryEP;
-    }
-
-    public String getAqDegree() {
-        return aqDegree;
-    }
-
-    public void setAqDegree(String aqDegree) {
-        this.aqDegree = aqDegree;
-    }
-
-    public String getAqType() {
-        return aqType;
-    }
-
-    public void setAqType(String aqType) {
-        this.aqType = aqType;
     }
 }

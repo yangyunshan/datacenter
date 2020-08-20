@@ -49,4 +49,11 @@ public interface SOSWebservice {
      */
     @WebMethod
     String getComponent(@WebParam(name = "platformId") String platformId);
+
+    /**
+     * 获取目录树
+     * @return
+     */
+    @WebMethod
+    String getTOC();
 }

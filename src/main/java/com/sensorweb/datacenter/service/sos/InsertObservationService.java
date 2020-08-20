@@ -60,7 +60,6 @@ public class InsertObservationService {
      */
     @Transactional(isolation = Isolation.DEFAULT, propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
     public List<String> insertObservation(InsertObservationRequest request) throws ParseException, XMLWriterException {
-        String obsId = "";
         List<Observation> observations = new ArrayList<>();
         List<FeatureOfInterest> fois = new ArrayList<>();
 
@@ -121,9 +120,8 @@ public class InsertObservationService {
         }
         DOMHelper domHelper = new DOMHelper(new ByteArrayInputStream(requestContent.getBytes()), false);
         InsertObservationReaderV20 reader = new InsertObservationReaderV20();
-        InsertObservationRequest request = reader.readXMLQuery(domHelper, domHelper.getRootElement());
 
-        return request;
+        return reader.readXMLQuery(domHelper, domHelper.getRootElement());
     }
 
     /**

@@ -68,26 +68,29 @@ public class DescribeSensorExpandService {
      * @throws DOMHelperException
      * @throws OWSException
      */
-    public String getSensorByIds(List<String> procedureIds) {
+    public List<Map<String, Object>> getSensorByIds(List<String> procedureIds) {
         Set<String> tempIds;
-        Map<String, Object> res = new HashMap<>();
+        List<Map<String, Object>> res = new ArrayList<>();
 
         if (procedureIds!=null && procedureIds.size()>0) {
             tempIds = new HashSet<>(procedureIds);
         } else {
-            return "";
+            return null;
         }
         for (String procedureId : tempIds) {
+            Map<String, Object> temp = new HashMap<>();
             Procedure procedure = procedureMapper.selectByIdAndFormat(procedureId, PROCEDURE_DESCRIPTION_FORMAT);
 
-            res.put("id", procedureId);
-            res.put("name", procedure.getName());
-            res.put("description", procedure.getDescription());
-            res.put("url", procedure.getDescriptionFile());
-            res.put("platformName", StringUtils.isBlank(getPlatformNameOfSensor(procedureId)) ? "":getPlatformNameOfSensor(procedureId));
-            res.put("platformId", StringUtils.isBlank(getPlatformIdOfSensor(procedureId)) ? "":getPlatformIdOfSensor(procedureId));
+            temp.put("id", procedureId);
+            temp.put("name", procedure.getName());
+            temp.put("description", procedure.getDescription());
+            temp.put("url", procedure.getDescriptionFile());
+            temp.put("platformName", StringUtils.isBlank(getPlatformNameOfSensor(procedureId)) ? "":getPlatformNameOfSensor(procedureId));
+            temp.put("platformId", StringUtils.isBlank(getPlatformIdOfSensor(procedureId)) ? "":getPlatformIdOfSensor(procedureId));
+
+            res.add(temp);
         }
-        return JSONObject.toJSONString(res);
+        return res;
     }
 
     /**
@@ -439,8 +442,10 @@ public class DescribeSensorExpandService {
 
         //remove duplicate element
         List<String> ids = DataCenterUtils.removeDuplicate(res);
+        System.out.println(ids.size());
+        System.out.println(getSensorByIds(ids));
 
-        return getSensorByIds(ids);
+        return JSONObject.toJSONString(getSensorByIds(ids));
     }
 
     /**
@@ -457,5 +462,26 @@ public class DescribeSensorExpandService {
             }
         }
         return res;
+    }
+
+    /**
+     * 获取目录树
+     * @return
+     */
+    public String getTOC() {
+        List<Map<String, Object>> res = new ArrayList<>();
+        List<String> platformIds = getAllPlatform();
+        if (platformIds.size()>0) {
+            for (String platformId : platformIds) {
+                Map<String, Object> temp = new HashMap<>();
+                temp.put("platformId", platformId);
+                temp.put("platformName", procedureMapper.selectById(platformId).getName());
+                temp.put("platformDescription", procedureMapper.selectById(platformId).getDescription());
+                List<String> sensorIds = getComponentByPlatformId(platformId);
+                temp.put("components", getSensorByIds(sensorIds));
+                res.add(temp);
+            }
+        }
+        return JSONObject.toJSONString(res);
     }
 }

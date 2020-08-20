@@ -1,5 +1,6 @@
 package com.sensorweb.datacenter.webservice.impl;
 
+import com.alibaba.fastjson.JSONObject;
 import com.sensorweb.datacenter.entity.sos.Observation;
 import com.sensorweb.datacenter.service.sos.*;
 import com.sensorweb.datacenter.util.DataCenterUtils;
@@ -156,6 +157,19 @@ public class SOSWebServiceImpl implements SOSWebservice {
      */
     @Override
     public String getComponent(String platformId) {
-        return expandService.getSensorByIds(expandService.getComponentByPlatformId(platformId));
+        List<String> componentIds = expandService.getComponentByPlatformId(platformId);
+        return JSONObject.toJSONString(expandService.getSensorByIds(componentIds));
     }
+
+    /**
+     * 获取目录树
+     *
+     * @return
+     */
+    @Override
+    public String getTOC() {
+        return expandService.getTOC();
+    }
+
+
 }

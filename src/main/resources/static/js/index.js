@@ -1,3 +1,7 @@
+$('#insertSensorML-btn').click(function () {
+    $('#insertSensorML-form').submit();
+})
+
 $('#insertSensor_btn').click(function () {
     $('insertSensor_form').submit();
 })

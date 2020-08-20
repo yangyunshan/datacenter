@@ -11,7 +11,12 @@
  
  The Original Code is the "SensorML DataProcessing Engine".
  
- The Initial Developer of the Original Code is the VAST team at the University of Alabama in Huntsville (UAH). <http://vast.uah.edu> Portions created by the Initial Developer are Copyright (C) 2007 the Initial Developer. All Rights Reserved. Please Contact Mike Botts <mike.botts@uah.edu> for more information.
+ The Initial Developer of the Original Code is the VAST team at the
+ University of Alabama in Huntsville (UAH). <http://vast.uah.edu>
+ Portions created by the Initial Developer are Copyright (C) 2007
+ the Initial Developer. All Rights Reserved.
+
+ Please Contact Mike Botts <mike.botts@uah.edu> for more information.
  
  Contributor(s): 
     Alexandre Robin <robin@nsstc.uah.edu>
@@ -117,7 +122,7 @@ public class AsciiDataParser extends AbstractDataParser
 	/**
 	 * Extract next token from stream
 	 * Discard any character with ASCII code less than 32 (space)
-	 * @param inputStream
+	 * @param
 	 * @return next token as a String
 	 * @throws IOException
 	 */
@@ -234,10 +239,10 @@ public class AsciiDataParser extends AbstractDataParser
         
     /**
      * Parse a token from a tuple depending on the corresponding Data Component Definition 
-     * @param scalarInfo
+     * @param
      * @param token
      * @param decimalSep character to be used as the decimal separator. (don't change anything and assume '.' if 0)
-     * @param dataBlock the DataBlock to contain the read data
+     * @param
      * @throws IOException
      */
     protected void parseToken(ScalarComponent component, String token, char decimalSep) throws IOException

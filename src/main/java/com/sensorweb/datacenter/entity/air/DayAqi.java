@@ -1,22 +1,32 @@
-package com.sensorweb.datacenter.entity.meteorology;
+package com.sensorweb.datacenter.entity.air;
 
-import java.util.Date;
+import java.time.Instant;
 
 /**
- * 指定时间审核日均
+ * 日均数据
  */
-public class CDay {
+public class DayAqi {
+    private String stationName;
     private String uniqueCode;
-    private Date sDateTime;
+    private Instant queryTime;
+    private String pm25;
+    private String pm10;
     private String so2;
     private String no2;
-    private String pm10;
     private String co;
     private String o3EightHour;
-    private String pm25;
     private String aqi;
     private String primaryEP;
+    private String aqDegree;
     private String aqType;
+
+    public String getStationName() {
+        return stationName;
+    }
+
+    public void setStationName(String stationName) {
+        this.stationName = stationName;
+    }
 
     public String getUniqueCode() {
         return uniqueCode;
@@ -26,12 +36,28 @@ public class CDay {
         this.uniqueCode = uniqueCode;
     }
 
-    public Date getsDateTime() {
-        return sDateTime;
+    public Instant getQueryTime() {
+        return queryTime;
     }
 
-    public void setsDateTime(Date sDateTime) {
-        this.sDateTime = sDateTime;
+    public void setQueryTime(Instant queryTime) {
+        this.queryTime = queryTime;
+    }
+
+    public String getPm25() {
+        return pm25;
+    }
+
+    public void setPm25(String pm25) {
+        this.pm25 = pm25;
+    }
+
+    public String getPm10() {
+        return pm10;
+    }
+
+    public void setPm10(String pm10) {
+        this.pm10 = pm10;
     }
 
     public String getSo2() {
@@ -50,14 +76,6 @@ public class CDay {
         this.no2 = no2;
     }
 
-    public String getPm10() {
-        return pm10;
-    }
-
-    public void setPm10(String pm10) {
-        this.pm10 = pm10;
-    }
-
     public String getCo() {
         return co;
     }
@@ -74,14 +92,6 @@ public class CDay {
         this.o3EightHour = o3EightHour;
     }
 
-    public String getPm25() {
-        return pm25;
-    }
-
-    public void setPm25(String pm25) {
-        this.pm25 = pm25;
-    }
-
     public String getAqi() {
         return aqi;
     }
@@ -96,6 +106,14 @@ public class CDay {
 
     public void setPrimaryEP(String primaryEP) {
         this.primaryEP = primaryEP;
+    }
+
+    public String getAqDegree() {
+        return aqDegree;
+    }
+
+    public void setAqDegree(String aqDegree) {
+        this.aqDegree = aqDegree;
     }
 
     public String getAqType() {

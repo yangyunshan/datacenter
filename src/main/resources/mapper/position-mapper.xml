@@ -18,7 +18,7 @@
 
     <delete id="deleteByProcedureId">
         DELETE FROM position
-        WHERE procedure-id = #{procedureId}
+        WHERE procedure_id = #{procedureId}
     </delete>
 
     <delete id="deleteById" parameterType="int">

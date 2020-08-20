@@ -12,8 +12,10 @@ public interface ComponentMapper {
     int insertData(Component component);
 
     int deleteById(int id);
-    int deleteByProcedureId(String procedureId);
+    int deleteByPlatformId(String platformId);
+    int deleteByHref(String href);
 
     Component selectById(int id);
     List<Component> selectByPlatformId(String platformId);
+    Component selectByHref(String href);//查询传感器所属平台
 }

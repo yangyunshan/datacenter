@@ -29,6 +29,9 @@ import org.vast.ows.sos.InsertSensorRequest;
 import org.vast.ows.sos.InsertSensorResponse;
 import org.vast.ows.sos.InsertSensorWriterV20;
 import org.vast.ows.swe.InsertSensorResponseWriterV20;
+import org.vast.ows.swe.SWESUtils;
+import org.vast.sensorML.SMLUtils;
+import org.vast.swe.SWEUtils;
 import org.vast.util.TimeExtent;
 import org.vast.xml.DOMHelper;
 import org.vast.xml.DOMHelperException;
@@ -131,7 +134,6 @@ public class InsertSensorService {
         if (StringUtils.isBlank(requestContent)) {
             return null;
         }
-
         DOMHelper domHelper = new DOMHelper(new ByteArrayInputStream(requestContent.getBytes()),false);
         InsertSensorReaderV20 insertSensorReader = new InsertSensorReaderV20();
         return insertSensorReader.readXMLQuery(domHelper, domHelper.getRootElement());
@@ -262,12 +264,12 @@ public class InsertSensorService {
                         Procedure platform = procedureMapper.selectById(procedureId);
                         if (platform!=null) {
                             Component component = new Component();
-                            component.setName(procedure.getName());
-                            component.setTitle(procedure.getDescription());
+//                            component.setName(procedure.getName());
+                            component.setTitle(procedure.getName());
                             component.setHref(procedure.getId());
                             component.setPlatformId(procedureId);
                             componentMapper.insertData(component);
-                            flushComponent(procedure.getName(), procedure.getDescription(), procedure.getId(), platform.getDescriptionFile());
+                            flushComponent(procedure.getName(), procedure.getId(), platform.getDescriptionFile());
                         } else {
                             throw new Exception("平台不存在");
                         }
@@ -668,13 +670,12 @@ public class InsertSensorService {
 
     /**
      * 每当传感器注册成功，实时刷新传感器平台建模文档（添加Component节点）
-     * @param name
      * @param title
      * @param href
      * @param filePath 传感器平台的Procedure
      * @throws DOMHelperException
      */
-    public void flushComponent(String name, String title, String href, String filePath) throws DOMHelperException {
+    public void flushComponent(String title, String href, String filePath) throws DOMHelperException {
         DOMHelper domHelper = new DOMHelper(new ByteArrayInputStream(DataCenterUtils.readFromFile(filePath).getBytes()), false);
         Element element = domHelper.getElement("components/ComponentList");
         if (element==null) {
@@ -686,8 +687,7 @@ public class InsertSensorService {
             element = domHelper.getElement(element, "components/ComponentList");
         }
         Element temp = domHelper.getParentDocument(element).getDocument().createElement("sml:component");
-        if (!StringUtils.isBlank(name) || !StringUtils.isBlank(title) || !StringUtils.isBlank(href))
-        temp.setAttribute("name", StringUtils.isBlank(name) ? "" : name);
+        if (!StringUtils.isBlank(title) || !StringUtils.isBlank(href))
         temp.setAttribute("title", StringUtils.isBlank(title) ? "" : title);
         temp.setAttribute("href",StringUtils.isBlank(href) ? "" : href);
         domHelper.removeAllText(element);
