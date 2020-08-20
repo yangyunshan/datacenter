@@ -12,8 +12,10 @@ public interface FoiMapper {
 
     int deleteById(String id);
     int deleteByName(String name);
+    int deleteByProcedureId(String procedureId);
 
     FeatureOfInterest selectById(String id);
     //判断是否在多边形内
     boolean selectByIdAndGeom(@Param("id") String id, @Param("polygon") String polygon);
+    boolean isExist(String id);
 }

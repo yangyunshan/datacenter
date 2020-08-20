@@ -128,7 +128,8 @@ public class SamplingFeature<GeomType extends AbstractGeometry> extends GenericF
         if (geom != null)
             return geom;
         else
-            return getShape();
+//            return getShape();//未修改之前
+            return null;//修改之后
     }
     
     

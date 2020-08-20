@@ -4,17 +4,22 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.sensorweb.datacenter.dao.ObservationMapper">
     <sql id="insertFields">
-        observation_id, observation_description, observation_time, procedure_id, offering_id, feature_of_interest_id, observation_value
+        observation_id, observation_description, observation_type, observation_time, procedure_id, feature_of_interest_id, observed_property_id, observation_value
     </sql>
 
     <sql id="selectFields">
-        observation_id, observation_description, observation_time, procedure_id, offering_id, feature_of_interest_id, observation_value
+        id, observation_id, observation_description, observation_type, observation_time, procedure_id, feature_of_interest_id, feature_of_interest_id, observation_value
     </sql>
 
     <insert id="insertData" parameterType="Observation">
         INSERT INTO observation (<include refid="insertFields"></include>)
-        VALUES (#{id}, #{description}, #{time}, #{procedureId}, #{offeringId}, #{foiId}, #{value})
+        VALUES (#{outId}, #{description}, #{type}, #{time}, #{procedureId}, #{foiId}, #{observedProperty}, #{value})
     </insert>
+
+    <delete id="deleteByProcedureId">
+        DELETE FROM observation
+        WHERE procedure_id = #{procedureId}
+    </delete>
 
     <select id="selectObservationsByConditions" resultMap="observation">
         SELECT <include refid="selectFields"></include>
@@ -54,8 +59,8 @@
         <id property="id" column="observation_id"/>
         <result property="description" column="observation_description"/>
         <result property="time" column="observation_time"/>
+        <result property="type" column="observation_type"/>
         <result property="procedureId" column="procedure_id"/>
-        <result property="offeringId" column="offering_id"/>
         <result property="foiId" column="feature_of_interest_id"/>
         <result property="observedProperty" column="observed_property"/>
         <result property="value" column="observation_value"/>

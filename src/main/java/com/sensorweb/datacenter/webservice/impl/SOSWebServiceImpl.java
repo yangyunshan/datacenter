@@ -78,20 +78,8 @@ public class SOSWebServiceImpl implements SOSWebservice {
 
     @Override
     public String InsertObservation(String requestContent) {
-        String str = "";
 
-        try {
-            InsertObservationRequest request = insertObservationService.getInsertObservationRequest(requestContent);
-            List<String> obsIds = insertObservationService.insertObservation(request);
-            if (obsIds!=null && obsIds.size()>0) {
-                Element element = insertObservationService.getInsertObservationResponse(obsIds);
-                str = DataCenterUtils.element2String(element);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        return str;
+        return "str";
     }
 
     @Override

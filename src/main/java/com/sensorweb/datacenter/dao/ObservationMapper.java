@@ -14,6 +14,8 @@ import java.util.Set;
 public interface ObservationMapper {
     int insertData(Observation observation);
 
+    int deleteByProcedureId(String procedureId);
+
     List<Observation> selectObservationsByConditions(@Param("offeringIds") Set<String> offerings,
                                                      @Param("procedureIds") Set<String> procedureIds,
                                                      @Param("fois") Set<String> fois,

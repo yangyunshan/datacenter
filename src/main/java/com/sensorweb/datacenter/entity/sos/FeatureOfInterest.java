@@ -5,6 +5,7 @@ public class FeatureOfInterest {
     private String name;
     private String description;
     private String geom;
+    private String procedureId;
 
     public String getId() {
         return id;
@@ -36,6 +37,14 @@ public class FeatureOfInterest {
 
     public void setGeom(String geom) {
         this.geom = geom;
+    }
+
+    public String getProcedureId() {
+        return procedureId;
+    }
+
+    public void setProcedureId(String procedureId) {
+        this.procedureId = procedureId;
     }
 }
 

@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sensorweb.datacenter.dao.ObservedPropertyMapper">
+    <sql id="insertFields">
+        observed_property_id, property_value, procedure_id
+    </sql>
+
+    <sql id="selectFields">
+        observed_property_id, property_value, procedure_id
+    </sql>
+
+    <insert id="insertData" parameterType="ObservedProperty">
+        INSERT INTO observed_property (<include refid="insertFields"></include>)
+        VALUES (#{id}, #{value}, #{procedureId})
+    </insert>
+
+    <delete id="deleteById">
+        DELETE FROM observed_property
+        WHERE observed_property_id = #{id}
+    </delete>
+
+    <delete id="deleteByProcedureId">
+        DELETE FROM observed_property
+        WHERE procedure_id = #{procedureId}
+    </delete>
+
+    <select id="selectById" resultMap="observedProperty">
+        SELECT <include refid="selectFields"></include>
+        FROM observed_property
+        WHERE observed_property_id = #{id}
+    </select>
+
+    <select id="isExist" resultType="java.lang.Boolean">
+        SELECT count(observed_property_id)
+        FROM observed_property
+        WHERE observed_property_id = #{id}
+    </select>
+
+    <resultMap id="observedProperty" type="ObservedProperty">
+        <id property="id" column="observed_property_id"/>
+        <result property="value" column="property_value"/>
+    </resultMap>
+
+</mapper>

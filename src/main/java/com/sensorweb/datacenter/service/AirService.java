@@ -1,7 +1,8 @@
 package com.sensorweb.datacenter.service;
 
-import com.alibaba.fastjson.JSONObject;
 import com.sensorweb.datacenter.entity.air.*;
+import com.sensorweb.datacenter.entity.sos.FeatureOfInterest;
+import com.sensorweb.datacenter.entity.sos.Observation;
 import com.sensorweb.datacenter.service.sos.InsertObservationService;
 import com.sensorweb.datacenter.util.DataCenterConstant;
 import com.sensorweb.datacenter.util.DataCenterUtils;
@@ -9,7 +10,14 @@ import com.sensorweb.datacenter.util.SWEModelUtils;
 import net.opengis.gml.v32.*;
 import net.opengis.swe.v20.*;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.hadoop.yarn.webapp.hamlet2.Hamlet;
+import org.apache.http.HttpEntity;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.util.EntityUtils;
 import org.dom4j.Document;
 import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
@@ -26,12 +34,7 @@ import org.vast.ows.sos.InsertObservationRequest;
 import org.vast.ows.sos.SOSUtils;
 import org.vast.util.TimeExtent;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
-import java.io.UnsupportedEncodingException;
-import java.net.URL;
-import java.net.URLConnection;
+import java.io.*;
 import java.net.URLEncoder;
 import java.time.Instant;
 import java.util.*;
@@ -52,8 +55,12 @@ public class AirService implements DataCenterConstant {
         if (!StringUtils.isBlank(document)) {
             List<Object> objects = parseXmlDoc(document);
             InsertObservationRequest request = writeInsertObservationRequest(objects);
-//            service.insertObservation(request);
-            System.out.println();
+            List<IObservation> iObservations = service.getObservation(request);
+            if (iObservations!=null && iObservations.size()>0) {
+                for (IObservation iObservation : iObservations) {
+                    service.insertObservation(iObservation);
+                }
+            }
         }
     }
 
@@ -67,8 +74,12 @@ public class AirService implements DataCenterConstant {
         if (!StringUtils.isBlank(document)) {
             List<Object> objects = parseXmlDoc(document);
             InsertObservationRequest request = writeInsertObservationRequest(objects);
-            service.insertObservation(request);
-            System.out.println();
+            List<IObservation> iObservations = service.getObservation(request);
+            if (iObservations!=null && iObservations.size()>0) {
+                for (IObservation iObservation : iObservations) {
+                    service.insertObservation(iObservation);
+                }
+            }
         }
     }
 
@@ -84,8 +95,12 @@ public class AirService implements DataCenterConstant {
         if (!StringUtils.isBlank(document)) {
             List<Object> objects = parseXmlDoc(document);
             InsertObservationRequest request = writeInsertObservationRequest(objects);
-            service.insertObservation(request);
-            System.out.println();
+            List<IObservation> iObservations = service.getObservation(request);
+            if (iObservations!=null && iObservations.size()>0) {
+                for (IObservation iObservation : iObservations) {
+                    service.insertObservation(iObservation);
+                }
+            }
         }
     }
 
@@ -101,37 +116,28 @@ public class AirService implements DataCenterConstant {
         if (!StringUtils.isBlank(document)) {
             List<Object> objects = parseXmlDoc(document);
             InsertObservationRequest request = writeInsertObservationRequest(objects);
-            service.insertObservation(request);
-            System.out.println();
+            List<IObservation> iObservations = service.getObservation(request);
+            if (iObservations!=null && iObservations.size()>0) {
+                for (IObservation iObservation : iObservations) {
+                    service.insertObservation(iObservation);
+                }
+            }
         }
     }
 
-    /**
-     * 向指定的url发送GET请求
-     * @param url
-     * @param param
-     * @return
-     */
-    public String doGet(String url, String param) {
-        String result = "";
-        String totalUrl = url + "?" + param;
-        try {
-            URL realUrl = new URL(totalUrl);
-            URLConnection connection = realUrl.openConnection();
-            connection.setRequestProperty("accept", "*/*");
-            connection.setRequestProperty("connection", "Keep-Alive");
-            connection.setRequestProperty("user-agent", "Mozilla/4.0 (compatible; MISE 6.0; Windows NT 5.1; SV1)");
-            connection.connect();
+    public String doGet(String url, String param) throws IOException {
+        //打开postman
+        //这一步相当于运行main方法。
+        //创建request连接 3、填写url和请求方式
+        HttpGet get = new HttpGet(url + "?" + param);
+        //如果有参数添加参数 get请求不需要参数，省略
+        CloseableHttpClient client = HttpClients.createDefault();
+        //点击发送按钮，发送请求、获取响应报文
+        CloseableHttpResponse response = client.execute(get);
+        //格式化响应报文
+        HttpEntity entity = response.getEntity();
 
-            BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-            String line = "";
-            while ((line = reader.readLine()) != null)
-                result += line;
-        } catch (Exception e) {
-            System.out.println("发送Get请求异常");
-            e.printStackTrace();
-        }
-        return result;
+        return EntityUtils.toString(entity);
     }
 
     /**
@@ -140,37 +146,25 @@ public class AirService implements DataCenterConstant {
      * @param param
      * @return
      */
-    public String doPost(String url, String param) {
-        String result = "";
-        try {
-            URL realUrl = new URL(url);
-            URLConnection connection = realUrl.openConnection();
-            connection.setRequestProperty("accept", "*/*");
-            connection.setRequestProperty("connection", "Keep-Alive");
-            connection.setRequestProperty("user-agent", "Mozilla/4.0 (compatible; MISE 6.0; Windows NT 5.1; SV1)");
-            //发送post请求必须设置以下两行
-            connection.setDoInput(true);
-            connection.setDoOutput(true);
-
-            PrintWriter writer = new PrintWriter(connection.getOutputStream());
-            //发送请求参数
-            writer.print(param);
-            writer.flush();
-            BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-
-            String line = "";
-            while ((line = reader.readLine()) != null) {
-                result += line;
-            }
-        } catch (Exception e) {
-            System.out.println("发送post请求失败");
-            e.printStackTrace();
-        }
-        return result;
+    public String doPost(String url, String param) throws IOException {
+        //打开postman
+        //这一步相当于运行main方法。
+        //创建request连接、填写url和请求方式
+        HttpPost httpPost = new HttpPost(url);
+        //额外设置Content-Type请求头
+        httpPost.setHeader("Content-Type","application/x-www-form-urlencoded;charset=UTF-8");
+        //如果有参数添加参数
+        CloseableHttpClient client = HttpClients.createDefault();
+        httpPost.setEntity(new StringEntity(param,"UTF-8"));
+        //点击发送按钮，发送请求、获取响应报文
+        CloseableHttpResponse response = client.execute(httpPost);
+        //格式化响应报文
+        HttpEntity entity = response.getEntity();
+        return EntityUtils.toString(entity);
     }
 
     /**
-     * 设置IProcedure属性
+     * 获取IProcedure属性
      * @param o
      * @return
      */
@@ -184,6 +178,21 @@ public class AirService implements DataCenterConstant {
         }
         ((IXlinkReference)procedure).setHref(id);
         return procedure;
+    }
+
+    /**
+     * 获取id属性
+     * @param o
+     * @return
+     */
+    public String getId(Object o) {
+        String id = "";
+        if (o instanceof AirQualityDay) {
+            id = ((AirQualityDay) o).getUniqueCode();
+        } else {
+            id = ((AirQualityHour) o).getUniqueCode();
+        }
+        return id;
     }
 
     public DefinitionRef getObservedProperty(Object o) {
@@ -884,12 +893,16 @@ public class AirService implements DataCenterConstant {
      */
     public IGeoFeature getFeatureOfInterset(Object object) {
         String name = "";
+        String id = "";
         if (object instanceof AirQualityHour) {
             name = ((AirQualityHour) object).getStationName();
+            id = ((AirQualityHour) object).getUniqueCode();
         } else {
             name = ((AirQualityDay) object).getStationName();
+            id = ((AirQualityDay) object).getUniqueCode();
         }
         SamplingFeature<AbstractGeometry> res = new SamplingFeature<>();
+        res.setUniqueIdentifier(id);
         res.setName(name);
         return res;
     }
@@ -904,6 +917,8 @@ public class AirService implements DataCenterConstant {
         if (objects!=null && objects.size()>0) {
             for (Object object : objects) {
                 ObservationImpl observation = new ObservationImpl();
+                observation.setId(getId(object));
+                observation.setUniqueIdentifier(getId(object));
                 observation.setProcedure(getProcedure(object));
                 observation.setResultTime(getRusltTime(object));
                 observation.setPhenomenonTime(getPhenomenonTime(object));

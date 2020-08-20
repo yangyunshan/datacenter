@@ -27,22 +27,7 @@ import java.util.*;
 public class GetCapabilitiesService {
 
     @Autowired
-    private OfferingMapper offeringMapper;
-
-    @Autowired
-    private ProcOffMapper procOffMapper;
-
-    @Autowired
     private ProcedureMapper procedureMapper;
-
-    @Autowired
-    private FoiOffMapper foiOffMapper;
-
-    @Autowired
-    private PhenOffMapper phenOffMapper;
-
-    @Autowired
-    private PhenomenonMapper phenomenonMapper;
 
     @Autowired
     private FoiMapper foiMapper;
@@ -219,14 +204,14 @@ public class GetCapabilitiesService {
      * @return
      */
     public SOSServiceCapabilities setContents(SOSServiceCapabilities sosServiceCapabilities) {
-        List<Offering> offerings = offeringMapper.getAll();
-        if (offerings!=null && offerings.size()>0) {
+//        List<Offering> offerings = offeringMapper.getAll();
+//        if (offerings!=null && offerings.size()>0) {
             SOSOfferingCapabilities offeringCapabilities = new SOSOfferingCapabilities();
-
-            for (Offering offering : offerings) {
-                String offeringId = offering.getId();
-                offeringCapabilities.setIdentifier(offeringId);
-                offeringCapabilities.setTitle(offering.getName());
+//
+//            for (Offering offering : offerings) {
+//                String offeringId = offering.getId();
+//                offeringCapabilities.setIdentifier(offeringId);
+//                offeringCapabilities.setTitle(offering.getName());
 //                offeringCapabilities.getObservableProperties().addAll(DataCenterUtils.string2List(offering.getObservableProperty()));
 
                 //根据offeringId查ProcedureId，进而获取procedure相关信息
@@ -258,11 +243,11 @@ public class GetCapabilitiesService {
 //                }
 
 //                offeringCapabilities.getResponseFormats().add("application/json");
-                offeringCapabilities.getResponseFormats().add("http://www.opengis.net/om/2.0");
-                offeringCapabilities.getResponseFormats().add("http://www.opengis.net/def/observationType/OGC-OM/2.0/OM_Measurement");
-            }
-            sosServiceCapabilities.getLayers().add(offeringCapabilities);
-        }
-        return sosServiceCapabilities;
+//                offeringCapabilities.getResponseFormats().add("http://www.opengis.net/om/2.0");
+//                offeringCapabilities.getResponseFormats().add("http://www.opengis.net/def/observationType/OGC-OM/2.0/OM_Measurement");
+//            }
+//            sosServiceCapabilities.getLayers().add(offeringCapabilities);
+//        }
+        return null;
     }
 }

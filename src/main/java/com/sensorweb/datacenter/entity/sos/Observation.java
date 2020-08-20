@@ -7,21 +7,30 @@ import java.time.LocalDateTime;
 import java.util.Date;
 
 public class Observation {
-    private String id;
+    private int id;
+    private String outId;
     private String description;
     private Instant time;
+    private String type;
     private String procedureId;
-    private String offeringId;
     private String foiId;
     private String observedProperty;
     private String value;
 
-    public String getId() {
+    public int getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(int id) {
         this.id = id;
+    }
+
+    public String getOutId() {
+        return outId;
+    }
+
+    public void setOutId(String outId) {
+        this.outId = outId;
     }
 
     public String getDescription() {
@@ -40,20 +49,20 @@ public class Observation {
         this.time = time;
     }
 
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
     public String getProcedureId() {
         return procedureId;
     }
 
     public void setProcedureId(String procedureId) {
         this.procedureId = procedureId;
-    }
-
-    public String getOfferingId() {
-        return offeringId;
-    }
-
-    public void setOfferingId(String offeringId) {
-        this.offeringId = offeringId;
     }
 
     public String getFoiId() {

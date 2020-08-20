@@ -2,8 +2,10 @@ package com.sensorweb.datacenter.service.sos;
 
 import com.sensorweb.datacenter.dao.FoiMapper;
 import com.sensorweb.datacenter.dao.ObservationMapper;
+import com.sensorweb.datacenter.dao.ObservedPropertyMapper;
 import com.sensorweb.datacenter.entity.sos.FeatureOfInterest;
 import com.sensorweb.datacenter.entity.sos.Observation;
+import com.sensorweb.datacenter.entity.sos.ObservedProperty;
 import com.sensorweb.datacenter.util.DataCenterUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import org.vast.ogc.def.DefinitionRef;
 import org.vast.ogc.gml.IGeoFeature;
 import org.vast.ogc.om.IObservation;
 import org.vast.ogc.om.OMUtils;
@@ -35,7 +38,8 @@ public class InsertObservationService {
     @Autowired
     private ObservationMapper observationMapper;
 
-    private String offeringId;
+    @Autowired
+    private ObservedPropertyMapper observedPropertyMapper;
 
     /**
      * 根据返回的插入成功的观测id，自动生成InsertObservationResponse
@@ -54,43 +58,26 @@ public class InsertObservationService {
 
     /**
      * 通过InsertObservation请求，将Observation插入到数据库中，返回插入成功的Observation的id
-     * @param request
+     * @param iObservation
      * @return
      * @throws ParseException
      */
     @Transactional(isolation = Isolation.DEFAULT, propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
-    public List<String> insertObservation(InsertObservationRequest request) throws ParseException, XMLWriterException {
-        List<Observation> observations = new ArrayList<>();
-        List<FeatureOfInterest> fois = new ArrayList<>();
-
-        List<IObservation> iObservations = getObservation(request);
-        if (iObservations!=null && iObservations.size()>0) {
-            for (IObservation iObservation : iObservations) {
-                Observation temp = getObservation(iObservation);
-                observations.add(temp);
-                FeatureOfInterest featureOfInterest = getFoi(iObservation);
-                fois.add(featureOfInterest);
-            }
-        }
-
-        //定义一个list存储插入的obs
-        List<String> obsIds = new ArrayList<>();
-        //插入观测数据
-        if (observations.size()>0) {
-            for (Observation observation : observations) {
-                observationMapper.insertData(observation);
-                obsIds.add(observation.getId());
-            }
-        }
+    public void insertObservation(IObservation iObservation) throws ParseException, XMLWriterException {
+        Observation observation = getObservation(iObservation);
+        FeatureOfInterest fois = getFoi(iObservation);
+        ObservedProperty observedProperty = getObservedProperty(iObservation);
 
         //将FOI数据写入数据库
-        if (fois.size()>0) {
-            for (FeatureOfInterest featureOfInterest : fois) {
-                foiMapper.insertData(featureOfInterest);
-            }
+        if (!foiMapper.isExist(fois.getId())) {
+            foiMapper.insertData(fois);
         }
-
-        return obsIds;
+        //insert observedProperty
+        if (!observedPropertyMapper.isExist(observedProperty.getId())) {
+            observedPropertyMapper.insertData(observedProperty);
+        }
+        //插入观测数据
+        observationMapper.insertData(observation);
     }
 
     /**
@@ -133,7 +120,6 @@ public class InsertObservationService {
         if (request==null) {
             return null;
         } else {
-            offeringId = request.getOffering();
             return request.getObservations();
         }
     }
@@ -151,7 +137,8 @@ public class InsertObservationService {
                 foi.setId(geoFeature.getUniqueIdentifier());
                 foi.setName(geoFeature.getName());
                 foi.setDescription(geoFeature.getDescription());
-                foi.setGeom(geoFeature.getGeometry().toString());
+                foi.setGeom(geoFeature.getGeometry()!=null ? geoFeature.getGeometry().toString():null);
+                foi.setProcedureId(iObservation.getProcedure().getUniqueIdentifier());
             }
         }
         return foi;
@@ -166,15 +153,34 @@ public class InsertObservationService {
     public Observation getObservation(IObservation iObservation) throws ParseException, XMLWriterException {
         Observation observation = new Observation();
         if (iObservation!=null) {
-            observation.setId(iObservation.getUniqueIdentifier());
+            observation.setOutId(iObservation.getUniqueIdentifier());
             observation.setDescription(iObservation.getDescription());
             observation.setFoiId(iObservation.getFeatureOfInterest().getUniqueIdentifier());
             observation.setProcedureId(iObservation.getProcedure().getUniqueIdentifier());
-            observation.setOfferingId(offeringId);
             observation.setTime(iObservation.getResultTime());
             observation.setValue(getOM(iObservation));
             observation.setObservedProperty(iObservation.getObservedProperty().getHref());
+            observation.setType(iObservation.getType());
         }
         return observation;
+    }
+
+    /**
+     * 解析IObservation对象，获取观测属性
+     * @param iObservation
+     * @return
+     */
+    public ObservedProperty getObservedProperty(IObservation iObservation) {
+        ObservedProperty observedProperty = new ObservedProperty();
+        if (iObservation!=null) {
+            DefinitionRef definitionRef = iObservation.getObservedProperty();
+            if (definitionRef!=null) {
+                String id = iObservation.getUniqueIdentifier();
+                observedProperty.setId(iObservation.getUniqueIdentifier());
+                observedProperty.setValue(definitionRef.getHref());
+                observedProperty.setProcedureId(iObservation.getProcedure().getUniqueIdentifier());
+            }
+        }
+        return observedProperty;
     }
 }

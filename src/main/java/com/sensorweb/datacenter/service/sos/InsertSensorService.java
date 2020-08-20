@@ -334,35 +334,6 @@ public class InsertSensorService {
     }
 
     /**
-     * 解析InsertSensorRequest请求，获取Offering信息，暂未存储offering与procedure的映射关系
-     * @param request
-     * @return
-     */
-    public List<Offering> getOfferings(InsertSensorRequest request) {
-        List<Offering> result = new ArrayList<>();
-        if (request!=null) {
-            AbstractProcess abstractProcess = request.getProcedureDescription();
-            if (abstractProcess!=null) {
-                Set<String> name = abstractProcess.getCapabilitiesList().getPropertyNames();
-                if (!name.contains("offerings")) {
-                    return null;
-                }
-                CapabilityList offeringCap = abstractProcess.getCapabilities("offerings");
-                if (offeringCap!=null && offeringCap.getCapabilityList()!=null && offeringCap.getCapabilityList().size()>0) {
-                    OgcPropertyList<DataComponent> datas = offeringCap.getCapabilityList();
-                    for (int i=0; i<datas.size();i++) {
-                        Offering temp = new Offering();
-                        temp.setId(datas.get(i).getData().getStringValue());
-                        temp.setName(datas.get(i).getLabel());
-                        result.add(temp);
-                    }
-                }
-            }
-        }
-        return result;
-    }
-
-    /**
      * 解析Request对象，并加以处理，最后返回自定义Identification对象集合
      * @param
      * @return
@@ -577,9 +548,6 @@ public class InsertSensorService {
                     result.add(contactTemp);
                     contact.getValue().getIndividualName();
                 }
-//                for (int i=0; i<contactList.size(); i++) {
-//
-//                }
             }
         }
 

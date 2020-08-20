@@ -34,9 +34,6 @@ public class DeleteSensorService {
     private ProcedureMapper procedureMapper;
 
     @Autowired
-    private OfferingMapper offeringMapper;
-
-    @Autowired
     private ComponentMapper componentMapper;
 
     @Autowired
@@ -83,6 +80,15 @@ public class DeleteSensorService {
 
     @Autowired
     private QuantityRangeMapper quantityRangeMapper;
+
+    @Autowired
+    private ObservationMapper observationMapper;
+
+    @Autowired
+    private FoiMapper foiMapper;
+
+    @Autowired
+    private ObservedPropertyMapper observedPropertyMapper;
 
     /**
      * 解析DeleteSensorRequest请求，获取DeleteSensorRequest对象
@@ -148,7 +154,10 @@ public class DeleteSensorService {
         return procedureId;
     }
 
-    //根据id删除procedure，删除时与插入时对应，不能漏删(Component节点留在别处处理)
+    /**
+     * 根据id删除procedure，删除时与插入时对应，不能漏删(Component节点留在别处处理)
+     * @param id
+     */
     public void deleteSensorById(String id) {
         if (!StringUtils.isBlank(id)) {
             //delete identification
@@ -156,12 +165,26 @@ public class DeleteSensorService {
             //delete classification
             classificationMapper.deleteByProcedureId(id);
             //delete characteristic
+            String characteristicId = id + ":characteristic";
+            categoryMapper.deleteByOutId(characteristicId);
+            quantityMapper.deleteByOutId(characteristicId);
+            quantityRangeMapper.deleteByOutId(characteristicId);
+            textMapper.deleteByOutId(characteristicId);
+            vectorMapper.deleteByOutId(characteristicId);
             characteristicMapper.deleteByProcedureId(id);
             //delete capability
+            String capabilityId = id + ":capability";
+            categoryMapper.deleteByOutId(capabilityId);
+            quantityMapper.deleteByOutId(capabilityId);
+            quantityRangeMapper.deleteByOutId(capabilityId);
+            textMapper.deleteByOutId(capabilityId);
+            vectorMapper.deleteByOutId(capabilityId);
             capabilityMapper.deleteByProcedureId(id);
             //delete validTime
             validTimeMapper.deleteByProcedureId(id);
             //delete contact
+            addressMapper.deleteByProcedureId(id);
+            telephoneMapper.deleteByProcedureId(id);
             contactMapper.deleteByProcedureId(id);
             //delete position
             positionMapper.deleteByProcedureId(id);
@@ -170,6 +193,10 @@ public class DeleteSensorService {
             //delete sensorML File
             Procedure procedure = procedureMapper.selectById(id);
             new File(procedure.getDescriptionFile()).delete();
+            //delete observation
+            observationMapper.deleteByProcedureId(id);
+            foiMapper.deleteByProcedureId(id);
+            observedPropertyMapper.deleteByProcedureId(id);
             //delete procedure
             procedureMapper.deleteById(id);
         }

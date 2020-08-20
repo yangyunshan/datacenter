@@ -27,22 +27,7 @@ public class ObservationController {
 
     @RequestMapping(path = "/insertObservation", method = RequestMethod.POST)
     public String insertObservation(Model model, String requestContent) {
-        Element element = null;
-        try {
-            InsertObservationRequest request = insertObservationService.getInsertObservationRequest(requestContent);
-            List<String> obsIds = insertObservationService.insertObservation(request);
-            element = insertObservationService.getInsertObservationResponse(obsIds);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        if (element!=null) {
-            model.addAttribute("InsertObservationResponse", DataCenterUtils.element2String(element));
-        }
-        model.addAttribute("InsertObservationRequest", requestContent);
-        model.addAttribute("tag", "InsertObservation");
-
-        return "index";
+        return "";
     }
 
     @RequestMapping(path = "/getObservation", method = RequestMethod.POST)
