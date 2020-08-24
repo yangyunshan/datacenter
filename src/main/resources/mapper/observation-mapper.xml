@@ -4,11 +4,11 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.sensorweb.datacenter.dao.ObservationMapper">
     <sql id="insertFields">
-        observation_id, observation_description, observation_type, observation_time, procedure_id, feature_of_interest_id, observed_property_id, observation_value
+        observation_id, observation_description, observation_type, observation_time, procedure_id, feature_of_interest_id, observed_property, observation_value
     </sql>
 
     <sql id="selectFields">
-        id, observation_id, observation_description, observation_type, observation_time, procedure_id, feature_of_interest_id, feature_of_interest_id, observation_value
+        id, observation_id, observation_description, observation_type, observation_time, procedure_id, feature_of_interest_id, observed_property, observation_value
     </sql>
 
     <insert id="insertData" parameterType="Observation">
@@ -25,19 +25,9 @@
         SELECT <include refid="selectFields"></include>
         FROM observation
         WHERE 1 = 1
-        <if test="offeringIds!=null">
-            <foreach collection="offeringIds" item="offeringId" open="and offering_id IN(" close=")" separator=",">
-                #{offeringId}
-            </foreach>
-        </if>
         <if test="procedureIds!=null">
             <foreach collection="procedureIds" item="procedureId" open="and procedure_id IN(" close=")" separator=",">
                 #{procedureId}
-            </foreach>
-        </if>
-        <if test="fois!=null">
-            <foreach collection="fois" item="foi" open="and feature_of_interest_id IN(" close=")" separator=",">
-                #{foi}
             </foreach>
         </if>
         <if test="observedProperties!=null">
@@ -45,11 +35,8 @@
                 #{observedProperty}
             </foreach>
         </if>
-        <if test="begin!=null">
-            and observation_time <![CDATA[>=]]> #{begin}
-        </if>
-        <if test="end!=null">
-            and observation_time <![CDATA[<=]]> #{end}
+        <if test="begin!=null and end!=null">
+            and observation_time between #{begin} and #{end}
         </if>
     </select>
     

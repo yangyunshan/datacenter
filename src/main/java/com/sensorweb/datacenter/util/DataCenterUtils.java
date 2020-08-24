@@ -134,6 +134,29 @@ public class DataCenterUtils {
     }
 
     /**
+     * Instant转string
+     * @param time
+     * @return
+     */
+    public static String instant2String(Instant time) {
+        Date tmpDate=Date.from(time);
+        SimpleDateFormat formatter=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        return formatter.format(tmpDate);
+    }
+
+    /**
+     * UTC时间字符串转Instant时间对象
+     * @param utc
+     * @return
+     */
+    public static Instant utc2Instant(String utc) {
+        if (StringUtils.isBlank(utc)) {
+            return null;
+        }
+        return Instant.parse(utc);
+    }
+
+    /**
      * Instant转LocalDateTime
      * @param instant
      * @return

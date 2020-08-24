@@ -87,9 +87,6 @@ public class DeleteSensorService {
     @Autowired
     private FoiMapper foiMapper;
 
-    @Autowired
-    private ObservedPropertyMapper observedPropertyMapper;
-
     /**
      * 解析DeleteSensorRequest请求，获取DeleteSensorRequest对象
      * @param requestContent
@@ -196,7 +193,6 @@ public class DeleteSensorService {
             //delete observation
             observationMapper.deleteByProcedureId(id);
             foiMapper.deleteByProcedureId(id);
-            observedPropertyMapper.deleteByProcedureId(id);
             //delete procedure
             procedureMapper.deleteById(id);
         }

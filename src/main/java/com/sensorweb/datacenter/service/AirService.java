@@ -85,6 +85,7 @@ public class AirService implements DataCenterConstant {
 
     /**
      * 根据时间接入指定日期内的天数据（当数据库中缺少某个时间段的数据时，可作为数据补充）
+     * @param beginTime/endTime格式: "2020-08-01 00:00:00", "2020-08-10 00:00:00"
      * @throws Exception
      */
     public void insertDayDataByDate(String beginTime, String endTime) throws Exception {
@@ -199,9 +200,9 @@ public class AirService implements DataCenterConstant {
         DefinitionRef observedProperty = new DefinitionRef();
         String property = "";
         if (o instanceof AirQualityHour) {
-            property = "HourData";
+            property = "AirQualityByHour";
         } else {
-            property = "DayData";
+            property = "AirQualityByDay";
         }
         observedProperty.setHref(property);
         return observedProperty;

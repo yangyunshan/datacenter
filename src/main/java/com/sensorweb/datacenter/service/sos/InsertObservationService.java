@@ -2,10 +2,8 @@ package com.sensorweb.datacenter.service.sos;
 
 import com.sensorweb.datacenter.dao.FoiMapper;
 import com.sensorweb.datacenter.dao.ObservationMapper;
-import com.sensorweb.datacenter.dao.ObservedPropertyMapper;
 import com.sensorweb.datacenter.entity.sos.FeatureOfInterest;
 import com.sensorweb.datacenter.entity.sos.Observation;
-import com.sensorweb.datacenter.entity.sos.ObservedProperty;
 import com.sensorweb.datacenter.util.DataCenterUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,7 +24,6 @@ import org.w3c.dom.Element;
 
 import java.io.ByteArrayInputStream;
 import java.text.ParseException;
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -37,9 +34,6 @@ public class InsertObservationService {
 
     @Autowired
     private ObservationMapper observationMapper;
-
-    @Autowired
-    private ObservedPropertyMapper observedPropertyMapper;
 
     /**
      * 根据返回的插入成功的观测id，自动生成InsertObservationResponse
@@ -66,15 +60,10 @@ public class InsertObservationService {
     public void insertObservation(IObservation iObservation) throws ParseException, XMLWriterException {
         Observation observation = getObservation(iObservation);
         FeatureOfInterest fois = getFoi(iObservation);
-        ObservedProperty observedProperty = getObservedProperty(iObservation);
 
         //将FOI数据写入数据库
         if (!foiMapper.isExist(fois.getId())) {
             foiMapper.insertData(fois);
-        }
-        //insert observedProperty
-        if (!observedPropertyMapper.isExist(observedProperty.getId())) {
-            observedPropertyMapper.insertData(observedProperty);
         }
         //插入观测数据
         observationMapper.insertData(observation);
@@ -163,24 +152,5 @@ public class InsertObservationService {
             observation.setType(iObservation.getType());
         }
         return observation;
-    }
-
-    /**
-     * 解析IObservation对象，获取观测属性
-     * @param iObservation
-     * @return
-     */
-    public ObservedProperty getObservedProperty(IObservation iObservation) {
-        ObservedProperty observedProperty = new ObservedProperty();
-        if (iObservation!=null) {
-            DefinitionRef definitionRef = iObservation.getObservedProperty();
-            if (definitionRef!=null) {
-                String id = iObservation.getUniqueIdentifier();
-                observedProperty.setId(iObservation.getUniqueIdentifier());
-                observedProperty.setValue(definitionRef.getHref());
-                observedProperty.setProcedureId(iObservation.getProcedure().getUniqueIdentifier());
-            }
-        }
-        return observedProperty;
     }
 }

@@ -23,10 +23,9 @@ import org.vast.xml.XMLReaderException;
 import org.w3c.dom.Element;
 
 import java.io.ByteArrayInputStream;
+import java.sql.Timestamp;
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Service
 public class GetObservationService {
@@ -36,6 +35,12 @@ public class GetObservationService {
 
     @Autowired
     private FoiMapper foiMapper;
+
+    @Autowired
+    private DescribeSensorExpandService describeSensorExpandService;
+
+    @Autowired
+    private DeleteSensorService deleteSensorService;
 
     /**
      * 根据查询获得的O&M数据内容，封装成Response，并以Element的形式返回
@@ -57,7 +62,7 @@ public class GetObservationService {
     }
 
     /**
-     * 根据查询请求查询结果，目前查询条件还不完善，仅支持单表查询
+     * 根据查询请求查询结果，目前查询条件还不完善
      * @param request
      * @return
      */
@@ -65,29 +70,33 @@ public class GetObservationService {
         List<Observation> result = new ArrayList<>();
 
         Set<String> procedureIds = getProcedureId(request);
-        Set<String> offerings = getOffering(request);
-        Set<String> observedProperties = getObservable(request); //暂不考虑
+        Set<String> observedProperties = getObservable(request);
         Set<String> fois = getFoi(request);
         Instant[] temporal = getTemporalFilter(request);
         double[] spatial = getSpatialFilter(request);
 
-        //获得满足offering、procedureId、observedProperties、foi、temporal条件的observation
-        List<Observation> observations = observationMapper.selectObservationsByConditions(offerings, procedureIds, fois, observedProperties,
-                temporal[0], temporal[1]);
-        //从上面的查询结果中进一步筛选出满足空间条件的结果
-        if (observations!=null && observations.size()>0 && !(spatial[0]==0.0 && spatial[1]==0.0 && spatial[2]==0.0) && spatial[3]==0.0) {
-            for (Observation temp : observations) {
-                //将空间参数转为wkt字符串
-                String spatialCondition = DataCenterUtils.coodinate2Wkt(spatial[0], spatial[1], spatial[2], spatial[3]);
-                //查询此观测结果对应的foi
-                boolean flag = foiMapper.selectByIdAndGeom(temp.getFoiId(), spatialCondition);
-                if (!flag) {
-                    observations.remove(temp);
-                }
+        Iterator<String> iterator = procedureIds.iterator();
+        if (iterator.hasNext()) {
+            String procedureId = iterator.next();
+            //如果id是平台的情况，查询平台下的所有传感器数据
+            if (deleteSensorService.isPlatform(procedureId)) {
+                List<String> sensorIds = describeSensorExpandService.getComponentByPlatformId(procedureId);
+                Set<String> ids = new HashSet<>(sensorIds);
+                //获得满足procedureId、observedProperties、foi、temporal条件的observation
+                List<Observation> temp = observationMapper.selectObservationsByConditions(ids, observedProperties,
+                        Timestamp.valueOf(DataCenterUtils.instant2String(temporal[0])), Timestamp.valueOf(DataCenterUtils.instant2String(temporal[1])));
+                result.addAll(temp);
+            } else {
+                Set<String> ids = new HashSet<>();
+                ids.add(procedureId);
+                List<Observation> temp = observationMapper.selectObservationsByConditions(ids, observedProperties,
+                        Timestamp.valueOf(DataCenterUtils.instant2String(temporal[0])), Timestamp.valueOf(DataCenterUtils.instant2String(temporal[1])));
+                result.addAll(temp);
             }
         }
 
-        return observations;
+
+        return result;
     }
 
     /**

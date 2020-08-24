@@ -5,7 +5,9 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
+import java.sql.Timestamp;
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
 
@@ -16,12 +18,10 @@ public interface ObservationMapper {
 
     int deleteByProcedureId(String procedureId);
 
-    List<Observation> selectObservationsByConditions(@Param("offeringIds") Set<String> offerings,
-                                                     @Param("procedureIds") Set<String> procedureIds,
-                                                     @Param("fois") Set<String> fois,
+    List<Observation> selectObservationsByConditions(@Param("procedureIds") Set<String> procedureIds,
                                                      @Param("observedProperties") Set<String> observedProperties,
-                                                     @Param("begin") Instant begin,
-                                                     @Param("end") Instant end);
+                                                     @Param("begin") Timestamp begin,
+                                                     @Param("end") Timestamp end);
 
     List<Observation> selectObservationsBySpatial(@Param("minX") double minX, @Param("minY") double minY,
                                                   @Param("maxX") double maxX, @Param("maxY") double maxY);
