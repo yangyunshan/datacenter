@@ -2,9 +2,12 @@ package com.sensorweb.datacenter;
 
 import com.sensorweb.datacenter.entity.sos.Observation;
 import com.sensorweb.datacenter.service.AirService;
+import com.sensorweb.datacenter.service.HdfsService;
+import com.sensorweb.datacenter.service.HimawariService;
 import com.sensorweb.datacenter.service.sos.*;
 import com.sensorweb.datacenter.util.DataCenterConstant;
 import com.sensorweb.datacenter.util.DataCenterUtils;
+import org.apache.commons.net.ftp.FTPClient;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -41,6 +44,36 @@ class DataCenterApplicationTests implements DataCenterConstant {
     public void test03() throws OWSException, DOMHelperException {
         GetObservationRequest request = getObservationService.getObservationRequest(DataCenterUtils.readFromFile("d://MEGA/Others/GetObservation.xml"));
         List<Observation> res = getObservationService.getObservationContent(request);
+        System.out.println();
+    }
+
+    @Autowired
+    private HimawariService himawariService;
+
+    @Test
+    public void test04() {
+        String host = "ftp.ptree.jaxa.jp";
+        String userName = "yangyunshan123_gmail.com";
+        String password = "SP+wari8";
+        FTPClient ftpClient = himawariService.getFTPClient(host, userName, password);
+
+        boolean flag = himawariService.downloadFTP(ftpClient, "/","READMEfirst_P-Ttree_en.txt", "d://");
+        System.out.println();
+    }
+
+    @Autowired
+    private HdfsService hdfsService;
+    @Test
+    public void test05() throws Exception {
+//        hdfsService.mkdir("/test");
+//        hdfsService.uploadFile("d://StationInfo.txt", "/input");
+//        List<Map<String, String>> res = hdfsService.listFile("/");
+        String ss = hdfsService.readFile("/input/file1.txt");
+//        boolean b = hdfsService.existFile("/input/StationInfo.txt");
+        System.out.println(ss);
+//        boolean c = hdfsService.deleteFile("/StationInfo.txt");
+//        boolean d = hdfsService.deleteDir("/test");
+//        hdfsService.downloadFile("/input/file1.txt", "d://test.txt");
         System.out.println();
     }
 

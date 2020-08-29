@@ -47,7 +47,7 @@ public class HdfsService {
      */
     public FileSystem getFileSystem() throws Exception {
         // 客户端去操作hdfs时是有一个用户身份的，默认情况下hdfs客户端api会从jvm中获取一个参数作为自己的用户身份
-        // DHADOOP_USER_NAME=hadoop
+        // DHADOOP_USER_NAME=root
         // 也可以在构造客户端fs对象时，通过参数传递进去
         FileSystem fileSystem = FileSystem.get(new URI(hdfsPath), getConfiguration(), hdfsName);
         return fileSystem;
@@ -163,13 +163,15 @@ public class HdfsService {
             inputStream = fs.open(srcPath);
             BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
             String lineTxt = "";
-            StringBuffer sb = new StringBuffer();
+            StringBuilder sb = new StringBuilder();
             while ((lineTxt = reader.readLine()) != null) {
                 sb.append(lineTxt);
             }
             return sb.toString();
         } finally {
-            inputStream.close();
+            if (inputStream!=null) {
+                inputStream.close();
+            }
             fs.close();
         }
     }
@@ -263,7 +265,7 @@ public class HdfsService {
         Path clientPath = new Path(sourceFilePath);
         Path serverPath = new Path(downloadFilePath);
 
-        fs.copyToLocalFile(false, clientPath, serverPath);
+        fs.copyToLocalFile(true, clientPath, serverPath);
         fs.close();
     }
 
