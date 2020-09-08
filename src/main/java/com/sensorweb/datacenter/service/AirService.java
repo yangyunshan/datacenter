@@ -22,6 +22,9 @@ import org.dom4j.Document;
 import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.vast.data.*;
 import org.vast.ogc.def.DefinitionRef;
@@ -36,14 +39,37 @@ import org.vast.util.TimeExtent;
 
 import java.io.*;
 import java.net.URLEncoder;
+import java.text.ParseException;
 import java.time.Instant;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.util.*;
 
 @Service
+@Configuration
+@EnableScheduling
 public class AirService implements DataCenterConstant {
 
     @Autowired
     InsertObservationService service;
+
+    /**
+     * 每天执行一次接入数据
+     * @throws Exception
+     */
+    @Scheduled(cron = "0 10 0 * * ?")//每天的0:10分执行一次
+    public void insertDataByDay() throws Exception {
+        insert24HoursData();
+    }
+
+    /**
+     * 每周执行一次接入数据
+     * @throws Exception
+     */
+    @Scheduled(cron = "0 10 0 ? * MON")//，每周一的0点10分执行一次
+    public void insertDataByWeek() throws Exception {
+        insert7DaysData();
+    }
 
     /**
      * 接入最近24小时内的数据
@@ -214,7 +240,7 @@ public class AirService implements DataCenterConstant {
      * @param object 数据模型为HourAqi、DayAqi、CDay、IDayAqi、IHourAqi
      * @return
      */
-    public DataComponent setDataComponent(Object object) throws UnsupportedEncodingException {
+    public DataComponent setDataComponent(Object object) {
         SWEFactory factory = new SWEFactory();
         DataRecord dataRecord = factory.newDataRecord();
         writeResult(object, dataRecord);
@@ -902,10 +928,14 @@ public class AirService implements DataCenterConstant {
             name = ((AirQualityDay) object).getStationName();
             id = ((AirQualityDay) object).getUniqueCode();
         }
-        SamplingFeature<AbstractGeometry> res = new SamplingFeature<>();
-        res.setUniqueIdentifier(id);
-        res.setName(name);
-        return res;
+        FeatureRef<?> ref = new FeatureRef<>();
+        ref.setHref(name);
+        return ref;
+
+//        SamplingFeature<AbstractGeometry> res = new SamplingFeature<>();
+//        res.setUniqueIdentifier(id);
+//        res.setName(name);
+//        return res;
     }
     /**
      * 根据Object对象，首先判断参数对象属于哪种数据模型，然后封装成IObservation对象进行返回
@@ -1302,7 +1332,7 @@ public class AirService implements DataCenterConstant {
      * @param hourAqiElement
      * @return
      */
-    public AirQualityHour getHourAqiInfo(Element hourAqiElement) {
+    public AirQualityHour getHourAqiInfo(Element hourAqiElement) throws ParseException {
         AirQualityHour airQualityHour = new AirQualityHour();
         for (Iterator j = hourAqiElement.elementIterator(); j.hasNext();) {
             Element attribute = (Element) j.next();
@@ -1311,7 +1341,7 @@ public class AirService implements DataCenterConstant {
                 continue;
             }
             if (attribute.getName().equals("QueryTime")) {
-                airQualityHour.setTime(DataCenterUtils.string2Instant(attribute.getText()));
+                airQualityHour.setTime(DataCenterUtils.string2LocalDateTime2(attribute.getText()).toInstant(ZoneOffset.ofHours(+8)));
                 continue;
             }
             if (attribute.getName().equals("StationName")) {
@@ -1354,7 +1384,7 @@ public class AirService implements DataCenterConstant {
      * @param hourAqiElement
      * @return
      */
-    public AirQualityDay getDayAqiInfo(Element hourAqiElement) {
+    public AirQualityDay getDayAqiInfo(Element hourAqiElement) throws ParseException {
         AirQualityDay airQualityDay = new AirQualityDay();
         for (Iterator j = hourAqiElement.elementIterator(); j.hasNext();) {
             Element attribute = (Element) j.next();
@@ -1363,7 +1393,7 @@ public class AirService implements DataCenterConstant {
                 continue;
             }
             if (attribute.getName().equals("QueryTime") || attribute.getName().equals("SDateTime")) {
-                airQualityDay.setTime(DataCenterUtils.string2Instant(attribute.getText()));
+                airQualityDay.setTime(DataCenterUtils.string2LocalDateTime2(attribute.getText()).toInstant(ZoneOffset.ofHours(+8)));
                 continue;
             }
             if (attribute.getName().equals("StationName")) {

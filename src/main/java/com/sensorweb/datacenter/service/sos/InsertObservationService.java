@@ -2,6 +2,7 @@ package com.sensorweb.datacenter.service.sos;
 
 import com.sensorweb.datacenter.dao.FoiMapper;
 import com.sensorweb.datacenter.dao.ObservationMapper;
+import com.sensorweb.datacenter.dao.ProcedureMapper;
 import com.sensorweb.datacenter.entity.sos.FeatureOfInterest;
 import com.sensorweb.datacenter.entity.sos.Observation;
 import com.sensorweb.datacenter.util.DataCenterUtils;
@@ -12,6 +13,7 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.vast.ogc.def.DefinitionRef;
+import org.vast.ogc.gml.FeatureRef;
 import org.vast.ogc.gml.IGeoFeature;
 import org.vast.ogc.om.IObservation;
 import org.vast.ogc.om.OMUtils;
@@ -35,6 +37,9 @@ public class InsertObservationService {
     @Autowired
     private ObservationMapper observationMapper;
 
+    @Autowired
+    private ProcedureMapper procedureMapper;
+
     /**
      * 根据返回的插入成功的观测id，自动生成InsertObservationResponse
      * @param obsIds
@@ -57,7 +62,7 @@ public class InsertObservationService {
      * @throws ParseException
      */
     @Transactional(isolation = Isolation.DEFAULT, propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
-    public void insertObservation(IObservation iObservation) throws ParseException, XMLWriterException {
+    public void insertObservation(IObservation iObservation) throws Exception {
         Observation observation = getObservation(iObservation);
         FeatureOfInterest fois = getFoi(iObservation);
 
@@ -66,7 +71,12 @@ public class InsertObservationService {
             foiMapper.insertData(fois);
         }
         //插入观测数据
-        observationMapper.insertData(observation);
+        if (procedureMapper.isExist(observation.getProcedureId())) {
+            observationMapper.insertData(observation);
+        } else {
+            throw new Exception("This procedure is not exsit");
+        }
+
     }
 
     /**
@@ -123,11 +133,17 @@ public class InsertObservationService {
         if (iObservation!=null) {
             IGeoFeature geoFeature = iObservation.getFeatureOfInterest();
             if (geoFeature!=null) {
-                foi.setId(geoFeature.getUniqueIdentifier());
-                foi.setName(geoFeature.getName());
-                foi.setDescription(geoFeature.getDescription());
-                foi.setGeom(geoFeature.getGeometry()!=null ? geoFeature.getGeometry().toString():null);
-                foi.setProcedureId(iObservation.getProcedure().getUniqueIdentifier());
+                if (geoFeature instanceof FeatureRef) {
+                    foi.setName(((FeatureRef) geoFeature).getHref());
+                    foi.setId(foi.getName());
+                    foi.setProcedureId(iObservation.getProcedure().getUniqueIdentifier());
+                } else {
+                    foi.setId(geoFeature.getUniqueIdentifier());
+                    foi.setName(geoFeature.getName());
+                    foi.setDescription(geoFeature.getDescription());
+                    foi.setGeom(geoFeature.getGeometry()!=null ? geoFeature.getGeometry().toString():null);
+                    foi.setProcedureId(iObservation.getProcedure().getUniqueIdentifier());
+                }
             }
         }
         return foi;

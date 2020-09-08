@@ -20,8 +20,8 @@ public interface ObservationMapper {
 
     List<Observation> selectObservationsByConditions(@Param("procedureIds") Set<String> procedureIds,
                                                      @Param("observedProperties") Set<String> observedProperties,
-                                                     @Param("begin") Timestamp begin,
-                                                     @Param("end") Timestamp end);
+                                                     @Param("begin") Instant begin,
+                                                     @Param("end") Instant end);
 
     List<Observation> selectObservationsBySpatial(@Param("minX") double minX, @Param("minY") double minY,
                                                   @Param("maxX") double maxX, @Param("maxY") double maxY);

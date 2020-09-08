@@ -140,6 +140,7 @@ public class DataCenterUtils {
      */
     public static String instant2String(Instant time) {
         Date tmpDate=Date.from(time);
+
         SimpleDateFormat formatter=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         return formatter.format(tmpDate);
     }
@@ -187,9 +188,23 @@ public class DataCenterUtils {
      * @throws ParseException
      */
     public static LocalDateTime string2LocalDateTime(String time) throws ParseException {
-        String pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'";
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern);
+        String pattern = "yyyy-MM-dd'T'HH:mm:ss";
         DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(pattern);
+        dateTimeFormatter.withZone(ZoneId.of("Asia/Shanghai"));
+        LocalDateTime localDateTime = LocalDateTime.parse(time, dateTimeFormatter);
+        return localDateTime;
+    }
+
+    /**
+     * 字符串转LocalDateTime
+     * @param time
+     * @return
+     * @throws ParseException
+     */
+    public static LocalDateTime string2LocalDateTime2(String time) throws ParseException {
+        String pattern = "yyyy-MM-dd HH:mm:ss";
+        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(pattern);
+        dateTimeFormatter.withZone(ZoneId.of("Asia/Shanghai"));
         LocalDateTime localDateTime = LocalDateTime.parse(time, dateTimeFormatter);
         return localDateTime;
     }

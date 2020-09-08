@@ -56,4 +56,5 @@ public interface SOSWebservice {
      */
     @WebMethod
     String getTOC();
+
 }

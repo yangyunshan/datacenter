@@ -23,6 +23,7 @@
 
 package org.vast.ogc.om;
 
+import com.sensorweb.datacenter.util.DataCenterUtils;
 import net.opengis.gml.v32.impl.CodeWithAuthorityImpl;
 import net.opengis.swe.v20.DataComponent;
 import org.vast.ogc.def.DefinitionRef;
@@ -186,6 +187,7 @@ public class ObservationReaderV20 implements IXMLReaderDOM<IObservation>
         
         // read foi
         Element foiPropElt = dom.getElement(obsElt, "featureOfInterest");
+        String s = DataCenterUtils.element2String(foiPropElt);
         if (foiPropElt != null && !dom.existAttribute(foiPropElt, "nil"))
             obs.setFeatureOfInterest(readFOI(dom, foiPropElt));
         

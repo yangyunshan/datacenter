@@ -13,23 +13,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.vast.ows.OWSException;
 import org.vast.ows.sos.GetObservationRequest;
+import org.vast.ows.sos.InsertSensorRequest;
 import org.vast.xml.DOMHelperException;
+import org.vast.xml.XMLWriterException;
 
+import java.io.IOException;
+import java.text.ParseException;
+import java.time.*;
 import java.util.*;
 
 @SpringBootTest
 class DataCenterApplicationTests implements DataCenterConstant {
-    @Autowired
-    private AirService service;
-
-    @Test
-    public void test01() throws Exception {
-        service.insert24HoursData();
-//        service.insert7DaysData();
-//        service.insertDayDataByDate("2020-08-01", "2020-08-10");
-        System.out.println();
-    }
-
     @Autowired
     DeleteSensorService deleteSensorService;
     @Test
@@ -42,39 +36,24 @@ class DataCenterApplicationTests implements DataCenterConstant {
     private GetObservationService getObservationService;
     @Test
     public void test03() throws OWSException, DOMHelperException {
-        GetObservationRequest request = getObservationService.getObservationRequest(DataCenterUtils.readFromFile("d://MEGA/Others/GetObservation.xml"));
+        GetObservationRequest request = getObservationService.getObservationRequest(DataCenterUtils.readFromFile("/home/yangyunshan/MEGA/Others/GetObservation.xml"));
         List<Observation> res = getObservationService.getObservationContent(request);
         System.out.println();
     }
 
     @Autowired
-    private HimawariService himawariService;
-
+    private AirService airService;
     @Test
-    public void test04() {
-        String host = "ftp.ptree.jaxa.jp";
-        String userName = "yangyunshan123_gmail.com";
-        String password = "SP+wari8";
-        FTPClient ftpClient = himawariService.getFTPClient(host, userName, password);
-
-        boolean flag = himawariService.downloadFTP(ftpClient, "/","READMEfirst_P-Ttree_en.txt", "d://");
+    public void test04() throws Exception {
+        airService.insert24HoursData();
         System.out.println();
     }
 
     @Autowired
-    private HdfsService hdfsService;
+    private HimawariService himawariService;
     @Test
-    public void test05() throws Exception {
-//        hdfsService.mkdir("/test");
-//        hdfsService.uploadFile("d://StationInfo.txt", "/input");
-//        List<Map<String, String>> res = hdfsService.listFile("/");
-        String ss = hdfsService.readFile("/input/file1.txt");
-//        boolean b = hdfsService.existFile("/input/StationInfo.txt");
-        System.out.println(ss);
-//        boolean c = hdfsService.deleteFile("/StationInfo.txt");
-//        boolean d = hdfsService.deleteDir("/test");
-//        hdfsService.downloadFile("/input/file1.txt", "d://test.txt");
-        System.out.println();
+    public void test05() throws ParseException, XMLWriterException {
+        himawariService.insertData("2020-09-07T21:50:00");
     }
-
 }
+

@@ -88,16 +88,21 @@ public interface DataCenterConstant {
     /******************************************************************************************************************/
     /**********************************************Hamawari相关常量*****************************************************/
     /***********************************************以下皆为最新版本*****************************************************/
+
+    /**
+     * Hamawari APR Level2
+     */
     String AREOSOL_PROPERTY_LEVEL2 = "/pub/himawari/L2/ARP/021/";
-    String SEA_SURFACE_TEMPERATURE_LEVEL2 = "/pub/himawari/L2/SST/v102_nc4_normal_nrt/";
-    String SHORT_WAVE_RADIATION_PAR_LEVEL2 = "/pub/himawari/L2/PAR/010/";
-    String CLOUD_PROPERTY_LEVEL2 = "/pub/himawari/L2/CLP/010/";
-    String WILD_FIRE_LEVEL2 = "/pub/himawari/L2/WLF/bet/";
 
-    String AREOSOL_PROPERTY_LEVEL3 = "/pub/himawari/L3/ARP/030";
-    String SEA_SURFACE_TEMPERATURE_LEVEL3 = "/pub/himawari/L3/SST/v102_nc4_normal_nrt/";
-    String SHORT_WAVE_RADIATION_PAR_LEVEL3 = "/pub/himawari/L3/PAR/010/";
-    String CHLOROPHYLL_LEVEL3 = "/pub/himawari/L3/CHL/010/";
-    String WILD_FIRE_LEVEL3 = "/pub/himawari/L3/WLF/bet/";
+    /**
+     * Hamawari APR Level3
+     */
+    String AREOSOL_PROPERTY_LEVEL3 = "/pub/himawari/L3/ARP/030/";
 
+    /**
+     * user & paword &host
+     */
+    String HAMAWARI_HOST = "ftp.ptree.jaxa.jp";
+    String HAMAWARI_USERNAME = "yangyunshan123_gmail.com";
+    String HAMAWARI_PASSWORD = "SP+wari8";
 }

@@ -25,6 +25,7 @@ import org.w3c.dom.Element;
 import java.io.ByteArrayInputStream;
 import java.sql.Timestamp;
 import java.time.Instant;
+import java.time.ZoneId;
 import java.util.*;
 
 @Service
@@ -84,13 +85,14 @@ public class GetObservationService {
                 Set<String> ids = new HashSet<>(sensorIds);
                 //获得满足procedureId、observedProperties、foi、temporal条件的observation
                 List<Observation> temp = observationMapper.selectObservationsByConditions(ids, observedProperties,
-                        Timestamp.valueOf(DataCenterUtils.instant2String(temporal[0])), Timestamp.valueOf(DataCenterUtils.instant2String(temporal[1])));
+                temporal[0], temporal[1]);
+
                 result.addAll(temp);
             } else {
                 Set<String> ids = new HashSet<>();
                 ids.add(procedureId);
                 List<Observation> temp = observationMapper.selectObservationsByConditions(ids, observedProperties,
-                        Timestamp.valueOf(DataCenterUtils.instant2String(temporal[0])), Timestamp.valueOf(DataCenterUtils.instant2String(temporal[1])));
+                        temporal[0], temporal[1]);
                 result.addAll(temp);
             }
         }

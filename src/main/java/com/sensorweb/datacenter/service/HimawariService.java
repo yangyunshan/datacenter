@@ -1,24 +1,313 @@
 package com.sensorweb.datacenter.service;
 
+import com.sensorweb.datacenter.entity.air.AirQualityDay;
+import com.sensorweb.datacenter.entity.air.AirQualityHour;
+import com.sensorweb.datacenter.entity.himawari.Aerosol;
+import com.sensorweb.datacenter.service.sos.InsertObservationService;
+import com.sensorweb.datacenter.util.DataCenterConstant;
+import com.sensorweb.datacenter.util.DataCenterUtils;
+import com.sensorweb.datacenter.util.SWEModelUtils;
+import net.opengis.gml.v32.AbstractGeometry;
+import net.opengis.swe.v20.DataComponent;
+import net.opengis.swe.v20.DataRecord;
+import net.opengis.swe.v20.Quantity;
+import net.opengis.swe.v20.Text;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPFile;
 import org.apache.commons.net.ftp.FTPReply;
 import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Configurable;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.vast.data.QuantityImpl;
+import org.vast.data.SWEFactory;
+import org.vast.data.TextImpl;
+import org.vast.ogc.def.DefinitionRef;
+import org.vast.ogc.gml.FeatureRef;
+import org.vast.ogc.gml.IGeoFeature;
+import org.vast.ogc.om.*;
+import org.vast.ogc.xlink.IXlinkReference;
+import org.vast.ogc.xlink.XlinkUtils;
+import org.vast.util.TimeExtent;
+import org.vast.xml.XMLWriterException;
 
+import javax.annotation.PostConstruct;
 import java.io.*;
 import java.net.InetAddress;
 import java.net.SocketException;
 import java.nio.charset.StandardCharsets;
+import java.text.ParseException;
+import java.time.*;
+import java.time.temporal.TemporalUnit;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
-public class HimawariService {
+@Configuration
+@EnableScheduling
+public class HimawariService implements DataCenterConstant {
+
+    @Value("${datacenter.path.himawari}")
+    private String upload;
+
+    @Value("${datacenter.domain}")
+    private String baseUrl;
+
+    @Autowired
+    private InsertObservationService service;
+
     private static Logger logger = Logger.getLogger(HimawariService.class);
+
+    /**
+     * 每隔一个小时执行一次，为了以小时为单位接入数据
+     */
+    @Scheduled(cron = "30 50 * * * ?")//每小时的50分30秒执行一次(本来是每小时的30分数据更新一次，但是由于数据量的关系，可能造成在半点的时候数据并没有完成上传而导致的获取数据失败，所以这里提前半个小时，)
+    public void insertDataByHour() throws ParseException {
+        LocalDateTime dateTime = LocalDateTime.now(ZoneId.of("Asia/Shanghai")).minusHours(8);
+        System.out.println(dateTime);
+
+        int year = dateTime.getYear();
+        Month month = dateTime.getMonth();
+        String monthValue = month.getValue()<10?"0"+month.getValue():month.getValue()+"";
+        String day = dateTime.getDayOfMonth()<10?"0"+dateTime.getDayOfMonth():dateTime.getDayOfMonth()+"";
+        String hour = dateTime.getHour()<10?"0"+dateTime.getHour():dateTime.getHour()+"";
+        String minute = dateTime.getMinute()<10?"0"+dateTime.getMinute():dateTime.getMinute()+"";
+        Aerosol aerosol = getData(year+"", monthValue+"", day+"", hour+"",minute+"");
+
+        if (aerosol==null) {
+            return;
+        }
+        IObservation observation = getIObservation(aerosol);
+        try {
+            service.insertObservation(observation);
+        } catch (Exception e) {
+            String url = observation.getResult().getComponent("url").getData().getStringValue();
+            new File(url).delete();
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * 初始化数据，接入2015-07-07T01:00:00至今的数据
+     * @throws ParseException
+     * @throws XMLWriterException
+     */
+//    @PostConstruct
+    public void insertInitData() throws ParseException, XMLWriterException {
+         String dateTime = "2015-07-07T01:00:00";
+         insertData(dateTime);
+    }
+
+    /**
+     * Registry Himawari Data, from dateTime to now
+     * @param dateTime YYYY-DD-MMThh:mm:ss  is start time
+     */
+    public void insertData(String dateTime) throws ParseException, XMLWriterException {
+        LocalDateTime time = DataCenterUtils.string2LocalDateTime(dateTime);
+        List<Aerosol> aerosols = new ArrayList<>();
+        while (time.isBefore(LocalDateTime.now(ZoneId.of("Asia/Shanghai")))) {
+            LocalDateTime temp = time.minusHours(8);
+            int year = temp.getYear();
+            Month month = temp.getMonth();
+            String monthValue = month.getValue()<10?"0"+month.getValue():month.getValue()+"";
+            String day = temp.getDayOfMonth()<10?"0"+temp.getDayOfMonth():temp.getDayOfMonth()+"";
+            String hour = temp.getHour()<10?"0"+temp.getHour():temp.getHour()+"";
+            String minute = temp.getMinute()<10?"0"+temp.getMinute():temp.getMinute()+"";
+            Aerosol aerosol = getData(year+"", monthValue+"", day+"", hour+"",minute+"");
+            aerosols.add(aerosol);
+            IObservation observation = getIObservation(aerosol);
+            try {
+                service.insertObservation(observation);
+            } catch (Exception e) {
+                String url = observation.getResult().getComponent("url").getData().getStringValue();
+                new File(url).delete();
+            }
+            time = time.plusHours(1);
+        }
+    }
+
+    /**
+     * get id of IObservation object
+     * @param aerosol
+     * @return
+     */
+    public String getId(Aerosol aerosol) {
+        return aerosol.getName();
+    }
+
+    /**
+     * get IProcedure of Aerosol object
+     * @param aerosol
+     * @return
+     */
+    public IProcedure getProcedure(Aerosol aerosol) {
+        IProcedure procedure = new ProcedureRef();
+        String id = "urn:JMA:def:identifier:OGC:2.0:Himawari-8-components";
+        ((IXlinkReference)procedure).setHref(id);
+        return procedure;
+    }
+
+    /**
+     * get resultTime of Aerosol object
+     * @param aerosol
+     * @return
+     */
+    public Instant getRusltTime(Aerosol aerosol) {
+        Instant res = aerosol.getTime();
+        return res;
+    }
+
+    /**
+     * get PhenomenonTime of Aerosol object
+     * @param aerosol
+     * @return
+     */
+    public TimeExtent getPhenomenonTime(Aerosol aerosol) {
+        Instant end = getRusltTime(aerosol);
+        Instant begin = end.minusSeconds(60 * 60);
+        if (end != null && begin != null) {
+            return TimeExtent.period(begin, end);
+        } else {
+            return null;
+        }
+    }
+
+    /**
+     * get FeatureOfInterest of Aerosol object
+     * @param aerosol
+     * @return
+     */
+    public IGeoFeature getFeatureOfInterset(Aerosol aerosol) {
+        String name = aerosol.getArea();
+        String id = aerosol.getName();
+
+        FeatureRef<?> ref = new FeatureRef<>();
+        ref.setHref(name);
+        return ref;
+
+//        SamplingFeature<AbstractGeometry> res = new SamplingFeature<>();
+//        res.setUniqueIdentifier(id);
+//        res.setName(name);
+//        return res;
+    }
+
+    /**
+     * get ObservedProperty of Aerosol object
+     * @param aerosol
+     * @return
+     */
+    public DefinitionRef getObservedProperty(Aerosol aerosol) {
+        DefinitionRef observedProperty = new DefinitionRef();
+        String property = "HimawariARP";
+        observedProperty.setHref(property);
+        return observedProperty;
+    }
+
+    /**
+     * get Result of Aerosol object
+     * @param aerosol
+     * @return
+     */
+    public DataComponent setDataComponent(Aerosol aerosol) {
+        SWEFactory factory = new SWEFactory();
+        DataRecord dataRecord = factory.newDataRecord();
+        writeResult(aerosol, dataRecord);
+        return dataRecord;
+    }
+
+    /**
+     * get result content of Aerosol object
+     * @param aerosol
+     * @param dataRecord
+     */
+    public void writeResult(Aerosol aerosol, DataRecord dataRecord) {
+        if (aerosol!=null) {
+            Text url = new TextImpl();
+            SWEModelUtils.setText(url, aerosol.getUrl(), "url");
+            Quantity pixelNum = new QuantityImpl();
+            SWEModelUtils.setQuantity(pixelNum, aerosol.getPixelNum()+"", "PixelNumber", "");
+            Quantity lineNum = new QuantityImpl();
+            SWEModelUtils.setQuantity(lineNum, aerosol.getLineNum()+"", "LineNumber", "");
+            dataRecord.addField("url", url);
+            dataRecord.addField("pixelNumber", pixelNum);
+            dataRecord.addField("lineNumber", lineNum);
+        }
+    }
+
+    /**
+     * get IObservation object by Aerosol object
+     * @param aerosol
+     * @return
+     */
+    public IObservation getIObservation(Aerosol aerosol) {
+        ObservationImpl observation = new ObservationImpl();
+        observation.setId(getId(aerosol));
+        observation.setUniqueIdentifier(getId(aerosol));
+        observation.setProcedure(getProcedure(aerosol));
+        observation.setResultTime(getRusltTime(aerosol));
+        observation.setPhenomenonTime(getPhenomenonTime(aerosol));
+        observation.setFeatureOfInterest(getFeatureOfInterset(aerosol));
+        observation.setPhenomenonTime(getPhenomenonTime(aerosol));
+        observation.setObservedProperty(getObservedProperty(aerosol));
+        observation.setType("http://www.opengis.net/def/observationType/OGC-OM/2.0/OM_Measurement");
+        observation.setResult(setDataComponent(aerosol));
+        return observation;
+    }
+    
+  /**
+     * get the data of APR
+     * @param year
+     * @param month
+     * @param day
+     * @param hour
+     * @param minute
+     */
+    public Aerosol getData(String year, String month, String day, String hour, String minute) throws ParseException {
+        FTPClient ftpClient = getFTPClient(DataCenterConstant.HAMAWARI_HOST, DataCenterConstant.HAMAWARI_USERNAME, DataCenterConstant.HAMAWARI_PASSWORD);
+        String fileName = getName(year, month, day, hour, minute);
+        String filePath = DataCenterConstant.AREOSOL_PROPERTY_LEVEL3 + year + month + "/" + day + "/";
+        String uploadFilePath = upload + "/" + fileName;
+        boolean flag = downloadFTP(ftpClient, filePath, fileName, uploadFilePath);
+
+        Aerosol aerosol = new Aerosol();
+        if (flag) {
+            aerosol.setName(fileName);
+            String date = year + "-" + month + "-" + day + "T" + hour + ":00:00";
+            Instant temp = DataCenterUtils.string2LocalDateTime(date).plusHours(8).toInstant(ZoneOffset.ofHours(+8));
+            aerosol.setTime(temp);
+            String url = baseUrl + "/himawari/" + fileName;
+            aerosol.setUrl(url);
+            return aerosol;
+        }
+        return null;
+    }
+
+    /**
+     * get the name of APR by naming convention
+     * @param year YYYY
+     * @param month MM
+     * @param day DD
+     * @param hour hh
+     * @param minute mm
+     * example: H08_20150727_0800_1HARP001_FLDK.02401_02401.nc
+     */
+    public String getName(String year, String month, String day, String hour, String minute) {
+        if (StringUtils.isBlank(year) || StringUtils.isBlank(month) || StringUtils.isBlank(day) || StringUtils.isBlank(hour)) {
+            logger.error("parameter is not right");
+        }
+        StringBuilder sb = new StringBuilder();
+        sb.append("H08_").append(year).append(month).append(day).append("_").append(hour).append("00_1HARP030_FLDK.02401_02401.nc");
+        return sb.toString();
+    }
 
     /**
      * 获取FTPClient对象
      * @param ftpHost
-     * @param ftpPort
      * @param userName
      * @param password
      * @return
@@ -88,7 +377,8 @@ public class HimawariService {
             for (FTPFile file : files) {
                 //取得指定文件并下载
                 if (file.getName().equals(fileName)) {
-                    File downFile = new File(downPath + File.separator + file.getName());
+//                    File downFile = new File(downPath + File.separator + file.getName());
+                    File downFile = new File(downPath);
                     OutputStream out = new FileOutputStream(downFile);
                     //绑定输出流下载文件,需要设置编码集,不然可能出现文件为空的情况
                     flag = ftpClient.retrieveFile(new String(file.getName().getBytes(StandardCharsets.UTF_8),StandardCharsets.ISO_8859_1), out);
@@ -104,6 +394,7 @@ public class HimawariService {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        closeFTP(ftpClient);
         return flag;
     }
 

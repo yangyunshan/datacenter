@@ -43,9 +43,10 @@
 
 
     <resultMap id="observation" type="Observation">
-        <id property="id" column="observation_id"/>
+        <id property="id" column="id"/>
+        <result property="outId" column="observation_id"/>
         <result property="description" column="observation_description"/>
-        <result property="time" column="observation_time"/>
+        <result property="time" javaType="java.time.Instant" column="observation_time" jdbcType="TIMESTAMP"/>
         <result property="type" column="observation_type"/>
         <result property="procedureId" column="procedure_id"/>
         <result property="foiId" column="feature_of_interest_id"/>

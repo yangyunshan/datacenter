@@ -102,8 +102,11 @@ public class InsertSensorService {
     @Autowired
     private QuantityRangeMapper quantityRangeMapper;
 
-    @Value("${datacenter.path.upload}")
+    @Value("${datacenter.path.sensorml}")
     private String uploadPath;
+
+    @Value("${datacenter.domain}")
+    private String baseUrl;
 
 
     /**
@@ -155,11 +158,11 @@ public class InsertSensorService {
         //写入文件
         String fileName = DataCenterUtils.generateUUID() + ".xml";
         try {
-            DataCenterUtils.write2File(uploadPath + "/sensorml/" + fileName, DataCenterUtils.element2String((Element) node));
+            DataCenterUtils.write2File(uploadPath + "/" + fileName, DataCenterUtils.element2String((Element) node));
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return uploadPath + "/sensorml/" + fileName;
+        return baseUrl + "/sensorml/" + fileName;
     }
 
     /**
@@ -254,32 +257,29 @@ public class InsertSensorService {
         //add procedure
         Procedure procedure = getProcedure(insertSensorRequest);
         if (procedure!=null) {
-            try {
-                int flag = procedureMapper.insertData(procedure);
-                if (flag>0) {
-                    result = procedure.getId();
-                    //传感器插入成功，更新平台component内容;如果是平台则跳过
-                    if (!isPlatform(insertSensorRequest)) {
-                        String procedureId = getPlatformId(result);
-                        Procedure platform = procedureMapper.selectById(procedureId);
-                        if (platform!=null) {
-                            Component component = new Component();
+            int flag = procedureMapper.insertData(procedure);
+            if (flag>0) {
+                result = procedure.getId();
+                //传感器插入成功，更新平台component内容;如果是平台则跳过
+                if (!isPlatform(insertSensorRequest)) {
+                    String procedureId = getPlatformId(result);
+                    Procedure platform = procedureMapper.selectById(procedureId);
+                    if (platform!=null) {
+                        Component component = new Component();
 //                            component.setName(procedure.getName());
-                            component.setTitle(procedure.getName());
-                            component.setHref(procedure.getId());
-                            component.setPlatformId(procedureId);
-                            componentMapper.insertData(component);
-                            flushComponent(procedure.getName(), procedure.getId(), platform.getDescriptionFile());
-                        } else {
-                            throw new Exception("平台不存在");
-                        }
+                        component.setTitle(procedure.getName());
+                        component.setHref(procedure.getId());
+                        component.setPlatformId(procedureId);
+                        componentMapper.insertData(component);
+                        flushComponent(procedure.getName(), procedure.getId(), platform.getDescriptionFile());
+                    } else {
+                        System.out.println("平台不存在");
                     }
                 }
-            } catch (Exception e) {
+            } else {
                 new File(procedure.getDescriptionFile()).delete();
-                throw new Exception("add failure");
+                System.out.println("add failure");
             }
-
         }
 
         return result;
@@ -644,6 +644,7 @@ public class InsertSensorService {
      * @throws DOMHelperException
      */
     public void flushComponent(String title, String href, String filePath) throws DOMHelperException {
+        filePath = uploadPath + filePath.substring(filePath.lastIndexOf("/"));
         DOMHelper domHelper = new DOMHelper(new ByteArrayInputStream(DataCenterUtils.readFromFile(filePath).getBytes()), false);
         Element element = domHelper.getElement("components/ComponentList");
         if (element==null) {

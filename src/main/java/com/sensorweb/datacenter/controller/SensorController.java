@@ -55,7 +55,6 @@ public class SensorController implements DataCenterConstant {
                 String content = temp.substring(temp.indexOf("<sml"));
                 InsertSensorRequest request = insertSensorService.getInsertSensorRequest(DataCenterConstant.INSERT_SENSOR_PREFIX + content + DataCenterConstant.INSERT_SENSOR_SUFFIX);
                 insertSensorService.insertSensor(request);
-                System.out.println();
             }
         }
 
