@@ -49,7 +49,7 @@ public class ObservationController {
 
             if (observations!=null && observations.size()>0) {
                 for (Observation observation : observations) {
-                    element = getObservationService.getObservationResponse(observation.getValue());
+//                    element = getObservationService.getObservationResponse(observation.getValue());
                 }
             }
 

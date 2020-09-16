@@ -45,7 +45,7 @@ class DataCenterApplicationTests implements DataCenterConstant {
     private AirService airService;
     @Test
     public void test04() throws Exception {
-        airService.insert24HoursData();
+        airService.insertDataByHour();
         System.out.println();
     }
 
@@ -55,5 +55,6 @@ class DataCenterApplicationTests implements DataCenterConstant {
     public void test05() throws ParseException, XMLWriterException {
         himawariService.insertData("2020-09-07T21:50:00");
     }
+    
 }
 

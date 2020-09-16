@@ -19,6 +19,7 @@ import javax.xml.bind.annotation.DomHandler;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.util.List;
 
 public class GetObservationResponseWriter extends SWEResponseWriter<GetObservationResponse> {
 
@@ -38,11 +39,13 @@ public class GetObservationResponseWriter extends SWEResponseWriter<GetObservati
             writeExtensions(dom, rootElt, response);
 
             //ObservationData
-            IObservation observation = response.getObservation();
-            if (observation!=null) {
-                Element observationData = dom.addElement(rootElt, "sos:observationData");
-                Element data = omUtils.writeObservation(dom, observation, "2.0");
-                observationData.appendChild(data);
+            List<IObservation> observations = response.getObservations();
+            if (observations!=null) {
+                for (IObservation iObservation:observations) {
+                    Element observationData = dom.addElement(rootElt, "sos:observationData");
+                    Element data = omUtils.writeObservation(dom, iObservation, "2.0");
+                    observationData.appendChild(data);
+                }
             }
             return rootElt;
         } catch (Exception e) {

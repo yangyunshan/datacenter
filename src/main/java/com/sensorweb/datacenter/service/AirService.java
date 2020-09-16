@@ -41,8 +41,10 @@ import java.io.*;
 import java.net.URLEncoder;
 import java.text.ParseException;
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 @Service
@@ -54,19 +56,42 @@ public class AirService implements DataCenterConstant {
     InsertObservationService service;
 
     /**
+     * 每小时接入一次数据
+     */
+    @Scheduled(cron = "0 15 0/1 * * ?")
+    public void insertDataByHour() throws Exception {
+        LocalDateTime dateTime = LocalDateTime.now(ZoneId.of("Asia/Shanghai"));
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd hh:00:00");
+        String time = dateTime.format(formatter);
+        insertHourDataByHour(time);
+    }
+
+    /**
+     * 每天接入一次数据
+     */
+    @Scheduled(cron = "0 30 0 * * ?")//每天的0:30分执行一次
+    public void insertDataByDay() throws Exception {
+        LocalDateTime dateTime = LocalDateTime.now(ZoneId.of("Asia/Shanghai"));
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd 00:00:00");
+        String endTime = dateTime.format(formatter);
+        String beginTime = dateTime.minusDays(1).format(formatter);
+        insertDayDataByDate(beginTime, endTime);
+    }
+
+    /**
      * 每天执行一次接入数据
      * @throws Exception
      */
-    @Scheduled(cron = "0 10 0 * * ?")//每天的0:10分执行一次
-    public void insertDataByDay() throws Exception {
-        insert24HoursData();
-    }
+//    @Scheduled(cron = "0 10 0 * * ?")//每天的0:10分执行一次
+//    public void insertDataByDay() throws Exception {
+//        insert24HoursData();
+//    }
 
     /**
      * 每周执行一次接入数据
      * @throws Exception
      */
-    @Scheduled(cron = "0 10 0 ? * MON")//，每周一的0点10分执行一次
+//    @Scheduled(cron = "0 10 0 ? * MON")//，每周一的0点10分执行一次
     public void insertDataByWeek() throws Exception {
         insert7DaysData();
     }
@@ -97,6 +122,26 @@ public class AirService implements DataCenterConstant {
     public void insert7DaysData() throws Exception {
         String param = "UsrName=" + DataCenterConstant.USER_NAME + "&passWord=" + DataCenterConstant.PASSWORD;
         String document = doGet(DataCenterConstant.GET_LAST_7_Days_DATA, param);
+        if (!StringUtils.isBlank(document)) {
+            List<Object> objects = parseXmlDoc(document);
+            InsertObservationRequest request = writeInsertObservationRequest(objects);
+            List<IObservation> iObservations = service.getObservation(request);
+            if (iObservations!=null && iObservations.size()>0) {
+                for (IObservation iObservation : iObservations) {
+                    service.insertObservation(iObservation);
+                }
+            }
+        }
+    }
+
+    /**
+     * 根据时间接入指定时间的小时数据（当数据库中缺少某个时间段的数据时，可作为数据补充）
+     * @throws Exception
+     */
+    public void insertHourDataByHour(String time) throws Exception {
+        String param = "UsrName=" + DataCenterConstant.USER_NAME + "&passWord=" + DataCenterConstant.PASSWORD +
+                "&date=" + URLEncoder.encode(time, "utf-8");
+        String document = doGet(DataCenterConstant.GET_LAST_HOURS_DATA, param);
         if (!StringUtils.isBlank(document)) {
             List<Object> objects = parseXmlDoc(document);
             InsertObservationRequest request = writeInsertObservationRequest(objects);

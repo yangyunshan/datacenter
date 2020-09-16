@@ -51,15 +51,12 @@ public class GetObservationService {
      * @throws OWSException
      * @throws XMLReaderException
      */
-    public Element getObservationResponse(String omContent) throws DOMHelperException, OWSException, XMLReaderException {
-        GetObservationResponse response = new GetObservationResponse();
+    public void getObservationResponse(String omContent, GetObservationResponse response) throws DOMHelperException, OWSException, XMLReaderException {
         OMUtils omUtils = new OMUtils(OMUtils.V2_0);
         DOMHelper domHelper = new DOMHelper(new ByteArrayInputStream(omContent.getBytes()), false);
         GetObservationResponseWriter writer = new GetObservationResponseWriter();
         IObservation observation = omUtils.readObservation(domHelper, domHelper.getRootElement());
-        response.setObservation(observation);
-
-        return writer.buildXMLResponse(domHelper, response, "2.0");
+        response.getObservations().add(observation);
     }
 
     /**
