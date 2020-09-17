@@ -61,9 +61,10 @@ public class AirService implements DataCenterConstant {
     @Scheduled(cron = "0 15 0/1 * * ?")
     public void insertDataByHour() throws Exception {
         LocalDateTime dateTime = LocalDateTime.now(ZoneId.of("Asia/Shanghai"));
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd hh:00:00");
-        String time = dateTime.format(formatter);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:00:00").withZone(ZoneId.of("Asia/Shanghai"));
+        String time = formatter.format(dateTime);
         insertHourDataByHour(time);
+        System.out.println(dateTime.toString());
     }
 
     /**

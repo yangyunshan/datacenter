@@ -13,6 +13,7 @@ import net.opengis.swe.v20.DataRecord;
 import net.opengis.swe.v20.Quantity;
 import net.opengis.swe.v20.Text;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPFile;
 import org.apache.commons.net.ftp.FTPReply;
@@ -369,6 +370,8 @@ public class HimawariService implements DataCenterConstant {
     public boolean downloadFTP(FTPClient ftpClient, String filePath, String fileName, String downPath) {
         boolean flag = false;
         try {
+            //common-net的ftpclient默认是使用ASCII_FILE_TYPE，文件会经过ASCII编码转换，所以可能会造成文件损坏。所以我们需要手动指定其文件类型为二进制文件，屏蔽ASCII转换的操作，避免文件在转换的过程中受损。
+            ftpClient.setFileType(FTP.BINARY_FILE_TYPE);
             //跳转到文件目录
             ftpClient.changeWorkingDirectory(filePath);
             //获取目录下文件集合
@@ -379,11 +382,11 @@ public class HimawariService implements DataCenterConstant {
                 if (file.getName().equals(fileName)) {
 //                    File downFile = new File(downPath + File.separator + file.getName());
                     File downFile = new File(downPath);
-                    OutputStream out = new FileOutputStream(downFile);
+//                    OutputStream out = new FileOutputStream(downFile);
                     //绑定输出流下载文件,需要设置编码集,不然可能出现文件为空的情况
-                    flag = ftpClient.retrieveFile(new String(file.getName().getBytes(StandardCharsets.UTF_8),StandardCharsets.ISO_8859_1), out);
-                    out.flush();
-                    out.close();
+                    flag = ftpClient.retrieveFile(new String(file.getName().getBytes(StandardCharsets.UTF_8),StandardCharsets.ISO_8859_1), new FileOutputStream(downFile));
+//                    out.flush();
+//                    out.close();
                     if (flag) {
                         logger.info("下载成功");
                     } else {
