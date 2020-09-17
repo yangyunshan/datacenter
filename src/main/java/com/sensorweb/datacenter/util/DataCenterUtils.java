@@ -202,6 +202,18 @@ public class DataCenterUtils {
      * @throws ParseException
      */
     public static LocalDateTime string2LocalDateTime2(String time) throws ParseException {
+        //处理类似2020/9/17格式的时间字符串为2020-09-17
+        String[] dateTemp = time.split(" ");
+        String[] date = dateTemp[0].split("/");
+        int year = Integer.valueOf(date[0]);
+        int month = Integer.valueOf(date[1]);
+        int day = Integer.valueOf(date[2]);
+        String[] timeTemp = dateTemp[1].split(":");
+        int hour = Integer.valueOf(timeTemp[0]);
+        int minute = Integer.valueOf(timeTemp[1]);
+        int second = Integer.valueOf(timeTemp[2]);
+        time = year+"-"+(month<10?"0"+month:month)+"-"+(day<10?"0"+day:day)+" "+(hour<10?"0"+hour:hour)+":"+(minute<10?"0"+minute:minute)+":"+(second<10?"0"+second:second);
+
         String pattern = "yyyy-MM-dd HH:mm:ss";
         DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(pattern);
         dateTimeFormatter.withZone(ZoneId.of("Asia/Shanghai"));

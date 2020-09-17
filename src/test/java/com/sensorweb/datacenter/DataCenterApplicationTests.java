@@ -18,8 +18,10 @@ import org.vast.xml.DOMHelperException;
 import org.vast.xml.XMLWriterException;
 
 import java.io.IOException;
+import java.net.URLEncoder;
 import java.text.ParseException;
 import java.time.*;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 @SpringBootTest
@@ -55,6 +57,6 @@ class DataCenterApplicationTests implements DataCenterConstant {
     public void test05() throws ParseException, XMLWriterException {
         himawariService.insertData("2020-09-07T21:50:00");
     }
-    
+
 }
 
