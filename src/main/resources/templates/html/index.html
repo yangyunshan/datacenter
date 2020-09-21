@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>纯css实现漂亮的文件上传样式</title>
+    <meta name="author" content="四个空格-https://www.4spaces.org">
+    <link href="" rel="stylesheet">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+          integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <style type="text/css">
+        .centerEle {
+            height: 300px;
+            display: -webkit-flex;
+            display: flex;
+            -webkit-align-items: center;
+            align-items: center;
+            -webkit-justify-content: center;
+            justify-content: center;
+        }
+    </style>
+
+    <script type="text/javascript">
+        function finishSelect() {
+            var content = '', files = [];
+            if (document.getElementById('upload').files === undefined) {
+                files[0] = {
+                    'name': document.getElementById('upload') && document.getElementById('upload').value
+                };
+            } else {
+                files = document.getElementById('upload').files;
+            }
+
+            for (var i = 0; i < files.length; i++) {
+                content += files[i].name.split("\\").pop() + ', ';
+            }
+
+            if (content !== '') {
+                document.getElementById('viewfile').value = content.replace(/\, $/g, '');
+            } else {
+                document.getElementById('viewfile').value = '';
+            }
+        }
+    </script>
+</head>
+<body>
+<div class="centerEle">
+    <div class="form-group col-md-3  mb-2">
+        <form th:action="@{/sensor/registry}" method="post" enctype="multipart/form-data" id="insertSensorML-form">
+            <input type="text" name="viewfile" id="viewfile" placeholder="未选择文件" disabled autocomplete="off" class="form-control">
+            <input type="file" name="files" style="display: none" onchange="finishSelect();" multiple="multiple" id="upload"/>
+        </form>
+
+    </div>
+    <label class="btn btn-primary  mb-2" for="upload">浏览</label>
+    <button class="btn btn-primary  mb-2" type="submit" id="insertSensorML-btn">注册</button>
+</div>
+</body>
+<script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.5.1/jquery.js"></script>
+<script type="text/javascript" th:src="@{/js/index.js}"></script>
+</html>

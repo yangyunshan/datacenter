@@ -1,33 +1,34 @@
 package com.sensorweb.datacenter.controller;
 
+import com.sensorweb.datacenter.dao.ObservationMapper;
 import com.sensorweb.datacenter.entity.sos.Observation;
-import com.sensorweb.datacenter.service.HimawariService;
 import com.sensorweb.datacenter.service.sos.GetObservationService;
 import com.sensorweb.datacenter.service.sos.InsertObservationService;
+import com.sensorweb.datacenter.util.DataCenterConstant;
 import com.sensorweb.datacenter.util.DataCenterUtils;
-import org.apache.commons.net.ftp.FTPClient;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.vast.ogc.om.IObservation;
+import org.vast.ows.OWSException;
 import org.vast.ows.sos.GetObservationRequest;
 import org.vast.ows.sos.InsertObservationRequest;
+import org.vast.xml.DOMHelperException;
 import org.w3c.dom.Element;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.*;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLConnection;
-import java.util.List;
+import javax.xml.crypto.Data;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.Month;
+import java.time.ZoneId;
+import java.util.*;
 
 @Controller
 @RequestMapping(path = "/observation")
-public class ObservationController {
+public class ObservationController implements DataCenterConstant {
 
     @Autowired
     private InsertObservationService insertObservationService;
@@ -36,67 +37,47 @@ public class ObservationController {
     private GetObservationService getObservationService;
 
     @RequestMapping(path = "/insertObservation", method = RequestMethod.POST)
-    public String insertObservation(Model model, String requestContent) {
-        return "";
-    }
-
-    @RequestMapping(path = "/getObservation", method = RequestMethod.POST)
-    public String getObservation(Model model, String requestContent) {
-        Element element = null;
-        try {
-            GetObservationRequest request = getObservationService.getObservationRequest(requestContent);
-            List<Observation> observations = getObservationService.getObservationContent(request);
-
+    public String insertObservation(Model model, String content) throws Exception {
+        if (StringUtils.isBlank(content)) {
+            model.addAttribute("msg", "failed");
+        } else {
+            String temp = INSERT_OBSERVATION_PREFIX + content + INSERT_OBSERVATION_SUFFIX;
+            InsertObservationRequest request = insertObservationService.getInsertObservationRequest(temp);
+            List<IObservation> observations = request.getObservations();
             if (observations!=null && observations.size()>0) {
-                for (Observation observation : observations) {
-//                    element = getObservationService.getObservationResponse(observation.getValue());
+                for (IObservation observation :observations) {
+                    insertObservationService.insertObservation(observation);
                 }
+                model.addAttribute("msg", "success");
             }
-
-        } catch (Exception e) {
-            e.printStackTrace();
         }
 
-        if (element!=null) {
-            model.addAttribute("GetObservationResponse", DataCenterUtils.element2String(element));
-        }
-        model.addAttribute("GetObservationRequest", requestContent);
-        model.addAttribute("tag", "GetObservation");
-
-        return "index";
+        return "html/observation";
     }
 
-//    @ResponseBody
-//    @RequestMapping(value = "/download/data/{url}")
-//    public void download(HttpServletRequest request, HttpServletResponse response, @PathVariable("url") String fileUrl) throws IOException {
-//        int pointIndex = fileUrl.lastIndexOf("/");
-//        BufferedInputStream bis;
-//        if (pointIndex!=-1) {
-//            String fileName = fileUrl.substring(pointIndex, fileUrl.length());
-//            URL url = new URL(fileUrl);
-//            URLConnection connection = url.openConnection();
-//            int fileSize = connection.getContentLength();
-//            bis = new BufferedInputStream(connection.getInputStream());
-//
-//            //清空response
-//            response.reset();
-//            //文件名称转换编码格式为utf-8，保证不出现乱码，这个文件名称用于浏览器的下载框中自动显示的文件名
-//            response.addHeader("Content-Disposition", "attachment;filename="+
-//                    new String(fileName.getBytes("utf-8"), "iso8859-1"));
-//            response.addHeader("Content-Length", "" + fileSize);
-//            BufferedOutputStream bos = new BufferedOutputStream(response.getOutputStream());
-//            response.setContentType("application/octet-stream");
-//
-//            //从输入流中读入字节流，然后写到文件中
-//            byte[] buffer = new byte[1024];
-//            int nRead;
-//            while ((nRead = bis.read(buffer, 0, 1024)) > 0) {
-//                bos.write(buffer, 0, nRead);
-//            }
-//            bis.close();
-//            bos.flush();
-//            bos.close();
-//        }
-//    }
+    @Autowired
+    private ObservationMapper observationMapper;
 
+    @RequestMapping(path = "/getObservationCountOfMonth", method = RequestMethod.GET)
+    public String getObservation(Model model) {
+        Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone(ZoneId.of("Asia/Shanghai")));
+        List<Map<String, Integer>> res = new ArrayList<>();
+        calendar.add(Calendar.MONTH, -12);
+        for (int i=0; i<12; i++) {
+            int month = calendar.get(Calendar.MONTH);
+            String begin = DataCenterUtils.getFirstDay(calendar);
+            String end = DataCenterUtils.getLastDay(calendar);
+
+            Instant start = DataCenterUtils.string2Instant(begin);
+            Instant stop = DataCenterUtils.string2Instant(end);
+            int count = observationMapper.selectObservationsByDateTime(start, stop);
+
+            Map<String, Integer> temp = new HashMap<>();
+            temp.put(month+"", count);
+            res.add(temp);
+            calendar.add(Calendar.MONTH, 1);
+        }
+        model.addAttribute("observationCountOfMonth", res);
+        return "html/observation";
+    }
 }

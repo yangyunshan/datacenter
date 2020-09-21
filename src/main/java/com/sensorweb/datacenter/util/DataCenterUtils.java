@@ -182,6 +182,34 @@ public class DataCenterUtils {
     }
 
     /**
+     * 获取月初时间
+     */
+    public static String getFirstDay(Calendar calendar) {
+        // 获取当月第一天和最后一天
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+        String firstDay;
+        // 获取前月的第一天
+        calendar.add(Calendar.MONTH, 0);
+        calendar.set(Calendar.DAY_OF_MONTH, 1);
+        firstDay = format.format(calendar.getTime());
+        return firstDay+" "+"00:00:00";
+    }
+
+    /**
+     * 获取月末时间
+     */
+    public static String getLastDay(Calendar calendar) {
+        // 获取当月第一天和最后一天
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+        String lastDay;
+        // 获取前月的第一天
+        calendar.add(Calendar.MONTH, 1);
+        calendar.set(Calendar.DAY_OF_MONTH, 0);
+        lastDay = format.format(calendar.getTime());
+        return lastDay+" "+"00:00:00";
+    }
+
+    /**
      * 字符串转LocalDateTime
      * @param time
      * @return

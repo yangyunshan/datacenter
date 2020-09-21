@@ -25,4 +25,8 @@ public interface ObservationMapper {
 
     List<Observation> selectObservationsBySpatial(@Param("minX") double minX, @Param("minY") double minY,
                                                   @Param("maxX") double maxX, @Param("maxY") double maxY);
+
+    List<Observation> selectObservationsBySensorId(String sensorId);
+
+    int selectObservationsByDateTime(@Param("begin") Instant begin, @Param("end") Instant end);
 }

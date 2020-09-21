@@ -1,62 +1,269 @@
-<!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
-
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-    <title>纯css实现漂亮的文件上传样式</title>
-    <meta name="author" content="四个空格-https://www.4spaces.org">
-    <link href="" rel="stylesheet">
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
-          integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
-    <style type="text/css">
-        .centerEle {
-            height: 300px;
-            display: -webkit-flex;
-            display: flex;
-            -webkit-align-items: center;
-            align-items: center;
-            -webkit-justify-content: center;
-            justify-content: center;
-        }
-    </style>
+<title>home</title>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 
-    <script type="text/javascript">
-        function finishSelect() {
-            var content = '', files = [];
-            if (document.getElementById('upload').files === undefined) {
-                files[0] = {
-                    'name': document.getElementById('upload') && document.getElementById('upload').value
-                };
-            } else {
-                files = document.getElementById('upload').files;
-            }
+  <link th:href="@{/css/bootstrap.min.css}" rel="stylesheet">
+  <link th:href="@{/css/new.css}" rel="stylesheet">
+  <link th:href="@{/css/charts-graphs.css}" rel="stylesheet">
+  <!-- Datepicker CSS -->
+  <link rel="stylesheet" type="text/css" th:href="@{/css/datepicker.css}">
 
-            for (var i = 0; i < files.length; i++) {
-                content += files[i].name.split("\\").pop() + ', ';
-            }
+  <link th:href="@{/fonts/font-awesome.min.css}" rel="stylesheet">
 
-            if (content !== '') {
-                document.getElementById('viewfile').value = content.replace(/\, $/g, '');
-            } else {
-                document.getElementById('viewfile').value = '';
-            }
-        }
-    </script>
+
+  <script th:src="@{/js/html5shiv.js}"></script>
+  <script th:src="@{/js/respond.min.js}"></script>
+
+
+
+<link th:href="@{/css/style.css}" rel="stylesheet" type="text/css" />
+
+<script type="text/javascript" th:src="@{/js/jquery.js}"></script>
+
+<script type="text/javascript" th:src="@{/js/easySlider1.5.js}"></script>
+
+  <script type="text/javascript" th:src="@{/js/echarts.min.js}"></script>
+
+
+
+  <script type="text/javascript" charset="utf-8">
+
+// <![CDATA[
+$(document).ready(function(){
+	$("#slider").easySlider({
+		controlsBefore:	'<p id="controls">',
+		controlsAfter:	'</p>',
+		auto: true,
+		continuous: true
+	});
+});
+// ]]>
+</script>
+<style type="text/css">
+#slider { margin:0; padding:0; list-style:none; }
+#slider ul,
+#slider li { margin:0; padding:0; list-style:none; }
+/*
+    define width and height of list item (slide)
+    entire slider area will adjust according to the parameters provided here
+*/
+#slider li { width:966px; height:348px; overflow:hidden; }
+p#controls { margin:0; position:relative; }
+#prevBtn,
+#nextBtn { display:block; margin:0; overflow:hidden; width:13px; height:28px; position:absolute; left: -13px; top:-210px; }
+#nextBtn { left:966px; }
+#prevBtn a { display:block; width:13px; height:28px; background:url(../static/images/l_arrow.gif) no-repeat 0 0; }
+#nextBtn a { display:block; width:13px; height:28px; background:url(../static/images/r_arrow.gif) no-repeat 0 0; }
+</style>
 </head>
 <body>
-<div class="centerEle">
-    <div class="form-group col-md-3  mb-2">
-        <form th:action="@{/sensor/registry}" method="post" enctype="multipart/form-data" id="insertSensorML-form">
-            <input type="text" name="viewfile" id="viewfile" placeholder="未选择文件" disabled autocomplete="off" class="form-control">
-            <input type="file" name="files" style="display: none" onchange="finishSelect();" multiple="multiple" id="upload"/>
-        </form>
+<div class="main">
+  <div class="header">
+    <div class="block_header">
+      <div class="logo"><a th:href="@{index}"><img th:src="@{/images/logo.gif}" width="209" height="44" border="0" alt="logo" /></a></div>
+      <div class="clr"></div>
+      <div class="menu">
+        <ul>
+          <li><a th:href="@{index}" class="active">Home</a></li>
+          <li><a th:href="@{html/sensor}">Services</a></li>
+          <li><a th:href="@{html/observation}">Portfolio</a></li>
+        </ul>
+      </div>
+      <div class="clr"></div>
+    </div>
+  </div>
+
+
+
+
+  <div class="body">
+
+    <div class="body_resize">
+
+      <div class="row">
+        <div class="widget">
+          <div class="widget-header">
+            <div class="title">
+              Procedure
+<!--              <span class="mini-title">-->
+<!--                      Right now-->
+<!--                    </span>-->
+            </div>
+          </div>
+          <div class="widget-body">
+            <div id="main2" style="width: 100%;height:400px;"></div>
+          </div>
+
+        </div>
+      </div>
+      <div class="clr"></div>
+
+      <div class="row">
+
+        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+          <div class="widget">
+            <div class="widget-header">
+              <div class="title">
+                Observation By Month
+              </div>
+            </div>
+            <div class="widget-body">
+              <div id="main" style="width: 100%;height:400px;"></div>
+            </div>
+          </div>
+        </div>
+
+
+
+        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+          <div class="widget">
+            <div class="widget-header">
+              <div class="title">
+                Observation By Day
+              </div>
+            </div>
+            <div class="widget-body">
+              <div id="main3" style="width: 450px;height:400px;"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
 
     </div>
-    <label class="btn btn-primary  mb-2" for="upload">浏览</label>
-    <button class="btn btn-primary  mb-2" type="submit" id="insertSensorML-btn">注册</button>
+
+  </div>
+
+
 </div>
+
+
+
+
+
+
+
+
+<script type="text/javascript">
+  // 基于准备好的dom，初始化echarts实例
+  var myChart = echarts.init(document.getElementById('main'));
+
+  // 指定图表的配置项和数据
+  var option = {
+    title: {
+      text: '表头：降水量'
+    },
+    tooltip: {},
+    legend: {
+      data:['降水量']
+    },
+    xAxis: {
+      data: ["1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1",]
+    },
+    yAxis: {},
+    series: [{
+      name: '销量',
+      type: 'bar',
+      data: [5, 20, 36, 10, 10, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20]
+    }]
+  };
+
+  // 使用刚指定的配置项和数据显示图表。
+  myChart.setOption(option);
+
+
+
+
+
+  var myChart2 = echarts.init(document.getElementById('main2'));
+  var platForm;
+  var count;
+  $.ajax({
+    url: '../datacenter/getTOC',
+    type: "get",
+    dataType: 'json',
+    success: function (data) {
+      data = data.allProcedureInfo;
+      data = JSON.parse(data);
+      if (data!=null) {
+        // for (var i=0; i<data.length;i++) {
+        //
+        // }
+        console.log(data.components.length());
+
+      }
+    },
+    error:function (dd) {
+      alert("error");
+    }
+  })
+
+  option = {
+    title : {
+      text: '某站点用户访问来源',
+      subtext: '纯属虚构',
+      x:'center'
+    },
+    legend: {
+      orient: 'vertical',
+      left: 'left',
+      data: ['直接访问','邮件营销','联盟广告','视频广告','搜索引擎']
+    },
+    series : [
+      {
+        name: '访问来源',
+        type: 'pie',
+        radius : '55%',
+        center: ['50%', '60%'],
+        data:[
+          {value:335, name:'直接访问'},
+          {value:310, name:'邮件营销'},
+          {value:234, name:'联盟广告'},
+          {value:135, name:'视频广告'},
+          {value:1548, name:'搜索引擎'}
+        ],
+        itemStyle: {
+          emphasis: {
+            shadowBlur: 10,
+            shadowOffsetX: 0,
+            shadowColor: 'rgba(0, 0, 0, 0.5)'
+          }
+        }
+      }
+    ]
+  };
+  // 使用刚指定的配置项和数据显示图表。
+  myChart2.setOption(option);
+
+
+
+  var myChart3 = echarts.init(document.getElementById('main3'));
+
+  option = {
+    xAxis: {
+      type: 'category',
+      data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+    },
+    yAxis: {
+      type: 'value'
+    },
+    series: [{
+      data: [820, 932, 901, 934, 1290, 1330, 1320],
+      type: 'line'
+    }]
+  };
+  // 使用刚指定的配置项和数据显示图表。
+  myChart3.setOption(option);
+
+
+
+
+
+
+
+</script>
+
 </body>
-<script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.5.1/jquery.js"></script>
-<script type="text/javascript" th:src="@{/js/index.js}"></script>
 </html>

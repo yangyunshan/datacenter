@@ -484,4 +484,15 @@ public class DescribeSensorExpandService {
         }
         return JSONObject.toJSONString(res);
     }
+
+    /**
+     * 获取传感器的详细信息
+     */
+    public Map<String, Object> getDetailInfo(String id) {
+        Map<String, Object> res = new HashMap<>();
+        if (!StringUtils.isBlank(id)) {
+
+        }
+        return res;
+    }
 }

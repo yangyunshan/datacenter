@@ -20,6 +20,7 @@ import org.vast.xml.XMLWriterException;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -36,6 +37,7 @@ class DataCenterApplicationTests implements DataCenterConstant {
 
     @Autowired
     private GetObservationService getObservationService;
+
     @Test
     public void test03() throws OWSException, DOMHelperException {
         GetObservationRequest request = getObservationService.getObservationRequest(DataCenterUtils.readFromFile("/home/yangyunshan/MEGA/Others/GetObservation.xml"));
@@ -55,7 +57,17 @@ class DataCenterApplicationTests implements DataCenterConstant {
     private HimawariService himawariService;
     @Test
     public void test05() throws ParseException, XMLWriterException {
-        himawariService.insertData("2020-09-07T21:50:00");
+        Calendar cale = Calendar.getInstance();
+
+        cale.add(Calendar.MONTH,-2);
+        cale.set(Calendar.DAY_OF_MONTH, 1);
+        Instant instant = cale.toInstant();
+        String ss = DataCenterUtils.getFirstDay(cale);
+        String sss = DataCenterUtils.getLastDay(cale);
+        System.out.println(ss);
+        System.out.println(sss);
+
+
     }
 
 }

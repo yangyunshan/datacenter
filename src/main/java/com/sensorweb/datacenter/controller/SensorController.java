@@ -1,8 +1,8 @@
 package com.sensorweb.datacenter.controller;
 
-import com.sensorweb.datacenter.service.sos.DeleteSensorService;
-import com.sensorweb.datacenter.service.sos.DescribeSensorService;
-import com.sensorweb.datacenter.service.sos.InsertSensorService;
+import com.sensorweb.datacenter.dao.ObservationMapper;
+import com.sensorweb.datacenter.entity.sos.Observation;
+import com.sensorweb.datacenter.service.sos.*;
 import com.sensorweb.datacenter.util.DataCenterConstant;
 import com.sensorweb.datacenter.util.DataCenterUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -11,18 +11,14 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
-import org.vast.ows.OWSException;
 import org.vast.ows.sos.InsertSensorRequest;
-import org.vast.ows.swe.DeleteSensorRequest;
-import org.vast.ows.swe.DescribeSensorRequest;
-import org.w3c.dom.Element;
+import org.vast.xml.XMLReaderException;
 
-import java.io.IOException;
+import java.util.List;
 
 @Controller
 @RequestMapping(path = "/sensor")
@@ -61,47 +57,59 @@ public class SensorController implements DataCenterConstant {
         return "index";
     }
 
-    @RequestMapping(path = "/describeSensor", method = RequestMethod.POST)
-    public String describeSensor(Model model, String requestContent) {
-        String result = null;
-        try {
-            DescribeSensorRequest request = describeSensorService.getDescribeSensorRequest(requestContent);
-            result = describeSensorService.getDescribeSensorResponse(request.getProcedureID(), request.getFormat());
-        } catch (Exception e) {
-            e.printStackTrace();
+    /**
+     * 通过XML文档注册传感器，不支持批量
+     */
+    @RequestMapping(path = "registryByXML", method = RequestMethod.POST)
+    public String insertSensor(Model model, String xmlContent) throws Exception {
+        if (!StringUtils.isBlank(xmlContent)) {
+            String content = xmlContent.substring(xmlContent.indexOf("<sml"));
+            InsertSensorRequest request = insertSensorService.getInsertSensorRequest(DataCenterConstant.INSERT_SENSOR_PREFIX + content + DataCenterConstant.INSERT_SENSOR_SUFFIX);
+            insertSensorService.insertSensor(request);
+            model.addAttribute("msg", "registry success");
+        } else {
+            model.addAttribute("msg", "registry failed");
         }
-
-        if (!StringUtils.isBlank(result)) {
-            model.addAttribute("DescribeSensorResponse", result);
-        }
-        model.addAttribute("DescribeSensorRequest", requestContent);
-        model.addAttribute("tag","DescribeSensor");
-
         return "index";
     }
 
-    @RequestMapping(path = "/deleteSensor", method = RequestMethod.POST)
-    public String deleteSensor(Model model, String requestContent) {
-        String result = null;
-        try {
-            DeleteSensorRequest request = deleteSensorService.getDeleteSensorRequest(requestContent);
-            String procedureId = deleteSensorService.getProcedureId(request);
-            Element element = deleteSensorService.getDeleteSensorResponse(deleteSensorService.deleteSensor(procedureId));
-            result = DataCenterUtils.element2String(element);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+    /**
+     * 获取系统中已注册传感器信息
+     */
+    @Autowired
+    private DescribeSensorExpandService describeSensorExpandService;
 
-        if (!StringUtils.isBlank(result)) {
-
-            model.addAttribute("DeleteSensorResponse", result);
-
-        }
-        model.addAttribute("DeleteSensorRequest", requestContent);
-        model.addAttribute("tag","DeleteSensor");
-
-        return "index";
+    @RequestMapping(path = "getAllProcedureInfo", method = RequestMethod.GET)
+    public String getAllProcedure(Model model) {
+        String info = describeSensorExpandService.getTOC();
+        model.addAttribute("infos", info);
+        return "html/sensor";
     }
 
+    /**
+     * 传感器查询
+     */
+    @RequestMapping(path = "getProcedureByCondition", method = RequestMethod.POST)
+    public String getProcedureByCondition(Model model, String condition) {
+        if (StringUtils.isBlank(condition)) {
+            String res = describeSensorExpandService.searchSensor(condition);
+            model.addAttribute("procedure", res);
+        } else {
+            model.addAttribute("procedure", null);
+        }
+        return "html/sensor";
+    }
 
+    /**
+     * 通过传感器查询观测数据
+     */
+    @Autowired
+    private GetObservationExpandService getObservationExpandService;
+
+    @RequestMapping(path = "getObservationOfSensor", method = RequestMethod.GET)
+    public String getObservationOfSensor(Model model, String id) throws XMLReaderException {
+        List<Observation> observations = getObservationExpandService.getObservationInfo(id);
+        model.addAttribute("observations", observations);
+        return "html/sensor";
+    }
 }

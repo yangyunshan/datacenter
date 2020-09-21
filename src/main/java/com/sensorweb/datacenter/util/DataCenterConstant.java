@@ -85,6 +85,22 @@ public interface DataCenterConstant {
     String INSERT_SENSOR_SUFFIX = "</swes:procedureDescription>\n" +
             "</swes:InsertSensor>";
 
+    /**
+     * InsertObservation前后缀
+     */
+    String INSERT_OBSERVATION_PREFIX = "<sos:InsertObservation xmlns:sos=\"http://www.opengis.net/sos/2.0\" \n" +
+            "xmlns:swes=\"http://www.opengis.net/swes/2.0\" \n" +
+            "xmlns:swe=\"http://www.opengis.net/swe/2.0\" \n" +
+            "xmlns:sml=\"http://www.opengis.net/sensorML/1.0.1\" \n" +
+            "xmlns:gml=\"http://www.opengis.net/gml/3.2\" \n" +
+            "xmlns:xlink=\"http://www.w3.org/1999/xlink\" \n" +
+            "xmlns:om=\"http://www.opengis.net/om/2.0\" \n" +
+            "xmlns:sams=\"http://www.opengis.net/samplingSpatial/2.0\" \n" +
+            "xmlns:sf=\"http://www.opengis.net/sampling/2.0\" \n" +
+            "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" service=\"SOS\" version=\"2.0.0\" \n" +
+            "xsi:schemaLocation=\"http://www.opengis.net/sos/2.0 http://schemas.opengis.net/sos/2.0/sos.xsd http://www.opengis.net/samplingSpatial/2.0 http://schemas.opengis.net/samplingSpatial/2.0/spatialSamplingFeature.xsd\">";
+    String INSERT_OBSERVATION_SUFFIX = "</sos:observation>\n" +
+            "</sos:InsertObservation>";
     /******************************************************************************************************************/
     /**********************************************Hamawari相关常量*****************************************************/
     /***********************************************以下皆为最新版本*****************************************************/

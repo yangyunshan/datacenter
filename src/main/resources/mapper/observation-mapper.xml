@@ -39,8 +39,24 @@
             and observation_time between #{begin} and #{end}
         </if>
     </select>
-    
 
+    <select id="selectObservationsByDateTime" resultType="int">
+        SELECT count(*)
+        FROM observation
+        WHERE 1 = 1
+        <if test="begin!=null and end!=null">
+            and observation_time between #{begin} and #{end}
+        </if>
+    </select>
+
+    <select id="selectObservationsBySensorId" resultMap="observation">
+        SELECT <include refid="selectFields"></include>
+        FROM observation
+        WHERE 1 = 1
+        <if test="sensorId!=null">
+            and procedure_id = #{sensorId}
+        </if>
+    </select>
 
     <resultMap id="observation" type="Observation">
         <id property="id" column="id"/>
