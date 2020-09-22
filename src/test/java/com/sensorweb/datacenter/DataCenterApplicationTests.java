@@ -57,17 +57,8 @@ class DataCenterApplicationTests implements DataCenterConstant {
     private HimawariService himawariService;
     @Test
     public void test05() throws ParseException, XMLWriterException {
-        Calendar cale = Calendar.getInstance();
-
-        cale.add(Calendar.MONTH,-2);
-        cale.set(Calendar.DAY_OF_MONTH, 1);
-        Instant instant = cale.toInstant();
-        String ss = DataCenterUtils.getFirstDay(cale);
-        String sss = DataCenterUtils.getLastDay(cale);
-        System.out.println(ss);
-        System.out.println(sss);
-
-
+        himawariService.insertDataByHour();
+        System.out.println();
     }
 
 }

@@ -377,24 +377,54 @@ public class HimawariService implements DataCenterConstant {
             //获取目录下文件集合
             ftpClient.enterLocalPassiveMode();
             FTPFile[] files = ftpClient.listFiles();
-            for (FTPFile file : files) {
-                //取得指定文件并下载
-                if (file.getName().equals(fileName)) {
-//                    File downFile = new File(downPath + File.separator + file.getName());
-                    File downFile = new File(downPath);
+            if(files.length==0) {
+//                String str = "H08_20200921_1400_1HARP030_FLDK.02401_02401";
+                String year = fileName.substring(4,8);
+                String month = fileName.substring(8,10);
+                String day = fileName.substring(10,12);
+                String hour = fileName.substring(13,15);
+                String time = year+"-"+month+"-"+day+"T"+"00:00:00";
+                LocalDateTime dateTime = DataCenterUtils.string2LocalDateTime(time);
+                dateTime = dateTime.minusDays(1);
+                int year1 = dateTime.getYear();
+                Month month1 = dateTime.getMonth();
+                String monthValue = month1.getValue()<10?"0"+month1.getValue():month1.getValue()+"";
+                String day1 = dateTime.getDayOfMonth()<10?"0"+dateTime.getDayOfMonth():dateTime.getDayOfMonth()+"";
+                String path = DataCenterConstant.AREOSOL_PROPERTY_LEVEL3 + year1 + monthValue + "/" + day1 + "/";
+                ftpClient.changeWorkingDirectory(path);
+                files = ftpClient.listFiles();
+            }
+            FTPFile file = files[files.length-1];
+            File downFile = new File(downPath);
+            OutputStream out = new FileOutputStream(downFile);
+            //绑定输出流下载文件,需要设置编码集,不然可能出现文件为空的情况
+            flag = ftpClient.retrieveFile(new String(file.getName().getBytes(StandardCharsets.UTF_8),StandardCharsets.ISO_8859_1), new FileOutputStream(downFile));
+            out.flush();
+            out.close();
+            if (flag) {
+                logger.info("下载成功");
+            } else {
+                logger.error("下载失败");
+            }
+
+//            for (FTPFile file : files) {
+//                //取得指定文件并下载
+//                if (file.getName().equals(fileName)) {
+////                    File downFile = new File(downPath + File.separator + file.getName());
+//                    File downFile = new File(downPath);
 //                    OutputStream out = new FileOutputStream(downFile);
-                    //绑定输出流下载文件,需要设置编码集,不然可能出现文件为空的情况
-                    flag = ftpClient.retrieveFile(new String(file.getName().getBytes(StandardCharsets.UTF_8),StandardCharsets.ISO_8859_1), new FileOutputStream(downFile));
+//                    //绑定输出流下载文件,需要设置编码集,不然可能出现文件为空的情况
+//                    flag = ftpClient.retrieveFile(new String(file.getName().getBytes(StandardCharsets.UTF_8),StandardCharsets.ISO_8859_1), new FileOutputStream(downFile));
 //                    out.flush();
 //                    out.close();
-                    if (flag) {
-                        logger.info("下载成功");
-                    } else {
-                        logger.error("下载失败");
-                    }
-                }
-            }
-        } catch (IOException e) {
+//                    if (flag) {
+//                        logger.info("下载成功");
+//                    } else {
+//                        logger.error("下载失败");
+//                    }
+//                }
+//            }
+        } catch (IOException | ParseException e) {
             e.printStackTrace();
         }
         closeFTP(ftpClient);
