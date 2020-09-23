@@ -35,4 +35,19 @@ public class GetObservationExpandService {
     public List<Observation> getObservationInfo(String procedureId) throws XMLReaderException {
         return observationMapper.selectObservationsBySensorId(procedureId);
     }
+
+    /**
+     * 通过日期查询观测数据的条目数
+     * @param begin
+     * @param end
+     * @return
+     */
+    public int getObservationByDateTime(Instant begin, Instant end) {
+        return observationMapper.selectObservationsByDateTime(begin, end);
+    }
+
+    public List<Observation> getObservationByProcedureId(String procedureId) {
+        return observationMapper.selectObservationsBySensorId(procedureId);
+    }
+
 }

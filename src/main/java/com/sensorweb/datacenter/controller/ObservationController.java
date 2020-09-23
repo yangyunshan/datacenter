@@ -2,6 +2,7 @@ package com.sensorweb.datacenter.controller;
 
 import com.sensorweb.datacenter.dao.ObservationMapper;
 import com.sensorweb.datacenter.entity.sos.Observation;
+import com.sensorweb.datacenter.service.sos.GetObservationExpandService;
 import com.sensorweb.datacenter.service.sos.GetObservationService;
 import com.sensorweb.datacenter.service.sos.InsertObservationService;
 import com.sensorweb.datacenter.util.DataCenterConstant;
@@ -10,8 +11,10 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.vast.ogc.om.IObservation;
 import org.vast.ows.OWSException;
 import org.vast.ows.sos.GetObservationRequest;
@@ -79,5 +82,15 @@ public class ObservationController implements DataCenterConstant {
         }
         model.addAttribute("observationCountOfMonth", res);
         return "html/observation";
+    }
+
+    @Autowired
+    private GetObservationExpandService getObservationExpandService;
+
+    @RequestMapping(path = "getObservationByProcedure/{procedureId}", method = RequestMethod.GET)
+    @ResponseBody
+    public List<Observation> getObservationByProcedure(@PathVariable("procedureId") String procedureId) {
+        List<Observation> obs = getObservationExpandService.getObservationByProcedureId(procedureId);
+        return obs;
     }
 }

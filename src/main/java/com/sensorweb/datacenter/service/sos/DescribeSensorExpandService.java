@@ -486,6 +486,28 @@ public class DescribeSensorExpandService {
     }
 
     /**
+     * 获取传感器信息
+     * @return
+     */
+    public List<Map<String,Object>> getAllSensorInfo() {
+        List<Map<String,Object>> res = new ArrayList<>();
+        List<String> sensorIds = getAllSensor();
+        if (sensorIds.size()>0) {
+            for (String sensorId : sensorIds) {
+                Map<String, Object> temp = new HashMap<>();
+                temp.put("sensorId", sensorId);
+                temp.put("name", getLongName(sensorId));
+                temp.put("description", procedureMapper.selectById(sensorId).getDescription());
+                temp.put("platformId", getPlatformIdOfSensor(sensorId));
+                temp.put("platformName", getPlatformNameOfSensor(sensorId));
+                res.add(temp);
+            }
+        }
+//        return JSONObject.toJSONString(res);
+        return res;
+    }
+
+    /**
      * 获取传感器的详细信息
      */
     public Map<String, Object> getDetailInfo(String id) {

@@ -4,117 +4,227 @@
 <title>home</title>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <link th:href="@{/css/style.css}" rel="stylesheet" type="text/css" />
-</head>
-<body>
-<div class="main">
-  <div class="header">
-    <div class="block_header">
-            <div class="logo"><a th:href="@{index}"><img th:src="@{/images/logo.gif}" width="209" height="44" border="0" alt="logo" /></a></div>
-            <div class="Twitter">Follow us on Twitter</div>
-            <div class="clr"></div>
-           <div class="menu">
-          <ul>
-            <li><a th:href="@{index}">Home</a></li>
-            <li><a th:href="@{sensor}" class="active">Sensor</a></li>
-            <li><a th:href="@{observation}">Observation</a></li>
+    <link type="text/css" rel="stylesheet" href="http://develop.lovejavascript.com/node_modules/gridmanager-angular-1.x/css/gm-angular.css"/>
+    <link type="text/css" rel="stylesheet" th:href="@{/css/common.css}"/>
 
-        </ul>
-       </div>
-      <div class="clr"></div>
+    <link rel="stylesheet" th:href="@{/css/codemirror.css}">
+    <link rel="stylesheet" th:href="@{/css/show-hint.css}">
+    <script th:src="@{/js/codemirror.js}"></script>
+    <script th:src="@{/js/show-hint.js}"></script>
+    <script th:src="@{/js/xml-hint.js}"></script>
+    <script th:src="@{/js/xml.js}"></script>
+
+    <script th:src="@{/js/jquery-1.12.4.min.js}"></script>
+    <script th:src="@{/js/bootstrap.js}"></script>
+    <link th:href="@{/css/bootstrap.min.css}" rel="stylesheet">
+    <script src="http://develop.lovejavascript.com/node_modules/angular/angular.min.js"></script>
+    <script src="http://develop.lovejavascript.com/node_modules/gridmanager-angular-1.x/js/gm-angular.js"></script>
+</head>
+
+<body ng-app="myApp" ng-controller="AppController as vm">
+
+    <div>
+        <div>
+<!--            <div class="logo"><a th:href="@{index1}"><img th:src="@{/images/logo.gif}" width="209" height="44" border="0" alt="logo" /></a></div>-->
+            <div class="clr"></div>
+            <div class="menu" style="width: 100%; background: #00A7AA; margin-bottom: 20px">
+                <ul>
+                    <li><a th:href="@{index}">Home</a></li>
+                    <li><a th:href="@{register}">register</a></li>
+                    <li><a th:href="@{sensor}" class="active">Sensor</a></li>
+                </ul>
+            </div>
+
+            <div class="clr"></div>
+        </div>
     </div>
-  </div>
-  <div class="slider2">
-    <div class="slice12">
-      <h2>Our Services </h2>
+
+<div class="search-area">
+    <div class="sa-ele">
+        <label class="se-title">标题:</label>
+        <input class="se-con" ng-model="searchForm.title"/>
     </div>
-  </div>
-  <div class="clr"></div>
-  <div class="body">
-    <div class="body_resize">
-    <div class="News">
-    <h2>Sub Navigation</h2>
-    <ul>
-      <li><a href="#">Management</a></li>
-      <li><a href="#">Consulting</a></li>
-      <li><a href="#">Repair</a></li>
-      <li><a href="#">Support</a></li>
-      <li><a href="#">We really do care</a></li>
-    </ul>
-<p></p>
+    <div class="sa-ele">
+        <label class="se-title">博文分类:</label>
+        <select class="se-con" ng-model="searchForm.type">
+            <option value="-1">请选择</option>
+            <option value="{{$index + 1}}" ng-repeat="item in TYPE_MAP track by $index">{{item}}</option>
+        </select>
     </div>
-    <div class="Welcome">
-    <h2>Feadured Services</h2>
-    <p><strong>Vestibulum sit amet neque eu neque suscipit consequat quis vel risus. </strong></p>
-    <div class="bg"></div>
-    <p>Vestibulum vehicula purus nec dui accumsan fermentum. Suspendisse potenti. Ut dapibus est id odio pretium blandit in eget leo. </p>
-    <div class="serv">
-      <h2>Services 1</h2>
-      <div class="bg"></div>
-      <p><img src="images/ser_1.gif" width="60" height="60" alt="img" /></p>
-      <p>Various versions have evolved over the years, sometimes by accident, sometimes on purpose</p>
-       <ul>
-      <li>Sed congue, dui vel tristique mollis.</li>
-      <li>Morbi eget sem. Nam mollis. </li>
-      <li>Donec sed velit ut tellus fermentum.</li>
-          </ul>
-    <p>&nbsp;</p>
-    <p><a href="#">+ order service</a></p>
+    <div class="sa-ele">
+        <label class="se-title">内容:</label>
+        <input class="se-con" ng-model="searchForm.content"/>
     </div>
-    <div class="serv">
-      <h2>Services 2</h2>
-      <div class="bg"></div>
-      <p><img src="images/ser_2.gif" width="60" height="60" alt="img" /></p>
-      <p>Various versions have evolved over the years, sometimes by accident, sometimes on purpose</p>
-       <ul>
-      <li>Sed congue, dui vel tristique mollis.</li>
-      <li>Morbi eget sem. Nam mollis. </li>
-      <li>Donec sed velit ut tellus fermentum.</li>
-          </ul>
-    <p>&nbsp;</p>
-    <p><a href="#">+ order service</a></p>
+    <div class="sa-ele">
+        <button class="search-action" ng-click="onSearch()">搜索</button>
+        <button class="reset-action" ng-click="onReset()">重置</button>
     </div>
-    <div class="serv">
-      <h2>Services 3</h2>
-      <div class="bg"></div>
-      <p><img src="images/ser_3.gif" width="60" height="60" alt="img" /></p>
-      <p>Various versions have evolved over the years, sometimes by accident, sometimes on purpose</p>
-       <ul>
-      <li>Sed congue, dui vel tristique mollis.</li>
-      <li>Morbi eget sem. Nam mollis. </li>
-      <li>Donec sed velit ut tellus fermentum.</li>
-          </ul>
-    <p>&nbsp;</p>
-    <p><a href="#">+ order service</a></p>
-    </div>
-    <div class="serv">
-      <h2>Services 4</h2>
-      <div class="bg"></div>
-      <p><img src="images/ser_4.gif" width="60" height="60" alt="img" /></p>
-      <p>Various versions have evolved over the years, sometimes by accident, sometimes on purpose</p>
-       <ul>
-      <li>Sed congue, dui vel tristique mollis.</li>
-      <li>Morbi eget sem. Nam mollis. </li>
-      <li>Donec sed velit ut tellus fermentum.</li>
-          </ul>
-    <p>&nbsp;</p>
-    <p><a href="#">+ order service</a></p>
-    </div>
-    </div>
-    
-      <div class="clr"></div>
-    </div>
-    <div class="clr"></div>
-  </div>
-   <div class="footer">
-    <div class="resize">
-      <div>
-        <p class="footer_logo"><a href="#"><img src="images/footer_logo.gif" width="140" height="40" border="0" alt="W3C" /></a></p>
-        <p>Copyright © Sitename.com. Collect from <a href="http://www.cssmoban.com/" title="网页模板" target="_blank">网页模板</a>. All Rights Reserved<br />
-          <a href="index.html">Home</a> | <a href="contact.html">Contact</a> | <a href="blog.html">RSS</a></p>
-      </div>
-    </div>
-    <p class="clr"></p>
-  </div>
 </div>
+<div class="grid-main">
+    <grid-manager option="option" callback="callback(query)"></grid-manager>
+</div>
+
+<!--<div class="bottom-bar">-->
+<!--    <a href="https://github.com/baukh789/GridManager-Angular-1.x" target="_blank">查看源码</a>-->
+<!--    <select class="fn-select" ng-model="fnSelected" ng-change="onFnChange(fnSelected)">-->
+<!--        <option value="-1">请选择方法</option>-->
+<!--        <option value="{{item.key}}"-->
+<!--                ng-repeat="item in GM_PUBLISH_METHOD_MAP track by $index"-->
+<!--                title="{{item.title}}"-->
+<!--                ng-disabled="!inited && item.relyInit"-->
+<!--        >{{item.key}}</option>-->
+<!--    </select>-->
+<!--    <input class="fn-code" placeholder="请通过选择方法生成所需要执行的代码" ng-model="fnCode" ng-disabled="{{inited}}"/>-->
+<!--    <button class="fn-run" ng-click="onFnRun()">执行</button>-->
+<!--    <span class="fn-run-info" ng-bind-html="fnRunInfo"></span>-->
+<!--</div>-->
+
+
+
+<!--观测信息模态框-->
+<div class="modal fade" id="SensorModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" style="width: 1200px" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h2 class="modal-title" id="myModalLabel"> 传感器信息 </h2>
+            </div>
+            <div class="modal-body">
+
+                <form class="form-horizontal">
+                    <div class="form-group">
+                        <table class="table table-bordered" id="Sensor">                      
+                            <thead style='text-align: center;'>
+                            <tr>
+                                <th  style='text-align: center;'>Identifier</th>
+                                <th  style='text-align: center;'>Description</th>
+                                <th  style='text-align: center;'>FOI</th>
+                                <th  style='text-align: center;'>ObservedProperty</th>
+                                <th  style='text-align: center;'>Time</th>
+                                <th  style='text-align: center;'>Type</th>
+                                <th  style='text-align: center;'>Action</th>
+                            </tr>
+                            </thead>
+                            <tbody  style='text-align: center;'>
+
+                            </tbody>
+                        </table>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+    <!--观测值模态框-->
+    <script th:src="@{/js/javascript.js}"></script>
+    <script th:src="@{/js/autorefresh.js}"></script>
+    <div class="modal fade" id="PlatformModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog" style="width: 1000px" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h2 class="modal-title" id="ModalLabel"> 观测信息 </h2>
+                </div>
+                <div class="modal-body">
+                    <textarea id="code" name="code"></textarea>
+                    <script>
+                        var dummy = {
+                            attrs: {
+                                color: ["red", "green", "blue", "purple", "white", "black", "yellow"],
+                                size: ["large", "medium", "small"],
+                                description: null
+                            },
+                            children: []
+                        };
+
+                        var tags = {
+                            "!top": ["top"],
+                            "!attrs": {
+                                id: null,
+                                class: ["A", "B", "C"]
+                            },
+                            top: {
+                                attrs: {
+                                    lang: ["en", "de", "fr", "nl"],
+                                    freeform: null
+                                },
+                                children: ["animal", "plant"]
+                            },
+                            animal: {
+                                attrs: {
+                                    name: null,
+                                    isduck: ["yes", "no"]
+                                },
+                                children: ["wings", "feet", "body", "head", "tail"]
+                            },
+                            plant: {
+                                attrs: {name: null},
+                                children: ["leaves", "stem", "flowers"]
+                            },
+                            wings: dummy, feet: dummy, body: dummy, head: dummy, tail: dummy,
+                            leaves: dummy, stem: dummy, flowers: dummy
+                        };
+
+
+
+                        function completeAfter(cm, pred) {
+                            var cur = cm.getCursor();
+                            if (!pred || pred()) setTimeout(function() {
+                                if (!cm.state.completionActive)
+                                    cm.showHint({completeSingle: false});
+                            }, 100);
+                            return CodeMirror.Pass;
+                        }
+
+                        function completeIfAfterLt(cm) {
+                            return completeAfter(cm, function() {
+                                var cur = cm.getCursor();
+                                return cm.getRange(CodeMirror.Pos(cur.line, cur.ch - 1), cur) == "<";
+                            });
+                        }
+
+                        function completeIfInTag(cm) {
+                            return completeAfter(cm, function() {
+                                var tok = cm.getTokenAt(cm.getCursor());
+                                if (tok.type == "string" && (!/['"]/.test(tok.string.charAt(tok.string.length - 1)) || tok.string.length == 1)) return false;
+                                var inner = CodeMirror.innerMode(cm.getMode(), tok.state).state;
+                                return inner.tagName;
+                            });
+                        }
+
+                        var editor = CodeMirror.fromTextArea(document.getElementById("code"), {
+                            mode: "xml",
+                            lineNumbers: true,
+                            autoRefresh: true,
+                            lineWrapping: true,    // 自动换行
+                            extraKeys: {
+                                "'<'": completeAfter,
+                                "'/'": completeIfAfterLt,
+                                "' '": completeIfInTag,
+                                "'='": completeIfInTag,
+                                "Ctrl-Space": "autocomplete"
+                            },
+                            hintOptions: {schemaInfo: tags}
+                        });
+
+                        $(document).on("click",".btn",function (){
+                            var obs_value = $(this).attr('obs_value');
+                            editor.setValue(obs_value);
+
+                            $("#PlatformModal").modal({
+                                backdrop:"static"
+                            });
+
+                        });
+                    </script>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+<script th:src="@{/js/angular-demo.js}"></script>
 </body>
 </html>

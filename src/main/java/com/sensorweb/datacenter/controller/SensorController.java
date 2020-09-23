@@ -14,11 +14,14 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 import org.vast.ows.sos.InsertSensorRequest;
 import org.vast.xml.XMLReaderException;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Controller
 @RequestMapping(path = "/sensor")
@@ -54,7 +57,18 @@ public class SensorController implements DataCenterConstant {
             }
         }
 
-        return "index";
+        return "html/register";
+    }
+
+    @RequestMapping(path = "/registryByContent", method = RequestMethod.POST)
+    public String insertSensorByContent(@RequestParam("xmlContent") String temp) throws Exception {
+        if (!StringUtils.isBlank(temp)) {
+            String content = temp.substring(temp.indexOf("<sml"));
+            InsertSensorRequest request = insertSensorService.getInsertSensorRequest(DataCenterConstant.INSERT_SENSOR_PREFIX + content + DataCenterConstant.INSERT_SENSOR_SUFFIX);
+            insertSensorService.insertSensor(request);
+        }
+
+        return "html/register";
     }
 
     /**
@@ -112,4 +126,5 @@ public class SensorController implements DataCenterConstant {
         model.addAttribute("observations", observations);
         return "html/sensor";
     }
+
 }
