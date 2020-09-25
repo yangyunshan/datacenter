@@ -45,7 +45,7 @@
         <input class="se-con" ng-model="searchForm.title"/>
     </div>
     <div class="sa-ele">
-        <label class="se-title">博文分类:</label>
+        <label class="se-title">分类:</label>
         <select class="se-con" ng-model="searchForm.type">
             <option value="-1">请选择</option>
             <option value="{{$index + 1}}" ng-repeat="item in TYPE_MAP track by $index">{{item}}</option>
@@ -199,6 +199,10 @@
                             lineNumbers: true,
                             autoRefresh: true,
                             lineWrapping: true,    // 自动换行
+                            smartIndent: true,
+                            matchBrackets : true,  //括号匹配
+                            // readOnly : true,  //只读
+                            indentWithTabs: true,
                             extraKeys: {
                                 "'<'": completeAfter,
                                 "'/'": completeIfAfterLt,

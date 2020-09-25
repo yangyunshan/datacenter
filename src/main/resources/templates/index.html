@@ -293,8 +293,11 @@ p#controls { margin:0; position:relative; }
         }
 
         var option = {
+          title: {
+            text: '表头：每日接入数据量'
+          },
           xAxis: {
-            type: '',
+            type: 'category',
             data: days
           },
           yAxis: {
@@ -302,7 +305,8 @@ p#controls { margin:0; position:relative; }
           },
           series: [{
             data: dayNums,
-            type: 'line'
+            type: 'line',
+            smooth: true
           }]
         };
         // 使用刚指定的配置项和数据显示图表。

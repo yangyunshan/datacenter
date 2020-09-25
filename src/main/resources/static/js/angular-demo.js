@@ -231,7 +231,7 @@ angular.module("myApp", ['gridManager'])
         isCombSorting: true,
         disableCache: false,
         ajaxData: function () {
-            return "http://localhost:8080/datacenter/getAllSensorInfo";
+            return "../datacenter/getAllSensorInfo";
         },
         ajaxType: 'GET',
 
