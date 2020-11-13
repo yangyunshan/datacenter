@@ -13,6 +13,9 @@ public class AirQualityHour {
     private String coOneHour;
     private String o3OneHour;
     private String aqi;
+    private String primaryEP;
+    private String aqDegree;
+    private String aqType;
 
     public String getStationName() {
         return stationName;
@@ -92,5 +95,29 @@ public class AirQualityHour {
 
     public void setAqi(String aqi) {
         this.aqi = aqi;
+    }
+
+    public String getAqDegree() {
+        return aqDegree;
+    }
+
+    public void setAqDegree(String aqDegree) {
+        this.aqDegree = aqDegree;
+    }
+
+    public String getAqType() {
+        return aqType;
+    }
+
+    public void setAqType(String aqType) {
+        this.aqType = aqType;
+    }
+
+    public String getPrimaryEP() {
+        return primaryEP;
+    }
+
+    public void setPrimaryEP(String primaryEP) {
+        this.primaryEP = primaryEP;
     }
 }

@@ -1,6 +1,18 @@
 package com.sensorweb.datacenter.util;
 
+import com.alibaba.fastjson.JSONObject;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.http.HttpEntity;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.message.BasicHeader;
+import org.apache.http.protocol.HTTP;
+import org.apache.http.util.EntityUtils;
 import org.springframework.util.DigestUtils;
 import org.springframework.web.multipart.MultipartFile;
 import org.w3c.dom.Element;
@@ -11,6 +23,8 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import java.io.*;
 import java.lang.reflect.Field;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.sql.Timestamp;
 import java.text.ParseException;
@@ -22,6 +36,94 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 public class DataCenterUtils {
+
+    /**
+     * 通过Http下载文件，适用于不需要授权的情况下
+     * @param url
+     * @param dir
+     * @param fileName
+     */
+    public static void downloadHttpUrl(String url, String dir, String fileName) {
+        try {
+            URL httpUrl = new URL(url);
+            File dirFile = new File(dir);
+            if (!dirFile.exists()) {
+                dirFile.mkdirs();
+            }
+            FileUtils.copyURLToFile(httpUrl, new File(dir+"/"+fileName));
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * 发送Get请求
+     * @param url
+     * @param param
+     * @return
+     * @throws IOException
+     */
+    public static String doGet(String url, String param) throws IOException {
+        //打开postman
+        //这一步相当于运行main方法。
+        //创建request连接 3、填写url和请求方式
+        HttpGet get = new HttpGet(url + "?" + param);
+        //如果有参数添加参数 get请求不需要参数，省略
+        CloseableHttpClient client = HttpClients.createDefault();
+        //点击发送按钮，发送请求、获取响应报文
+        CloseableHttpResponse response = client.execute(get);
+        //格式化响应报文
+        HttpEntity entity = response.getEntity();
+
+        return EntityUtils.toString(entity);
+    }
+
+    /**
+     * 发送Post请求
+     * @param url
+     * @param jsonObject
+     * @param encoding
+     * @return
+     * @throws ParseException
+     * @throws IOException
+     */
+    public static String doPost(String url, JSONObject jsonObject, String encoding) throws ParseException, IOException{
+        String body = "";
+
+        //创建httpclient对象
+        CloseableHttpClient client = HttpClients.createDefault();
+        //创建post方式请求对象
+        HttpPost httpPost = new HttpPost(url);
+
+        //装填参数
+        StringEntity s = new StringEntity(jsonObject.toString(), "utf-8");
+        s.setContentEncoding(new BasicHeader(HTTP.CONTENT_TYPE,
+                "application/json"));
+        //设置参数到请求对象中
+        httpPost.setEntity(s);
+        System.out.println("请求地址："+url);
+//        System.out.println("请求参数："+nvps.toString());
+
+        //设置header信息
+        //指定报文头【Content-type】、【User-Agent】
+//        httpPost.setHeader("Content-type", "application/x-www-form-urlencoded");
+        httpPost.setHeader("Content-type", "application/json");
+        httpPost.setHeader("User-Agent", "Mozilla/4.0 (compatible; MSIE 5.0; Windows NT; DigExt)");
+
+        //执行请求操作，并拿到结果（同步阻塞）
+        CloseableHttpResponse response = client.execute(httpPost);
+        //获取结果实体
+        HttpEntity entity = response.getEntity();
+        if (entity != null) {
+            //按指定编码转换结果实体为String类型
+            body = EntityUtils.toString(entity, encoding);
+        }
+        EntityUtils.consume(entity);
+        //释放链接
+        response.close();
+        return body;
+    }
 
     /**
      * 去除重复元素

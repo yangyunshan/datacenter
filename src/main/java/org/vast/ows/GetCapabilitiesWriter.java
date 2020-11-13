@@ -78,7 +78,7 @@ public class GetCapabilitiesWriter extends AbstractRequestWriter<GetCapabilities
 		String nsUri = OGCRegistry.getNamespaceURI(request.getService(), request.getVersion());
 		dom.addUserPrefix(DOMHelper.DEFAULT_PREFIX, nsUri);
 		
-		Element rootElt = dom.createElement(request.getOperation());		
+		Element rootElt = dom.createElement(request.getOperation());
 		dom.setAttributeValue(rootElt, "service", request.getService());
 		
 		if (request.getAcceptedVersions().isEmpty())

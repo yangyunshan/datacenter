@@ -121,4 +121,8 @@ public interface DataCenterConstant {
     String HAMAWARI_HOST = "ftp.ptree.jaxa.jp";
     String HAMAWARI_USERNAME = "yangyunshan123_gmail.com";
     String HAMAWARI_PASSWORD = "SP+wari8";
+
+    /******************************************************************************************************************/
+    /***********************************************LAADS Web Service***************************************************/
+    String LAADS_Web_Service = "https://modwebsrv.modaps.eosdis.nasa.gov/axis2/services/MODAPSservices";
 }

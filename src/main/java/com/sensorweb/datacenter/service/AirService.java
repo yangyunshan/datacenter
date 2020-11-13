@@ -1,5 +1,6 @@
 package com.sensorweb.datacenter.service;
 
+import com.sensorweb.datacenter.dao.AirQualityHourMapper;
 import com.sensorweb.datacenter.entity.air.*;
 import com.sensorweb.datacenter.entity.sos.FeatureOfInterest;
 import com.sensorweb.datacenter.entity.sos.Observation;
@@ -18,6 +19,7 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
+import org.apache.log4j.Logger;
 import org.dom4j.Document;
 import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
@@ -37,6 +39,7 @@ import org.vast.ows.sos.InsertObservationRequest;
 import org.vast.ows.sos.SOSUtils;
 import org.vast.util.TimeExtent;
 
+import javax.xml.crypto.Data;
 import java.io.*;
 import java.net.URLEncoder;
 import java.text.ParseException;
@@ -50,7 +53,8 @@ import java.util.*;
 @Service
 @Configuration
 @EnableScheduling
-public class AirService implements DataCenterConstant {
+public class AirService extends Thread implements DataCenterConstant {
+    private static final Logger logger = Logger.getLogger(HimawariService.class);
 
     @Autowired
     InsertObservationService service;
@@ -58,19 +62,37 @@ public class AirService implements DataCenterConstant {
     /**
      * 每小时接入一次数据
      */
-    @Scheduled(cron = "0 30 0/1 * * ?")
-    public void insertDataByHour() throws Exception {
+    @Scheduled(cron = "0 20 0/1 * * ?") //每个小时的20分开始接入
+    public void insertDataByHour() {
         LocalDateTime dateTime = LocalDateTime.now(ZoneId.of("Asia/Shanghai"));
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:00:00").withZone(ZoneId.of("Asia/Shanghai"));
         String time = formatter.format(dateTime);
-        insertHourDataByHour(time);
-        System.out.println(dateTime.toString());
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                boolean flag = true;
+                while (flag) {
+                    try {
+                        flag = !insertHourDataByHour(time);
+                        if (!flag) {
+                            System.out.println("湖北省监测站接入时间: " + dateTime.toString() + "Status: Success");
+                        }
+                        Thread.sleep(2 * 60 * 1000);
+                    } catch (Exception e) {
+//                        e.printStackTrace();
+                        logger.error(e.getMessage());
+                        System.out.println("湖北省监测站接入时间: " + dateTime.toString() + "Status: Fail");
+                    }
+                }
+            }
+        }).start();
     }
 
     /**
      * 每天接入一次数据
      */
-    @Scheduled(cron = "0 30 0 * * ?")//每天的0:30分执行一次
+//    @Scheduled(cron = "0 30 0 * * ?")//每天的0:30分执行一次
     public void insertDataByDay() throws Exception {
         LocalDateTime dateTime = LocalDateTime.now(ZoneId.of("Asia/Shanghai"));
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd 00:00:00");
@@ -94,7 +116,7 @@ public class AirService implements DataCenterConstant {
      */
     public void insert24HoursData() throws Exception {
         String param = "UsrName=" + DataCenterConstant.USER_NAME + "&passWord=" + DataCenterConstant.PASSWORD;
-        String document = doGet(DataCenterConstant.GET_LAST_24_HOUR_DATA, param);
+        String document = DataCenterUtils.doGet(DataCenterConstant.GET_LAST_24_HOUR_DATA, param);
         if (!StringUtils.isBlank(document)) {
             List<Object> objects = parseXmlDoc(document);
             InsertObservationRequest request = writeInsertObservationRequest(objects);
@@ -113,7 +135,7 @@ public class AirService implements DataCenterConstant {
      */
     public void insert7DaysData() throws Exception {
         String param = "UsrName=" + DataCenterConstant.USER_NAME + "&passWord=" + DataCenterConstant.PASSWORD;
-        String document = doGet(DataCenterConstant.GET_LAST_7_Days_DATA, param);
+        String document = DataCenterUtils.doGet(DataCenterConstant.GET_LAST_7_Days_DATA, param);
         if (!StringUtils.isBlank(document)) {
             List<Object> objects = parseXmlDoc(document);
             InsertObservationRequest request = writeInsertObservationRequest(objects);
@@ -130,12 +152,27 @@ public class AirService implements DataCenterConstant {
      * 根据时间接入指定时间的小时数据（当数据库中缺少某个时间段的数据时，可作为数据补充）
      * @throws Exception
      */
-    public void insertHourDataByHour(String time) throws Exception {
+    @Autowired
+    private AirQualityHourMapper airQualityHourMapper;
+
+    public boolean insertHourDataByHour(String time) throws Exception {
         String param = "UsrName=" + DataCenterConstant.USER_NAME + "&passWord=" + DataCenterConstant.PASSWORD +
                 "&date=" + URLEncoder.encode(time, "utf-8");
-        String document = doGet(DataCenterConstant.GET_LAST_HOURS_DATA, param);
+        String document = DataCenterUtils.doGet(DataCenterConstant.GET_LAST_HOURS_DATA, param);
         if (!StringUtils.isBlank(document)) {
             List<Object> objects = parseXmlDoc(document);
+            if (objects.size()==0) {
+                return false;
+            }
+            //将环境监测站数据
+            for (Object o : objects) {
+                if (o instanceof AirQualityHour) {
+                    airQualityHourMapper.insertData((AirQualityHour)o);
+//                    return true;
+                } else {
+//                    return false;
+                }
+            }
             InsertObservationRequest request = writeInsertObservationRequest(objects);
             List<IObservation> iObservations = service.getObservation(request);
             if (iObservations!=null && iObservations.size()>0) {
@@ -143,6 +180,9 @@ public class AirService implements DataCenterConstant {
                     service.insertObservation(iObservation);
                 }
             }
+            return true;
+        } else {
+            return false;
         }
     }
 
@@ -155,7 +195,7 @@ public class AirService implements DataCenterConstant {
         String param = "UsrName=" + DataCenterConstant.USER_NAME + "&passWord=" + DataCenterConstant.PASSWORD +
                 "&beginTime=" + URLEncoder.encode(beginTime, "utf-8") +
                 "&endTime=" + URLEncoder.encode(endTime, "utf-8");
-        String document = doGet(DataCenterConstant.GET_ORIGINAL_DAYILY_DATA, param);
+        String document = DataCenterUtils.doGet(DataCenterConstant.GET_ORIGINAL_DAYILY_DATA, param);
         if (!StringUtils.isBlank(document)) {
             List<Object> objects = parseXmlDoc(document);
             InsertObservationRequest request = writeInsertObservationRequest(objects);
@@ -175,8 +215,8 @@ public class AirService implements DataCenterConstant {
     public void insertHourDataByDate(String beginTime, String endTime) throws Exception {
         String param = "UsrName=" + DataCenterConstant.USER_NAME + "&passWord=" + DataCenterConstant.PASSWORD +
                 "&beginTime=" + URLEncoder.encode(beginTime, "utf-8") +
-                "&endTime=" + URLEncoder.encode(endTime, "utf-8");;
-        String document = doGet(DataCenterConstant.GET_ORIGINAL_HOURLY_DATA, param);
+                "&endTime=" + URLEncoder.encode(endTime, "utf-8");
+        String document = DataCenterUtils.doGet(DataCenterConstant.GET_ORIGINAL_HOURLY_DATA, param);
         if (!StringUtils.isBlank(document)) {
             List<Object> objects = parseXmlDoc(document);
             InsertObservationRequest request = writeInsertObservationRequest(objects);
@@ -187,44 +227,6 @@ public class AirService implements DataCenterConstant {
                 }
             }
         }
-    }
-
-    public String doGet(String url, String param) throws IOException {
-        //打开postman
-        //这一步相当于运行main方法。
-        //创建request连接 3、填写url和请求方式
-        HttpGet get = new HttpGet(url + "?" + param);
-        //如果有参数添加参数 get请求不需要参数，省略
-        CloseableHttpClient client = HttpClients.createDefault();
-        //点击发送按钮，发送请求、获取响应报文
-        CloseableHttpResponse response = client.execute(get);
-        //格式化响应报文
-        HttpEntity entity = response.getEntity();
-
-        return EntityUtils.toString(entity);
-    }
-
-    /**
-     * 向指定url发送post请求
-     * @param url
-     * @param param
-     * @return
-     */
-    public String doPost(String url, String param) throws IOException {
-        //打开postman
-        //这一步相当于运行main方法。
-        //创建request连接、填写url和请求方式
-        HttpPost httpPost = new HttpPost(url);
-        //额外设置Content-Type请求头
-        httpPost.setHeader("Content-Type","application/x-www-form-urlencoded;charset=UTF-8");
-        //如果有参数添加参数
-        CloseableHttpClient client = HttpClients.createDefault();
-        httpPost.setEntity(new StringEntity(param,"UTF-8"));
-        //点击发送按钮，发送请求、获取响应报文
-        CloseableHttpResponse response = client.execute(httpPost);
-        //格式化响应报文
-        HttpEntity entity = response.getEntity();
-        return EntityUtils.toString(entity);
     }
 
     /**
@@ -463,7 +465,7 @@ public class AirService implements DataCenterConstant {
      * @param objects
      * @return
      */
-    public List<IObservation> getObservation(List<Object> objects) throws UnsupportedEncodingException {
+    public List<IObservation> getObservation(List<Object> objects) {
         List<IObservation> res = new ArrayList<>();
 
         if (objects!=null && objects.size()>0) {
@@ -582,7 +584,19 @@ public class AirService implements DataCenterConstant {
                 continue;
             }
             if (attribute.getName().equals("AQI")) {
-                airQualityHour.setO3OneHour(attribute.getText().equals("NA")||StringUtils.isBlank(attribute.getText()) ? -1+"":attribute.getText());
+                airQualityHour.setAqi(attribute.getText().equals("NA")||StringUtils.isBlank(attribute.getText()) ? -1+"":attribute.getText());
+                continue;
+            }
+            if (attribute.getName().equals("PrimaryEP")) {
+                airQualityHour.setPrimaryEP(attribute.getText().equals("NA")||StringUtils.isBlank(attribute.getText()) ? -1+"":attribute.getText());
+                continue;
+            }
+            if (attribute.getName().equals("AQDegree")) {
+                airQualityHour.setAqDegree(attribute.getText().equals("NA")||StringUtils.isBlank(attribute.getText()) ? -1+"":attribute.getText());
+                continue;
+            }
+            if (attribute.getName().equals("AQType")) {
+                airQualityHour.setAqType(attribute.getText().equals("NA")||StringUtils.isBlank(attribute.getText()) ? -1+"":attribute.getText());
             }
         }
         return airQualityHour;

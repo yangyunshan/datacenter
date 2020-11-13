@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sensorweb.datacenter.dao.EntryMapper">
+    <sql id="insertFields">
+        entry_id, title, updated, link, start_time, stop_time, bbox
+    </sql>
+
+    <sql id="selectFields">
+        id, entry_id, title, updated, link, start_time, stop_time, ST_AsText(bbox) As bbox
+    </sql>
+
+    <insert id="insertData" parameterType="Entry">
+        INSERT INTO laads_entry (<include refid="insertFields"></include>)
+        VALUES (#{entryId}, #{title}, #{updated}, #{link}, #{start}, #{stop}, ST_GeomFromText(#{bbox}, 4326));
+    </insert>
+
+    <select id="selectByEntryId" resultMap="entry">
+        SELECT <include refid="selectFields"></include>
+        FROM laads_entry
+        WHERE entry_id = #{entryId}
+    </select>
+
+    <select id="selectByConditions" resultMap="entry">
+        SELECT <include refid="selectFields"></include>
+        FROM laads_entry
+        WHERE 1=1
+        <if test="startTime!=null">
+            AND start_time between #{startTime} and #{stopTime}
+        </if>
+        <if test="stopTime!=null">
+            AND stop_time between #{startTime} and #{stopTime}
+        </if>
+        <if test="bbox!=null">
+            AND ST_Intersects(ST_GeomFromText(#{bbox}, 4326), bbox)=true
+        </if>
+    </select>
+
+    <resultMap id="entry" type="Entry">
+        <id column="id" property="id"/>
+        <result column="entry_id" property="entryId"/>
+        <result column="title" property="title"/>
+        <result column="updated" property="updated"/>
+        <result column="link" property="link"/>
+        <result column="start_time" property="start"/>
+        <result column="stop_time" property="stop"/>
+        <result column="bbox" property="bbox"/>
+    </resultMap>
+
+</mapper>

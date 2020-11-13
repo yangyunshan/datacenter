@@ -158,7 +158,7 @@ public class InsertSensorService {
         //写入文件
         String fileName = DataCenterUtils.generateUUID() + ".xml";
         try {
-            DataCenterUtils.write2File(uploadPath + "/" + fileName, DataCenterUtils.element2String((Element) node));
+            DataCenterUtils.write2File(uploadPath + fileName, DataCenterUtils.element2String((Element) node));
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -644,7 +644,7 @@ public class InsertSensorService {
      * @throws DOMHelperException
      */
     public void flushComponent(String title, String href, String filePath) throws DOMHelperException {
-        filePath = uploadPath + filePath.substring(filePath.lastIndexOf("/"));
+        filePath = uploadPath + filePath.substring(filePath.lastIndexOf("/") + 1);
         DOMHelper domHelper = new DOMHelper(new ByteArrayInputStream(DataCenterUtils.readFromFile(filePath).getBytes()), false);
         Element element = domHelper.getElement("components/ComponentList");
         if (element==null) {

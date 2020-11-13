@@ -62,15 +62,14 @@ public class HimawariService implements DataCenterConstant {
     @Autowired
     private InsertObservationService service;
 
-    private static Logger logger = Logger.getLogger(HimawariService.class);
+    private static final Logger logger = Logger.getLogger(HimawariService.class);
 
     /**
      * 每隔一个小时执行一次，为了以小时为单位接入数据
      */
-    @Scheduled(cron = "00 32 * * * ?")//每小时的35分00秒执行一次(本来是每小时的30分数据更新一次，但是由于数据量的关系，可能造成在半点的时候数据并没有完成上传而导致的获取数据失败，所以这里提前半个小时，)
-    public void insertDataByHour() throws ParseException {
+    @Scheduled(cron = "00 35 * * * ?")//每小时的35分00秒执行一次(本来是每小时的30分数据更新一次，但是由于数据量的关系，可能造成在半点的时候数据并没有完成上传而导致的获取数据失败，所以这里提前半个小时，)
+    public void insertDataByHour() {
         LocalDateTime dateTime = LocalDateTime.now(ZoneId.of("Asia/Shanghai")).minusHours(8);
-        System.out.println(dateTime);
 
         int year = dateTime.getYear();
         Month month = dateTime.getMonth();
@@ -78,19 +77,29 @@ public class HimawariService implements DataCenterConstant {
         String day = dateTime.getDayOfMonth()<10?"0"+dateTime.getDayOfMonth():dateTime.getDayOfMonth()+"";
         String hour = dateTime.getHour()<10?"0"+dateTime.getHour():dateTime.getHour()+"";
         String minute = dateTime.getMinute()<10?"0"+dateTime.getMinute():dateTime.getMinute()+"";
-        Aerosol aerosol = getData(year+"", monthValue+"", day+"", hour+"",minute+"");
 
-        if (aerosol==null) {
-            return;
-        }
-        IObservation observation = getIObservation(aerosol);
-        try {
-            service.insertObservation(observation);
-        } catch (Exception e) {
-            String url = observation.getResult().getComponent("url").getData().getStringValue();
-            new File(url).delete();
-            e.printStackTrace();
-        }
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                String url = "";
+                try {
+                    Aerosol aerosol = getData(year+"", monthValue+"", day+"", hour+"",minute+"");
+                    if (aerosol==null) {
+                        return;
+                    }
+                    IObservation observation = getIObservation(aerosol);
+                    url = observation.getResult().getComponent("url").getData().getStringValue();
+
+                    service.insertObservation(observation);
+                    System.out.println("Himawari接入时间: " + dateTime + "Status: Success");
+                } catch (Exception e) {
+                    new File(url).deleteOnExit();
+//                    e.printStackTrace();
+                    logger.error(e.getMessage());
+                    System.out.println("Himawari接入时间: " + dateTime + "Status: Fail");
+                }
+            }
+        }).start();
     }
 
     /**
@@ -108,7 +117,7 @@ public class HimawariService implements DataCenterConstant {
      * Registry Himawari Data, from dateTime to now
      * @param dateTime YYYY-DD-MMThh:mm:ss  is start time
      */
-    public void insertData(String dateTime) throws ParseException, XMLWriterException {
+    public void insertData(String dateTime) throws ParseException {
         LocalDateTime time = DataCenterUtils.string2LocalDateTime(dateTime);
         List<Aerosol> aerosols = new ArrayList<>();
         while (time.isBefore(LocalDateTime.now(ZoneId.of("Asia/Shanghai")))) {
@@ -190,11 +199,6 @@ public class HimawariService implements DataCenterConstant {
         FeatureRef<?> ref = new FeatureRef<>();
         ref.setHref(name);
         return ref;
-
-//        SamplingFeature<AbstractGeometry> res = new SamplingFeature<>();
-//        res.setUniqueIdentifier(id);
-//        res.setName(name);
-//        return res;
     }
 
     /**
@@ -272,7 +276,7 @@ public class HimawariService implements DataCenterConstant {
         FTPClient ftpClient = getFTPClient(DataCenterConstant.HAMAWARI_HOST, DataCenterConstant.HAMAWARI_USERNAME, DataCenterConstant.HAMAWARI_PASSWORD);
         String fileName = getName(year, month, day, hour, minute);
         String filePath = DataCenterConstant.AREOSOL_PROPERTY_LEVEL3 + year + month + "/" + day + "/";
-        String uploadFilePath = upload + "/" + fileName;
+        String uploadFilePath = upload + fileName;
         boolean flag = downloadFTP(ftpClient, filePath, fileName, uploadFilePath);
 
         Aerosol aerosol = new Aerosol();
